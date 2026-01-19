@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Exit - Smart Parking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        .bill {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .bill.show {
+            display: block;
+        }
+        
+        .bill-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .bill-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .bill-row:last-child {
+            border-bottom: none;
+        }
+        
+        .bill-label {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .bill-value {
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .bill-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            margin-top: 10px;
+            border-top: 2px solid #667eea;
+            font-size: 18px;
+        }
+        
+        .bill-total .bill-label {
+            color: #667eea;
+        }
+        
+        .bill-total .bill-value {
+            color: #667eea;
+            font-size: 24px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 3px;
+        }
+        
+        .info-box p {
+            color: #333;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚪 Vehicle Exit</h1>
+        <p class="subtitle">Step 3: Scan QR at exit gate and process payment</p>
+        
+        <div class="info-box">
+            <p>💡 <strong>Steps:</strong></p>
+            <p>1. Scan the same QR code at exit gate</p>
+            <p>2. Select payment method (Cash or Online)</p>
+            <p>3. Bill will be calculated automatically</p>
+        </div>
+        
+        <form id="exitForm">
+            <!-- QR Code Input -->
+            <div class="form-group">
+                <label for="qrCode">QR Code *</label>
+                <input 
+                    type="text" 
+                    id="qrCode" 
+                    name="qr_code" 
+                    placeholder="Scan or paste QR code"
+                    autofocus
+                    required
+                >
+            </div>
+            
+            <!-- Payment Method Selection -->
+            <div class="form-group">
+                <label for="paymentMethod">Payment Method *</label>
+                <select id="paymentMethod" name="payment_method" required>
+                    <option value="">-- Select Payment Method --</option>
+                    <option value="CASH">💵 Cash</option>
+                    <option value="ONLINE">💳 Online (UPI/Card)</option>
+                </select>
+            </div>
+            
+            <!-- Submit Button -->
+            <button type="submit">Process Exit & Generate Bill</button>
+        </form>
+        
+        <!-- Loading Spinner -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Processing...</p>
+        </div>
+        
+        <!-- Message -->
+        <div id="message" class="message"></div>
+        
+        <!-- Bill -->
+        <div id="bill" class="bill">
+            <div class="bill-header">✓ Payment Successful</div>
+            
+            <div class="bill-row">
+                <span class="bill-label">Vehicle:</span>
+                <span class="bill-value" id="vehicleNumber">-</span>
+            </div>
+            
+            <div class="bill-row">
+                <span class="bill-label">Zone:</span>
+                <span class="bill-value" id="zoneName">-</span>
+            </div>
+            
+            <div class="bill-row">
+                <span class="bill-label">Parking Duration:</span>
+                <span class="bill-value" id="duration">-</span>
+            </div>
+            
+            <div class="bill-row">
+                <span class="bill-label">Payment Method:</span>
+                <span class="bill-value" id="paymentMethod">-</span>
+            </div>
+            
+            <div class="bill-total">
+                <span class="bill-label">Total Amount:</span>
+                <span class="bill-value" id="amountPaid">-</span>
+            </div>
+            
+            <p style="margin-top: 20px; color: #666; font-size: 12px; text-align: center;">
+                ✓ You are all set! Thank you for parking with us.
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Get form element
+        const form = document.getElementById('exitForm');
+        const loading = document.getElementById('loading');
+        const messageDiv = document.getElementById('message');
+        const bill = document.getElementById('bill');
+        
+        // Handle form submission
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Show loading spinner
+            loading.classList.add('show');
+            messageDiv.classList.remove('success', 'error');
+            bill.classList.remove('show');
+            
+            // Get form data
+            const formData = new FormData(form);
+            
+            try {
+                // Send request to server
+                const response = await fetch('/parking/exit-qr-scan/', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                // Parse response
+                const data = await response.json();
+                
+                // Hide loading
+                loading.classList.remove('show');
+                
+                // Check if successful
+                if (data.success) {
+                    // Show bill
+                    bill.classList.add('show');
+                    document.getElementById('vehicleNumber').textContent = data.data.vehicle_number;
+                    document.getElementById('zoneName').textContent = data.data.zone_name;
+                    document.getElementById('duration').textContent = data.data.parking_duration;
+                    document.getElementById('paymentMethod').textContent = 
+                        data.data.payment_method === 'CASH' ? '💵 Cash' : '💳 Online';
+                    document.getElementById('amountPaid').textContent = '₹' + data.data.amount_charged;
+                    
+                    // Clear form
+                    form.reset();
+                    document.getElementById('qrCode').focus();
+                } else {
+                    // Show error message
+                    messageDiv.textContent = data.message;
+                    messageDiv.classList.add('error');
+                    document.getElementById('qrCode').focus();
+                }
+            } catch (error) {
+                loading.classList.remove('show');
+                messageDiv.textContent = 'Error: ' + error.message;
+                messageDiv.classList.add('error');
+            }
+        });
+    </script>
+</body>
+</html>

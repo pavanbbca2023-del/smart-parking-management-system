@@ -1,42 +1,54 @@
 """
-PARKING MANAGEMENT SYSTEM - Views
-==================================
+============================================
+PARKING MANAGEMENT SYSTEM - VIEWS
+============================================
 Simple and beginner-friendly view functions
-Uses simple service functions (not complex patterns)
-Easy to read and understand
+All complex logic is in utils.py
+Views just call utility functions and return results
+============================================
 """
 
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_protect
 from django.utils import timezone
+import logging
 
 # Import models
-from .models import Vehicle, ParkingZone, ParkingSession, ParkingSlot
+from .models import ParkingZone, ParkingSession
 
-# Import simple service functions
-from .services.slot_service import allocate_slot, release_slot, close_session, get_zone_occupancy_status
-from .services.billing_service import calculate_bill, save_bill_to_session, get_bill_details
-from .services.qr_service import generate_qr, validate_qr_code
+# Import utility functions that contain all business logic
+from .utils import (
+    allocate_slot,
+    scan_entry_qr,
+    scan_exit_qr,
+    cancel_parking_session,
+    calculate_refund
+)
 
-# Import simple validator functions
-from .validators.session_validator import validate_vehicle_entry, is_session_active, validate_session_exit
 
+# ============================================
+# VIEW 1: VEHICLE ENTRY (STEP 1)
+# ============================================
 
-# ========== VEHICLE ENTRY VIEW ==========
-
-@csrf_exempt  # Disable CSRF for testing (enable in production!)
 @require_http_methods(["GET", "POST"])
-def vehicle_entry(request):
+def vehicle_entry_view(request):
     """
-    STEP 1: Vehicle enters parking zone
+    Vehicle Entry View
     
-    GET: Show list of available zones
-    POST: Process vehicle entry
+    GET: Display entry form with available zones
+    POST: Process vehicle entry and allocate parking slot
+    
+    Process:
+    1. User enters vehicle number and selects zone
+    2. System finds first available slot
+    3. Slot is marked as occupied
+    4. Parking session is created with QR code
+    5. Return QR code and slot number to user
     """
     
-    # ===== GET REQUEST: Show entry form with zones =====
+    # GET REQUEST: Show entry form
     if request.method == "GET":
         # Get all active parking zones
         zones = ParkingZone.objects.filter(is_active=True)
@@ -45,162 +57,238 @@ def vehicle_entry(request):
             'zones': zones
         })
     
-    # ===== POST REQUEST: Process vehicle entry =====
+    # POST REQUEST: Process vehicle entry
     if request.method == "POST":
-        # STEP 1: Get input from user
+        # Get form data
         vehicle_number = request.POST.get("vehicle_number", "").strip()
+        owner_name = request.POST.get("owner_name", "").strip()
         zone_id = request.POST.get("zone_id", "").strip()
         
-        # STEP 2: Validate input using validator function
-        is_valid, error_message = validate_vehicle_entry(vehicle_number, zone_id)
-        
-        if not is_valid:
+        # Validate input
+        if not vehicle_number or not zone_id:
             return JsonResponse({
                 'success': False,
-                'message': error_message
+                'message': 'Vehicle number and zone are required'
             })
         
-        # STEP 3: Get the zone
-        zone = ParkingZone.objects.get(id=zone_id)
-        
-        # STEP 4: Get or create vehicle
-        vehicle, created = Vehicle.objects.get_or_create(
-            vehicle_number=vehicle_number
-        )
-        
-        # STEP 5: Allocate slot using service function
-        # This will:
-        # - Find a free slot
-        # - Mark it as occupied
-        # - Create a parking session with unique QR code
-        session = allocate_slot(vehicle, zone)
-        
-        # STEP 6: Check if slot was allocated
-        # Returns None if no free slots available
-        if session is None:
+        # Call utility function to allocate slot with error handling
+        try:
+            result = allocate_slot(vehicle_number, owner_name, zone_id)
+            return JsonResponse(result)
+        except Exception as e:
+            logging.error(f"Error in vehicle entry: {str(e)}")
             return JsonResponse({
                 'success': False,
-                'message': f'No free slots available in {zone.name}'
+                'message': 'System error occurred. Please try again.',
+                'data': None
             })
-        
-        # STEP 7: Return success response with session details
-        return JsonResponse({
-            'success': True,
-            'message': 'Vehicle entry successful!',
-            'session_id': str(session.id),
-            'qr_code': session.qr_code,
-            'slot_number': session.slot.slot_number,
-            'zone_name': zone.name,
-            'entry_time': session.entry_time.isoformat(),
-            'hourly_rate': str(zone.hourly_rate)
-        })
 
 
-# ========== VEHICLE EXIT VIEW ==========
+# ============================================
+# VIEW 2: QR ENTRY SCAN (STEP 2)
+# ============================================
 
-@csrf_exempt  # Disable CSRF for testing (enable in production!)
 @require_http_methods(["GET", "POST"])
-def vehicle_exit(request):
+def qr_entry_scan_view(request):
     """
-    STEP 2: Vehicle exits parking zone
+    Entry QR Scan View
     
-    GET: Show exit form
-    POST: Process vehicle exit and calculate bill
+    GET: Display QR scanning form
+    POST: Process entry QR scan
+    
+    Process:
+    1. User scans QR code at entry gate
+    2. System finds parking session with this QR code
+    3. Entry time is recorded
+    4. Entry QR scanned flag is set to True (prevents double scan)
+    5. Refund is locked permanently
+    6. Return confirmation to user
     """
     
-    # ===== GET REQUEST: Show exit form =====
+    # GET REQUEST: Show scanning form
+    if request.method == "GET":
+        return render(request, 'parking/entry_scan.html')
+    
+    # POST REQUEST: Process QR scan
+    if request.method == "POST":
+        # Get QR code from request
+        qr_code = request.POST.get("qr_code", "").strip()
+        
+        # Validate input
+        if not qr_code:
+            return JsonResponse({
+                'success': False,
+                'message': 'QR code is required'
+            })
+        
+        # Call utility function to scan entry QR with error handling
+        try:
+            result = scan_entry_qr(qr_code)
+            return JsonResponse(result)
+        except Exception as e:
+            logging.error(f"Error in entry QR scan: {str(e)}")
+            return JsonResponse({
+                'success': False,
+                'message': 'QR scan failed. Please try again.',
+                'data': None
+            })
+
+
+# ============================================
+# VIEW 3: QR EXIT SCAN (STEP 3)
+# ============================================
+
+@require_http_methods(["GET", "POST"])
+def qr_exit_scan_view(request):
+    """
+    Exit QR Scan View
+    
+    GET: Display exit form
+    POST: Process exit QR scan and calculate bill
+    
+    Process:
+    1. User scans QR code at exit gate
+    2. System verifies entry QR was already scanned
+    3. Exit time is recorded
+    4. Parking amount is calculated based on duration
+    5. Payment method is recorded (CASH/ONLINE)
+    6. Slot is released (marked as available)
+    7. Bill is returned to user
+    """
+    
+    # GET REQUEST: Show exit form
     if request.method == "GET":
         return render(request, 'parking/exit.html')
     
-    # ===== POST REQUEST: Process vehicle exit =====
+    # POST REQUEST: Process vehicle exit
     if request.method == "POST":
-        # STEP 1: Get QR code from user
+        # Get form data
         qr_code = request.POST.get("qr_code", "").strip()
+        payment_method = request.POST.get("payment_method", "").strip()
         
-        # STEP 2: Validate QR code using validator function
-        is_valid, error_message, session = validate_session_exit(qr_code)
-        
-        if not is_valid:
+        # Validate input
+        if not qr_code or not payment_method:
             return JsonResponse({
                 'success': False,
-                'message': error_message
+                'message': 'QR code and payment method are required'
             })
         
-        # STEP 3: Close session (set exit time to NOW)
-        session = close_session(session)
-        
-        # STEP 4: Calculate bill amount based on parking duration
-        amount_to_pay = calculate_bill(session)
-        
-        # STEP 5: Save bill to database and mark session as paid
-        bill_result = save_bill_to_session(session, amount_to_pay)
-        
-        # STEP 5a: Check if bill was saved successfully
-        if bill_result is None:
+        # Validate payment method
+        if payment_method not in ['CASH', 'ONLINE']:
             return JsonResponse({
                 'success': False,
-                'message': 'Error calculating bill amount'
+                'message': 'Invalid payment method. Use CASH or ONLINE'
             })
         
-        # STEP 6: Release the parking slot (mark as free)
-        is_released = release_slot(session)
-        
-        # STEP 6a: Check if slot was released successfully
-        if not is_released:
+        # Call utility function to process exit with error handling
+        try:
+            result = scan_exit_qr(qr_code, payment_method)
+            return JsonResponse(result)
+        except Exception as e:
+            logging.error(f"Error in exit QR scan: {str(e)}")
             return JsonResponse({
                 'success': False,
-                'message': 'Error releasing parking slot'
+                'message': 'Exit processing failed. Please contact support.',
+                'data': None
             })
-        
-        # STEP 7: Get complete bill details using service function
-        bill_details = get_bill_details(session)
-        
-        # STEP 8: Return bill to user
+
+
+# ============================================
+# VIEW 4: CANCEL BOOKING
+# ============================================
+
+@csrf_protect
+@require_http_methods(["POST"])
+def cancel_booking_view(request):
+    """
+    Cancel Parking Booking View
+    
+    POST: Cancel a parking booking and process refund
+    
+    Process:
+    1. User provides QR code of booking to cancel
+    2. System checks if entry was done
+    3. If no entry: Apply grace period rules
+       - Within 5 min: 100% refund eligible
+       - After 5 min: 0% refund
+    4. If entry done: No refund allowed
+    5. Slot is released
+    6. Return refund details to user
+    """
+    
+    # Get form data
+    qr_code = request.POST.get("qr_code", "").strip()
+    
+    # Validate input
+    if not qr_code:
         return JsonResponse({
-            'success': True,
-            'message': 'Vehicle exit successful!',
-            'vehicle_number': bill_details['vehicle_number'],
-            'zone_name': bill_details['zone_name'],
-            'parking_duration': f"{bill_details['duration_hours']}h {bill_details['duration_minutes']}m",
-            'amount_to_pay': str(bill_details['amount_paid']),
-            'status': 'Paid'
+            'success': False,
+            'message': 'QR code is required'
+        })
+    
+    # Call utility function to cancel booking with error handling
+    try:
+        result = cancel_parking_session(qr_code)
+        return JsonResponse(result)
+    except Exception as e:
+        logging.error(f"Error in booking cancellation: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'message': 'Cancellation failed. Please contact support.',
+            'data': None
         })
 
 
-# ========== ZONE STATUS VIEW ==========
+# ============================================
+# VIEW 5: CHECK ZONE STATUS (Optional)
+# ============================================
 
 @require_http_methods(["GET"])
-def zone_status(request, zone_id):
+def zone_status_view(request, zone_id):
     """
-    Get current occupancy status of a parking zone
+    Zone Status View - Optional
     
-    Shows:
-    - Total slots
-    - Occupied slots
-    - Available slots
+    Shows current status of a parking zone
+    
+    Returns:
+    - Total slots available
+    - Number of occupied slots
+    - Number of free slots
     - Occupancy percentage
     """
     
-    # STEP 1: Find the zone
     try:
+        # Get the zone
         zone = ParkingZone.objects.get(id=zone_id)
+        
+        # Get total slots in zone
+        total_slots = zone.slots.count()
+        
+        # Get occupied slots
+        occupied_slots = zone.slots.filter(is_occupied=True).count()
+        
+        # Calculate available slots
+        available_slots = total_slots - occupied_slots
+        
+        # Calculate occupancy percentage
+        if total_slots > 0:
+            occupancy_percent = (occupied_slots / total_slots) * 100
+        else:
+            occupancy_percent = 0
+        
+        # Return status
+        return JsonResponse({
+            'success': True,
+            'zone_name': zone.name,
+            'total_slots': total_slots,
+            'occupied_slots': occupied_slots,
+            'available_slots': available_slots,
+            'occupancy_percent': round(occupancy_percent, 2),
+            'hourly_rate': str(zone.hourly_rate)
+        })
+    
     except ParkingZone.DoesNotExist:
         return JsonResponse({
             'success': False,
             'message': 'Zone not found'
         })
-    
-    # STEP 2: Get zone occupancy status using service function
-    status = get_zone_occupancy_status(zone)
-    
-    # STEP 3: Return status with all details
-    return JsonResponse({
-        'success': True,
-        'zone_name': zone.name,
-        'total_slots': status['total_slots'],
-        'occupied_slots': status['occupied_slots'],
-        'available_slots': status['available_slots'],
-        'occupancy_percent': round(status['occupancy_percent'], 2),
-        'hourly_rate': str(zone.hourly_rate),
-        'is_active': zone.is_active
-    })
