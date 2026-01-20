@@ -1,0 +1,55 @@
+# Production Requirements for Smart Parking Management System
+# Use: pip install -r requirements-production.txt
+
+# Django & Core
+Django==6.0.1
+djangorestframework==3.16.1
+djangorestframework-simplejwt==5.5.1
+
+# Database
+psycopg2-binary==2.9.9  # PostgreSQL adapter
+mysql-connector-python==8.2.0  # MySQL adapter (optional)
+
+# Security & Environment
+python-dotenv==1.0.0
+cryptography==41.0.7
+PyJWT==2.8.1
+
+# Payment Gateways
+razorpay==1.4.1
+requests==2.31.0
+
+# QR Code
+qrcode==7.4.2
+Pillow==10.1.0
+
+# Production Server
+gunicorn==21.2.0
+whitenoise==6.6.0  # Static files serving
+
+# Monitoring & Logging
+sentry-sdk==1.39.2
+python-json-logger==2.0.7
+
+# Security Headers
+django-cors-headers==4.3.1
+django-ratelimit==4.1.0
+
+# Database Migration
+django-extensions==3.2.3
+
+# Email
+django-anymail==10.1  # For multiple email providers
+
+# Testing
+pytest==7.4.3
+pytest-django==4.7.0
+pytest-cov==4.1.0
+
+# Code Quality
+black==23.12.1
+flake8==6.1.0
+isort==5.13.2
+
+# Documentation
+drf-spectacular==0.27.0  # Auto API documentation

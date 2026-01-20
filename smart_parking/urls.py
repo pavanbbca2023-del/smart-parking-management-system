@@ -19,5 +19,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('parking/', include('backend_core.parking.urls')),  # Include parking URLs
+    path('', include('backend_core_api.urls')),  # Include new API URLs
 ]
