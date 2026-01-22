@@ -3,6 +3,13 @@
 import os
 import sys
 
+# Apply Python 3.14 compatibility patch for Django
+try:
+    from django_py314_patch import patch_django_context
+    patch_django_context()
+except ImportError:
+    pass
+
 
 def main():
     """Run administrative tasks."""
