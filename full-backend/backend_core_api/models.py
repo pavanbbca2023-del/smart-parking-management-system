@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
+from decimal import Decimal
 
 class User(AbstractUser):
     ROLE_CHOICES = (
@@ -9,16 +10,13 @@ class User(AbstractUser):
         ('USER', 'User'),
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='USER')
-    salary = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    salary = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     position = models.CharField(max_length=100, blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
 
     def __str__(self):
         return f"{self.username} ({self.role})"
 
-
-    def __str__(self):
-        return f"{self.username} ({self.role})"
 
 class Attendance(models.Model):
     staff = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'STAFF'})
@@ -67,7 +65,9 @@ class ParkingSession(models.Model):
     zone = models.ForeignKey(Zone, on_delete=models.CASCADE)
     entry_time = models.DateTimeField(auto_now_add=True)
     exit_time = models.DateTimeField(null=True, blank=True)
-    amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    initial_amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    final_amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    total_amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     payment_method = models.CharField(max_length=50, blank=True, null=True)
     payment_status = models.CharField(max_length=20, default='pending')
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='active')
@@ -78,16 +78,37 @@ class ParkingSession(models.Model):
     def __str__(self):
         return f"{self.vehicle_number} - {self.zone.name} ({self.status})"
 
+    def save(self, *args, **kwargs):
+        # Ensure values are Decimals before addition to prevent TypeError
+        try:
+            initial = Decimal(str(self.initial_amount_paid))
+        except:
+            initial = Decimal('0.00')
+            
+        try:
+            final = Decimal(str(self.final_amount_paid))
+        except:
+            final = Decimal('0.00')
+            
+        self.total_amount_paid = initial + final
+        super().save(*args, **kwargs)
+
 class Payment(models.Model):
+    PAYMENT_TYPE_CHOICES = (
+        ('INITIAL', 'Initial Booking Fee'),
+        ('FINAL', 'Final Exit Billing'),
+        ('FULL', 'Full Pre-payment'),
+    )
     session = models.ForeignKey(ParkingSession, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_method = models.CharField(max_length=50)
+    payment_type = models.CharField(max_length=10, choices=PAYMENT_TYPE_CHOICES, default='FULL')
     transaction_id = models.CharField(max_length=100, unique=True, null=True, blank=True)
     status = models.CharField(max_length=20, default='success')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.transaction_id} - {self.amount}"
+        return f"{self.transaction_id or 'TXN'} - {self.amount} ({self.payment_type})"
 
 class Vehicle(models.Model):
     vehicle_number = models.CharField(max_length=20, unique=True)
@@ -130,3 +151,26 @@ class Schedule(models.Model):
 
     def __str__(self):
         return f"{self.staff.username} - {self.day}"
+
+class ShiftLog(models.Model):
+    staff = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'STAFF'})
+    shift_start = models.DateTimeField()
+    shift_end = models.DateTimeField(null=True, blank=True)
+    entry_count = models.IntegerField(default=0)
+    exit_count = models.IntegerField(default=0)
+    revenue_collected = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    cash_collected = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    online_collected = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    notes = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.staff.username} Shift - {self.shift_start.date()}"
+
+class Feedback(models.Model):
+    session = models.OneToOneField(ParkingSession, on_delete=models.CASCADE, related_name='feedback')
+    rating = models.IntegerField(default=5)  # 1-5
+    comment = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Feedback for {self.session.vehicle_number} - {self.rating}★"

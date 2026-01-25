@@ -8,11 +8,11 @@ from .views import (
     ActiveSessionsView,
     CompletedSessionsView,
     PaymentAnalyticsView,
-    StaffSalaryViewSet
+    AlertViewSet
 )
 
 router = DefaultRouter()
-router.register(r'list', StaffSalaryViewSet, basename='staff-salary')
+router.register(r'alerts', AlertViewSet, basename='alert')
 
 urlpatterns = [
     path('dashboard/', DashboardAnalyticsView.as_view(), name='analytics-dashboard'),

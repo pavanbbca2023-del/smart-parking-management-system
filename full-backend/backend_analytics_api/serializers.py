@@ -1,22 +1,9 @@
 from rest_framework import serializers
 
-class StaffSalarySerializer(serializers.ModelSerializer):
-    name = serializers.CharField(source='staff.username', read_only=True)
-    position = serializers.CharField(source='staff.role', read_only=True)
-    net_salary = serializers.FloatField(read_only=True)
-    
-    class Meta:
-        from .models import StaffSalary
-        model = StaffSalary
-        fields = [
-            'id', 'staff', 'name', 'position', 'month', 'year', 
-            'base_salary', 'overtime_amount', 'bonus', 'deductions', 
-            'status', 'pay_date', 'net_salary'
-        ]
-
 class DashboardSummarySerializer(serializers.Serializer):
     active_sessions = serializers.IntegerField()
     completed_sessions = serializers.IntegerField()
+    vehicles_entered = serializers.IntegerField()
     total_revenue = serializers.FloatField()
     total_zones = serializers.IntegerField()
     total_slots = serializers.IntegerField()
@@ -39,6 +26,8 @@ class RevenueReportSerializer(serializers.Serializer):
     from_date = serializers.DateField()
     to_date = serializers.DateField()
     total_revenue = serializers.FloatField()
+    cash_revenue = serializers.FloatField()
+    online_revenue = serializers.FloatField()
     total_sessions = serializers.IntegerField()
     zone_revenue = serializers.ListField()
     payment_method_revenue = serializers.ListField()
@@ -63,3 +52,9 @@ class CompletedSessionSerializer(serializers.Serializer):
     exit_time = serializers.DateTimeField()
     amount_paid = serializers.FloatField()
     payment_method = serializers.CharField(allow_null=True, required=False)
+
+from .models import Alert
+class AlertSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Alert
+        fields = '__all__'

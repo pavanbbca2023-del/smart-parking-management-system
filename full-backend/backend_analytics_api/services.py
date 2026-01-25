@@ -22,12 +22,29 @@ class AnalyticsService:
     def get_dashboard_summary():
         try:
             ParkingSession, Zone, Vehicle, Payment, Slot = AnalyticsService.get_models()
+            now = timezone.now()
+            today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            
+            # Count entries that happened TODAY
+            vehicles_entered = ParkingSession.objects.filter(entry_time__gte=today_start).count()
+            
+            # Count exits that happened TODAY
+            vehicles_exited = ParkingSession.objects.filter(status='completed', exit_time__gte=today_start).count()
+            
             active_sessions = ParkingSession.objects.filter(status='active').count()
-            completed_sessions = ParkingSession.objects.filter(status='completed').count()
-            total_revenue = ParkingSession.objects.filter(payment_status='paid').aggregate(total=Sum('amount_paid'))['total'] or Decimal('0.00')
+            
+            # Revenue based on actual Payment records today
+            if Payment:
+                total_revenue = Payment.objects.filter(
+                    created_at__gte=today_start,
+                    status='success'
+                ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+            else:
+                total_revenue = Decimal('0.00')
+            
             total_zones = Zone.objects.filter(is_active=True).count()
-            total_slots = Slot.objects.count()
-            occupied_slots = Slot.objects.filter(is_occupied=True).count()
+            total_slots = Slot.objects.filter(is_active=True).count()
+            occupied_slots = Slot.objects.filter(is_occupied=True, is_active=True).count()
             
             from django.contrib.auth import get_user_model
             User = get_user_model()
@@ -35,8 +52,9 @@ class AnalyticsService:
             occupancy_rate = (occupied_slots / total_slots * 100) if total_slots > 0 else 0
             
             return {
-                'active_sessions': active_sessions,
-                'completed_sessions': completed_sessions,
+                'active_sessions': active_sessions, # Keep for other uses if needed
+                'completed_sessions': vehicles_exited,
+                'vehicles_entered': vehicles_entered,
                 'total_revenue': float(total_revenue),
                 'total_zones': total_zones,
                 'total_slots': total_slots,
@@ -73,38 +91,69 @@ class AnalyticsService:
             return {'error': str(e)}
 
     @staticmethod
-    def get_revenue_report(from_date=None, to_date=None):
+    def get_revenue_report(from_date=None, to_date=None, period='ALL'):
         try:
             ParkingSession, Zone, Vehicle, Payment, Slot = AnalyticsService.get_models()
-            if not from_date: from_date = timezone.now().date() - timedelta(days=30)
-            if not to_date: to_date = timezone.now().date()
+            now = timezone.now()
+            
+            if not from_date:
+                if period == 'DAILY':
+                    from_date = now.date()
+                else:
+                    from_date = now.date() - timedelta(days=30)
+            if not to_date: to_date = now.date()
             
             from_datetime = datetime.combine(from_date, datetime.min.time())
             to_datetime = datetime.combine(to_date, datetime.max.time())
             
-            sessions = ParkingSession.objects.filter(entry_time__range=[from_datetime, to_datetime], payment_status='paid')
-            total_revenue = sessions.aggregate(total=Sum('amount_paid'))['total'] or Decimal('0.00')
-            zone_revenue = sessions.values('zone__name').annotate(revenue=Sum('amount_paid'), session_count=Count('id')).order_by('-revenue')
-            
-            # Calculate daily revenue
-            from django.db.models.functions import TruncDate
-            daily_revenue = sessions.annotate(date=TruncDate('entry_time')).values('date').annotate(
-                revenue=Sum('amount_paid')
-            ).order_by('date')
-            
-            # Calculate payment method revenue
-            payment_method_revenue = sessions.values('payment_method').annotate(
-                revenue=Sum('amount_paid')
-            ).order_by('-revenue')
+            if Payment:
+                # Still need sessions for count
+                sessions = ParkingSession.objects.filter(entry_time__range=[from_datetime, to_datetime], payment_status='paid')
+                
+                payments_query = Payment.objects.filter(
+                    created_at__range=[from_datetime, to_datetime],
+                    status='success'
+                )
+                
+                total_revenue = payments_query.aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+                cash_revenue = payments_query.filter(payment_method__iexact='cash').aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+                online_revenue = Decimal(total_revenue) - Decimal(cash_revenue)
+                
+                total_sessions = sessions.count()
+                
+                # Zone revenue still needs to join with session
+                zone_revenue = payments_query.values('session__zone__name').annotate(
+                    revenue=Sum('amount'), 
+                    session_count=Count('session', distinct=True)
+                ).order_by('-revenue')
+                
+                from django.db.models.functions import TruncDate
+                daily_revenue = payments_query.annotate(date=TruncDate('created_at')).values('date').annotate(
+                    revenue=Sum('amount')
+                ).order_by('date')
+                
+                payment_method_revenue = payments_query.values('payment_method').annotate(
+                    revenue=Sum('amount')
+                ).order_by('-revenue')
+            else:
+                total_revenue = Decimal('0.00')
+                cash_revenue = Decimal('0.00')
+                online_revenue = Decimal('0.00')
+                total_sessions = 0
+                zone_revenue = []
+                daily_revenue = []
+                payment_method_revenue = []
             
             return {
                 'from_date': from_date.isoformat(),
                 'to_date': to_date.isoformat(),
                 'total_revenue': float(total_revenue),
-                'total_sessions': sessions.count(),
+                'cash_revenue': float(cash_revenue),
+                'online_revenue': float(online_revenue),
+                'total_sessions': total_sessions,
                 'zone_revenue': list(zone_revenue),
                 'payment_method_revenue': [
-                    {'payment_method': pm['payment_method'] or 'Cash', 'revenue': float(pm['revenue'])}
+                    {'payment_method': pm['payment_method'] or 'Unknown', 'revenue': float(pm['revenue'])}
                     for pm in payment_method_revenue
                 ],
                 'daily_revenue': [
@@ -145,3 +194,40 @@ class AnalyticsService:
             return ParkingSession.objects.filter(status='completed').select_related('zone').order_by('-exit_time')[:50]
         except Exception as e:
             return []
+
+class AlertService:
+    @staticmethod
+    def create_alert(alert_type, title, message):
+        """Create a new alert in the system"""
+        from .models import Alert
+        return Alert.objects.create(
+            type=alert_type,
+            title=title,
+            message=message
+        )
+
+    @staticmethod
+    def check_zone_capacity(zone_id):
+        """Check if zone is nearing capacity and create alerts if needed"""
+        from backend_core_api.models import Zone
+        try:
+            zone = Zone.objects.get(id=zone_id)
+            total = zone.total_slots
+            occupied = zone.slots.filter(is_occupied=True).count()
+            
+            if total > 0:
+                occupancy = (occupied / total) * 100
+                if occupancy >= 100:
+                    AlertService.create_alert(
+                        'critical',
+                        f'ZONE FULL: {zone.name}',
+                        f'Zone {zone.name} has reached 100% capacity. No more entries allowed.'
+                    )
+                elif occupancy >= 90:
+                    AlertService.create_alert(
+                        'warning',
+                        f'Zone Nearing Capacity: {zone.name}',
+                        f'Zone {zone.name} is at {round(occupancy, 1)}% occupancy ({occupied}/{total} slots).'
+                    )
+        except Exception as e:
+            print(f"Error checking zone capacity: {e}")

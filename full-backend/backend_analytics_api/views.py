@@ -6,8 +6,15 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .services import AnalyticsService
 from .serializers import (
     DashboardSummarySerializer, ZoneOccupancySerializer, RevenueReportSerializer,
-    PeakHoursSerializer, ActiveSessionSerializer, CompletedSessionSerializer
+    PeakHoursSerializer, ActiveSessionSerializer, CompletedSessionSerializer,
+    AlertSerializer
 )
+from .models import Alert
+
+class AlertViewSet(viewsets.ModelViewSet):
+    queryset = Alert.objects.all().order_by('-created_at')
+    serializer_class = AlertSerializer
+    permission_classes = [AllowAny]
 
 class DashboardAnalyticsView(APIView):
     permission_classes = [AllowAny]
@@ -20,7 +27,8 @@ class DashboardAnalyticsView(APIView):
 class RevenueAnalyticsView(APIView):
     permission_classes = [AllowAny]
     def get(self, request):
-        data = AnalyticsService.get_revenue_report()
+        period = request.query_params.get('period', 'ALL')
+        data = AnalyticsService.get_revenue_report(period=period)
         serializer = RevenueReportSerializer(data)
         return Response({'success': True, 'data': serializer.data})
 
@@ -51,41 +59,6 @@ class CompletedSessionsView(APIView):
         data = AnalyticsService.get_completed_sessions()
         serializer = CompletedSessionSerializer(data, many=True)
         return Response({'success': True, 'data': serializer.data})
-
-from rest_framework import viewsets
-from django.utils import timezone
-class StaffSalaryViewSet(viewsets.ModelViewSet):
-    from .models import StaffSalary
-    from .serializers import StaffSalarySerializer
-    queryset = StaffSalary.objects.all()
-    serializer_class = StaffSalarySerializer
-    permission_classes = [AllowAny]
-
-    def list(self, request):
-        month = request.query_params.get('month')
-        year = request.query_params.get('year')
-        
-        queryset = self.queryset
-        if month: queryset = queryset.filter(month=month)
-        if year: queryset = queryset.filter(year=year)
-            
-        serializer = self.get_serializer(queryset, many=True)
-        return Response({'success': True, 'staff_salaries': serializer.data})
-
-    @action(detail=False, methods=['post'])
-    def pay(self, request):
-        salary_id = request.data.get('salary_id')
-        if salary_id:
-            try:
-                from .models import StaffSalary
-                salary = StaffSalary.objects.get(id=salary_id)
-                salary.status = 'paid'
-                salary.pay_date = timezone.now()
-                salary.save()
-                return Response({'success': True, 'message': 'Payment successful'})
-            except StaffSalary.DoesNotExist:
-                return Response({'success': False, 'message': 'Salary record not found'}, status=404)
-        return Response({'success': False, 'message': 'No salary_id provided'}, status=400)
 
 class PaymentAnalyticsView(APIView):
     permission_classes = [AllowAny]

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Slot, Attendance, Zone, ParkingSession, Payment, Vehicle, Dispute, Schedule
+from .models import User, Slot, Attendance, Zone, ParkingSession, Payment, Vehicle, Dispute, Schedule, ShiftLog, Feedback
 
 @admin.register(Slot)
 class SlotAdmin(admin.ModelAdmin):
@@ -59,3 +59,13 @@ class ScheduleAdmin(admin.ModelAdmin):
     list_display = ('staff', 'day', 'shift_start', 'shift_end', 'is_active')
     list_filter = ('day', 'is_active')
     search_fields = ('staff__username',)
+
+@admin.register(ShiftLog)
+class ShiftLogAdmin(admin.ModelAdmin):
+    list_display = ('staff', 'shift_start', 'shift_end', 'entry_count', 'exit_count', 'revenue_collected')
+    list_filter = ('staff', 'shift_start')
+
+@admin.register(Feedback)
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ('session', 'rating', 'created_at')
+    list_filter = ('rating', 'created_at')

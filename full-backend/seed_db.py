@@ -6,20 +6,29 @@ from datetime import datetime, time
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'smart_parking.settings')
 django.setup()
 
-from backend_core_api.models import User, Zone, StaffSalary, Vehicle, Dispute, Schedule, ParkingSession
+from django.apps import apps
+from django.contrib.auth import get_user_model
 
 def seed():
+    User = get_user_model()
+    Zone = apps.get_model('backend_core_api', 'Zone')
+    StaffSalary = apps.get_model('backend_analytics_api', 'StaffSalary')
+    Vehicle = apps.get_model('backend_core_api', 'Vehicle')
+    Dispute = apps.get_model('backend_core_api', 'Dispute')
+    Schedule = apps.get_model('backend_core_api', 'Schedule')
+    ParkingSession = apps.get_model('backend_core_api', 'ParkingSession')
+    Slot = apps.get_model('backend_core_api', 'Slot')
+    
     # 1. Create Superuser
-    admin, created = User.objects.get_or_create(
-        username='admin',
-        defaults={'email': 'admin@example.com', 'is_superuser': True, 'is_staff': True}
-    )
-    if created or admin.password == '':
-        admin.set_password('admin123')
-        admin.save()
-        print("Superuser created/updated")
+    if not User.objects.filter(username='admin').exists():
+        User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
+        print("Superuser created")
+    else:
+        print("Superuser already exists")
 
-    # 2. Create Zones
+    admin = User.objects.get(username='admin')
+
+    # 2. Create Zones & Slots
     zones_data = [
         {'name': 'Zone A', 'total_slots': 20, 'base_price': 20.00},
         {'name': 'Zone B', 'total_slots': 15, 'base_price': 30.00},
@@ -27,9 +36,12 @@ def seed():
     ]
     zones = []
     for z in zones_data:
-        obj, _ = Zone.objects.get_or_create(name=z['name'], defaults=z)
+        obj, created = Zone.objects.get_or_create(name=z['name'], defaults=z)
         zones.append(obj)
-    print("Zones created")
+        if created:
+            for i in range(1, z['total_slots'] + 1):
+                Slot.objects.create(zone=obj, slot_number=f"{obj.name[5] if len(obj.name) > 5 else obj.name[0]}-{i:02d}")
+    print("Zones and Slots created")
 
     # 3. Create Staff Members
     staff_data = [
@@ -37,8 +49,8 @@ def seed():
         {'username': 'staff2', 'email': 'staff2@parking.io', 'role': 'STAFF', 'position': 'Security Officer', 'salary': 25000},
     ]
     for s in staff_data:
-        user, created = User.objects.get_or_create(username=s['username'], defaults=s)
-        if created:
+        if not User.objects.filter(username=s['username']).exists():
+            user = User.objects.create_user(**s)
             user.set_password('staff123')
             user.save()
             
@@ -47,23 +59,46 @@ def seed():
     print("Staff and Schedules created")
 
     # 4. Create Vehicles
-    vehicle, _ = Vehicle.objects.get_or_create(
-        vehicle_number='ABC-1234',
-        defaults={'user': admin, 'vehicle_type': 'Car'}
-    )
-    print("Vehicle created")
-
+    v1, _ = Vehicle.objects.get_or_create(vehicle_number='MH-01-AB-1234', defaults={'user': admin, 'vehicle_type': 'Car'})
+    v2, _ = Vehicle.objects.get_or_create(vehicle_number='DL-05-CD-5678', defaults={'user': admin, 'vehicle_type': 'SUV'})
+    
     # 5. Create Sessions & Disputes
-    session, _ = ParkingSession.objects.get_or_create(
-        vehicle_number='ABC-1234',
-        zone=zones[0],
-        defaults={'status': 'completed', 'amount_paid': 40, 'payment_status': 'paid'}
+    # Active Session in Zone A
+    zone_a = zones[0]
+    s1_slot = Slot.objects.filter(zone=zone_a, is_occupied=False).first()
+    if s1_slot:
+        s1_slot.is_occupied = True
+        s1_slot.save()
+        ParkingSession.objects.get_or_create(
+            vehicle_number='MH-01-AB-1234',
+            defaults={
+                'zone': zone_a, 
+                'slot': s1_slot, 
+                'status': 'active',
+                'initial_amount_paid': zone_a.base_price,
+                'payment_status': 'partially_paid'
+            }
+        )
+
+    # Completed Session
+    zone_b = zones[1]
+    s2, _ = ParkingSession.objects.get_or_create(
+        vehicle_number='DL-05-CD-5678',
+        zone=zone_b,
+        defaults={
+            'status': 'completed', 
+            'initial_amount_paid': zone_b.base_price,
+            'final_amount_paid': 120.00,
+            'total_amount_paid': 150.00, 
+            'payment_status': 'paid', 
+            'exit_time': timezone.now()
+        }
     )
     
     Dispute.objects.get_or_create(
-        session=session,
+        session=s2,
         user=admin,
-        defaults={'reason': 'Overcharged for 1 hour', 'status': 'pending'}
+        defaults={'reason': 'Incorrect slot assignment', 'status': 'Open', 'dispute_type': 'Operations', 'severity': 'Medium'}
     )
     print("Sessions and Disputes created")
 

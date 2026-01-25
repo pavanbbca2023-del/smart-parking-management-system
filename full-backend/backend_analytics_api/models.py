@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from decimal import Decimal
 
 class DailyReport(models.Model):
     """Daily analytics report"""
@@ -83,29 +84,6 @@ class RevenueReport(models.Model):
     def __str__(self):
         return f"{self.period_type} Report: {self.start_date} to {self.end_date}"
 
-class StaffSalary(models.Model):
-    STAFF_STATUS = (
-        ('pending', 'Pending'),
-        ('paid', 'Paid'),
-    )
-    staff = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, limit_choices_to={'role': 'STAFF'})
-    month = models.IntegerField()
-    year = models.IntegerField()
-    base_salary = models.DecimalField(max_digits=10, decimal_places=2)
-    overtime_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    bonus = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    deductions = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    status = models.CharField(max_length=10, choices=STAFF_STATUS, default='pending')
-    pay_date = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    @property
-    def net_salary(self):
-        return self.base_salary + self.overtime_amount + self.bonus - self.deductions
-
-    def __str__(self):
-        return f"{self.staff.username} - {self.month}/{self.year}"
-
 class PeakHourAnalytics(models.Model):
     """Peak hours analytics"""
     date = models.DateField()
@@ -122,3 +100,20 @@ class PeakHourAnalytics(models.Model):
     
     def __str__(self):
         return f"{self.date} - {self.hour}:00"
+
+
+class Alert(models.Model):
+    TYPE_CHOICES = (
+        ('critical', 'Critical'),
+        ('warning', 'Warning'),
+        ('success', 'Success'),
+        ('info', 'Info'),
+    )
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='info')
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.type.upper()}: {self.title}"

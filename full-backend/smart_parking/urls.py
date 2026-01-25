@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from backend_core_api.views import home, CoreDashboardView, ParkingSessionViewSet
-from backend_analytics_api.views import DashboardAnalyticsView, StaffSalaryViewSet
+from backend_analytics_api.views import DashboardAnalyticsView
 
 urlpatterns = [
     path('', home, name='home'),
@@ -16,16 +16,11 @@ urlpatterns = [
     path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     
     # Unified App Includes
-    path('api/', include('backend_core_api.urls')),
-    path('api/admin/', include('backend_core_api.urls')), # Alias for frontend compatibility
+    path('api/core/', include('backend_core_api.urls')),
     path('api/analytics/', include('backend_analytics_api.urls')),
     
     # Dashboard Aliases
     path('api/dashboard/', CoreDashboardView.as_view(), name='core-dashboard'),
-    
-    # Staff Salary Alias (Direct mapping to match frontend)
-    path('api/staff/salaries/', StaffSalaryViewSet.as_view({'get': 'list', 'post': 'create'})),
-    path('api/staff/salaries/<int:pk>/', StaffSalaryViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'})),
     
     # Specialized Parking Logic (Direct Overrides for specific frontend paths)
     path('api/parking/book/', ParkingSessionViewSet.as_view({'post': 'book_parking'})),

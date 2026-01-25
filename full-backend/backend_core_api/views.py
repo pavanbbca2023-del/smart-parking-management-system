@@ -5,12 +5,23 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from django.utils import timezone
 from django.http import JsonResponse
-from .models import User, Slot, Attendance, Zone, ParkingSession, Payment, Vehicle, Dispute, Schedule
+from .models import User, Slot, Attendance, Zone, ParkingSession, Payment, Vehicle, Dispute, Schedule, ShiftLog, Feedback
 from .serializers import (
     UserSerializer, SlotSerializer, ZoneSerializer, 
     ParkingSessionSerializer, PaymentSerializer, VehicleSerializer,
-    DisputeSerializer, ScheduleSerializer, AttendanceSerializer
+    DisputeSerializer, ScheduleSerializer, AttendanceSerializer,
+    ShiftLogSerializer, FeedbackSerializer
 )
+
+class ShiftLogViewSet(viewsets.ModelViewSet):
+    queryset = ShiftLog.objects.all()
+    serializer_class = ShiftLogSerializer
+    permission_classes = [AllowAny]
+
+class FeedbackViewSet(viewsets.ModelViewSet):
+    queryset = Feedback.objects.all()
+    serializer_class = FeedbackSerializer
+    permission_classes = [AllowAny]
 
 class CoreDashboardView(APIView):
     permission_classes = [AllowAny]
@@ -111,8 +122,9 @@ class ZoneViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['get'])
     def slots(self, request, pk=None):
         zone = self.get_object()
-        slots = [{'id': i, 'status': 'available' if i > 5 else 'occupied'} for i in range(1, zone.total_slots + 1)]
-        return Response({'success': True, 'slots': slots})
+        slots = Slot.objects.filter(zone=zone).order_by('slot_number')
+        serializer = SlotSerializer(slots, many=True)
+        return Response({'success': True, 'slots': serializer.data})
 
 class ParkingSessionViewSet(viewsets.ModelViewSet):
     queryset = ParkingSession.objects.all()
@@ -121,6 +133,12 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
+        
+        # Filter by vehicle_number if provided
+        vehicle_number = request.query_params.get('vehicle_number')
+        if vehicle_number:
+            queryset = queryset.filter(vehicle_number__icontains=vehicle_number)
+            
         serializer = self.get_serializer(queryset, many=True)
         return Response({'success': True, 'sessions': serializer.data})
 
@@ -140,28 +158,181 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
                 status='active',
                 user=request.user if request.user.is_authenticated else None
             )
+            
+            # Generate QR code data
+            import json
+            qr_data = {
+                'session_id': session.id,
+                'vehicle_number': session.vehicle_number,
+                'zone': session.zone.name,
+                'entry_time': session.entry_time.isoformat(),
+                'type': 'parking_session'
+            }
+            session.qr_code_data = json.dumps(qr_data)
+            session.save()
+            
             serializer = self.get_serializer(session)
-            return Response(serializer.data, status=201)
+            response_data = serializer.data
+            response_data['qr_code'] = qr_data
+            
+            return Response(response_data, status=201)
         except Zone.DoesNotExist:
             return Response({'error': 'Zone not found'}, status=404)
 
     @action(detail=False, methods=['post'], url_path='scan-entry')
     def scan_entry(self, request):
-        return Response({'success': True, 'message': 'Entry recorded'})
+        print(f"DEBUG: scan_entry called with data: {request.data}")
+        vehicle_number = request.data.get('vehicle_number')
+        session_id = request.data.get('session_id')
+        zone_id = request.data.get('zone_id')
+        
+        # 1. Try to find session by ID (QR scan of a booking)
+        session = None
+        if session_id:
+            try:
+                session = ParkingSession.objects.get(id=session_id)
+            except ParkingSession.DoesNotExist:
+                return Response({'error': 'Booking ID not found'}, status=404)
+        
+        # 2. If no session_id, check for active session by vehicle number
+        if not session and vehicle_number:
+            session = ParkingSession.objects.filter(vehicle_number=vehicle_number, status='active').first()
+            
+        # 3. If session found, ensure it has a slot
+        if session:
+            if session.status != 'active':
+                return Response({'error': f'Session is in {session.status} status'}, status=400)
+                
+            if not session.slot:
+                slot = Slot.objects.filter(zone=session.zone, is_occupied=False, is_active=True).first()
+                if slot:
+                    slot.is_occupied = True
+                    slot.save()
+                    session.slot = slot
+                    session.save()
+            return Response({'success': True, 'message': 'Entry verified', 'session_id': session.id})
+            
+        # 4. If no session found, create walk-in session if zone_id provided
+        if vehicle_number and zone_id:
+            try:
+                zone = Zone.objects.get(id=zone_id)
+                slot = Slot.objects.filter(zone=zone, is_occupied=False, is_active=True).first()
+                if not slot:
+                    return Response({'error': 'No slots available in this zone'}, status=400)
+                
+                session = ParkingSession.objects.create(
+                    vehicle_number=vehicle_number,
+                    zone=zone,
+                    slot=slot,
+                    status='active',
+                    initial_amount_paid=request.data.get('initial_amount', zone.base_price),
+                    payment_status='partially_paid'
+                )
+                slot.is_occupied = True
+                slot.save()
+                
+                # Record Initial Payment
+                payment_method = request.data.get('payment_method', 'Cash')
+                params_amount = session.initial_amount_paid
+                Payment.objects.create(
+                    session=session,
+                    amount=params_amount,
+                    payment_method=payment_method,
+                    payment_type='INITIAL',
+                    status='success'
+                )
+                
+                # Update Shift Log
+                if request.user.is_authenticated:
+                    from .services import ShiftService
+                    ShiftService.update_stats(request.user, 'entry', params_amount, payment_method)
+                
+                # Check Zone Capacity for Alerting
+                try:
+                    from backend_analytics_api.services import AlertService
+                    AlertService.check_zone_capacity(zone.id)
+                except:
+                    pass
+                
+                return Response({
+                    'success': True, 
+                    'message': 'Walk-in entry recorded with initial payment', 
+                    'session_id': session.id,
+                    'initial_amount': float(session.initial_amount_paid)
+                })
+            except Zone.DoesNotExist:
+                return Response({'error': 'Zone not found'}, status=404)
+
+        return Response({'error': 'Missing vehicle_number or session_id'}, status=400)
 
     @action(detail=False, methods=['post'], url_path='scan-exit')
     def scan_exit(self, request):
+        print(f"DEBUG: scan_exit called with {request.data}")
         session_id = request.data.get('session_id')
-        try:
-            session = ParkingSession.objects.get(id=session_id, status='active')
-            session.exit_time = timezone.now()
-            session.status = 'completed'
-            duration = (session.exit_time - session.entry_time).total_seconds() / 3600
-            session.amount_paid = session.zone.base_price * max(1, int(duration))
-            session.save()
-            return Response({'success': True, 'amount': session.amount_paid})
-        except ParkingSession.DoesNotExist:
+        vehicle_number = request.data.get('vehicle_number')
+        
+        session = None
+        if session_id:
+            try:
+                session = ParkingSession.objects.get(id=session_id, status='active')
+            except ParkingSession.DoesNotExist:
+                pass
+                
+        if not session and vehicle_number:
+            session = ParkingSession.objects.filter(vehicle_number=vehicle_number, status='active').last()
+            
+        if not session:
             return Response({'error': 'Active session not found'}, status=404)
+
+        session.exit_time = timezone.now()
+        session.status = 'completed'
+        
+        # Calculate duration in hours
+        duration_delta = session.exit_time - session.entry_time
+        hours = duration_delta.total_seconds() / 3600
+        # Round up to nearest hour
+        billable_hours = max(1, int(hours) + (1 if hours % 1 > 0 else 0))
+        
+        total_bill = session.zone.base_price * billable_hours
+        session.final_amount_paid = max(0, total_bill - session.initial_amount_paid)
+        session.payment_status = 'paid'
+        
+        # Free the slot
+        if session.slot:
+            slot = session.slot
+            slot.is_occupied = False
+            slot.save()
+            
+        session.save()
+        
+        # Record Final Payment
+        if session.final_amount_paid > 0:
+            payment_method = request.data.get('payment_method', 'Cash')
+            Payment.objects.create(
+                session=session,
+                amount=session.final_amount_paid,
+                payment_method=payment_method,
+                payment_type='FINAL',
+                status='success'
+            )
+            
+            # Update Shift Log
+            if request.user.is_authenticated:
+                from .services import ShiftService
+                ShiftService.update_stats(request.user, 'exit', session.final_amount_paid, payment_method)
+        else:
+             # Just increment exit count for prepaid/zero balance
+             if request.user.is_authenticated:
+                from .services import ShiftService
+                ShiftService.update_stats(request.user, 'exit', 0, 'Cash')
+
+        return Response({
+            'success': True, 
+            'total_amount': float(session.total_amount_paid),
+            'initial_paid': float(session.initial_amount_paid),
+            'final_balance': float(session.final_amount_paid),
+            'duration_hours': round(hours, 2)
+        })
 
     @action(detail=False, methods=['post'], url_path='refund')
     def refund(self, request):

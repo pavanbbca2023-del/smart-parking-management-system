@@ -1,5 +1,11 @@
 from django.contrib import admin
-from .models import DailyReport, ZoneAnalytics, VehicleAnalytics, RevenueReport, PeakHourAnalytics
+from .models import DailyReport, ZoneAnalytics, VehicleAnalytics, RevenueReport, PeakHourAnalytics, Alert
+
+@admin.register(Alert)
+class AlertAdmin(admin.ModelAdmin):
+    list_display = ('title', 'type', 'is_read', 'created_at')
+    list_filter = ('type', 'is_read', 'created_at')
+    search_fields = ('title', 'message')
 
 class DailyReportAdmin(admin.ModelAdmin):
     list_display = ('date', 'total_sessions', 'total_revenue', 'occupancy_rate')
@@ -27,10 +33,3 @@ admin.site.register(ZoneAnalytics, ZoneAnalyticsAdmin)
 admin.site.register(VehicleAnalytics, VehicleAnalyticsAdmin)
 admin.site.register(RevenueReport, RevenueReportAdmin)
 admin.site.register(PeakHourAnalytics, PeakHourAnalyticsAdmin)
-
-from .models import StaffSalary
-@admin.register(StaffSalary)
-class StaffSalaryAdmin(admin.ModelAdmin):
-    list_display = ('staff', 'month', 'year', 'base_salary', 'status', 'pay_date')
-    list_filter = ('status', 'month', 'year')
-    search_fields = ('staff__username',)
