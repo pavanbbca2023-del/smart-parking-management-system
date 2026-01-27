@@ -378,6 +378,7 @@ const ZoneManagement = () => {
                       color: '#64748b'
                     }}>
                       <span>🚗 {occupied} Occupied</span>
+                      {zone.current_occupancy.reserved > 0 && <span style={{ color: '#f59e0b' }}>🔒 {zone.current_occupancy.reserved} Reserved</span>}
                       <span>✅ {available} Available</span>
                     </div>
                   </div>

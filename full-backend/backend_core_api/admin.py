@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Slot, Attendance, Zone, ParkingSession, Payment, Vehicle, Dispute, Schedule, ShiftLog, Feedback
+from .models import User, Slot, Attendance, Zone, ParkingSession, Payment, Vehicle, Dispute, Schedule, ShiftLog, Feedback, BookingActivityLog
 
 @admin.register(Slot)
 class SlotAdmin(admin.ModelAdmin):
@@ -69,3 +69,15 @@ class ShiftLogAdmin(admin.ModelAdmin):
 class FeedbackAdmin(admin.ModelAdmin):
     list_display = ('session', 'rating', 'created_at')
     list_filter = ('rating', 'created_at')
+
+@admin.register(BookingActivityLog)
+class BookingActivityLogAdmin(admin.ModelAdmin):
+    list_display = ('session', 'vehicle_number_display', 'user', 'activity_type', 'created_at')
+    list_filter = ('activity_type', 'created_at')
+    search_fields = ('session__vehicle_number', 'user__username', 'description')
+    readonly_fields = ('session', 'user', 'activity_type', 'description', 'metadata', 'created_at')
+    
+    def vehicle_number_display(self, obj):
+        return obj.session.vehicle_number
+    vehicle_number_display.short_description = 'Vehicle Number'
+

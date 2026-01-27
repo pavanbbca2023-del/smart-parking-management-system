@@ -45,6 +45,7 @@ class AnalyticsService:
             total_zones = Zone.objects.filter(is_active=True).count()
             total_slots = Slot.objects.filter(is_active=True).count()
             occupied_slots = Slot.objects.filter(is_occupied=True, is_active=True).count()
+            reserved_slots = ParkingSession.objects.filter(status='active', slot__isnull=True).count()
             
             from django.contrib.auth import get_user_model
             User = get_user_model()
@@ -59,6 +60,8 @@ class AnalyticsService:
                 'total_zones': total_zones,
                 'total_slots': total_slots,
                 'occupied_slots': occupied_slots,
+                'reserved_slots': reserved_slots,
+                'available_slots': total_slots - occupied_slots - reserved_slots,
                 'occupancy_rate': round(occupancy_rate, 2),
                 'total_users': total_users,
                 'users_this_week': 0
@@ -73,8 +76,10 @@ class AnalyticsService:
             zones_data = []
             for zone in Zone.objects.filter(is_active=True):
                 total_slots = zone.total_slots
-                occupied_slots = zone.slots.filter(is_occupied=True).count()
-                occupancy_rate = (occupied_slots / total_slots * 100) if total_slots > 0 else 0
+                occupied_slots = zone.occupied_slots
+                reserved_slots = zone.reserved_slots
+                available_slots = zone.available_slots
+                occupancy_rate = ((occupied_slots + reserved_slots) / total_slots * 100) if total_slots > 0 else 0
                 
                 zones_data.append({
                     'zone_id': zone.id,
@@ -82,9 +87,10 @@ class AnalyticsService:
                     'hourly_rate': float(zone.base_price),
                     'total_slots': total_slots,
                     'occupied_slots': occupied_slots,
-                    'available_slots': total_slots - occupied_slots,
+                    'reserved_slots': reserved_slots,
+                    'available_slots': available_slots,
                     'occupancy_rate': round(occupancy_rate, 2),
-                    'active_sessions': occupied_slots
+                    'active_sessions': occupied_slots + reserved_slots
                 })
             return zones_data
         except Exception as e:
@@ -183,7 +189,7 @@ class AnalyticsService:
     def get_active_sessions():
         try:
             ParkingSession, Zone, Vehicle, Payment, Slot = AnalyticsService.get_models()
-            return ParkingSession.objects.filter(status='active').select_related('zone')
+            return ParkingSession.objects.filter(status__in=['active', 'reserved']).select_related('zone').order_by('-entry_time')
         except Exception as e:
             return []
 

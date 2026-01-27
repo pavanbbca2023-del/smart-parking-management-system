@@ -28,7 +28,8 @@ const StaffDirectory = () => {
                     role: user.role === 'STAFF' ? 'Attendant' : (user.role || 'Staff'),
                     status: user.is_active ? 'Active' : 'Deactivated',
                     phone: user.phone || 'N/A',
-                    joinDate: user.date_joined ? new Date(user.date_joined).toLocaleDateString() : 'N/A'
+                    joinDate: user.date_joined ? new Date(user.date_joined).toLocaleDateString() : 'N/A',
+                    zones: user.assigned_zones || []
                 })));
             }
         } catch (err) {
@@ -143,13 +144,18 @@ const StaffDirectory = () => {
                                         </div>
                                     </td>
                                     <td style={{ padding: '24px 40px' }}>
-                                        <div style={{
-                                            display: 'flex', alignItems: 'center', gap: '10px', px: '12px', py: '6px',
-                                            borderRadius: '10px', fontSize: '13px', fontWeight: '700',
-                                            backgroundColor: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', width: 'fit-content', padding: '6px 14px'
-                                        }}>
-                                            <Shield size={14} style={{ color: '#3b82f6' }} />
-                                            {staff.role}
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                            {staff.zones && staff.zones.length > 0 ? staff.zones.map((zone, i) => (
+                                                <div key={i} style={{
+                                                    padding: '4px 10px', borderRadius: '8px', fontSize: '11px', fontWeight: '800',
+                                                    background: '#eff6ff', color: '#3b82f6', border: '1px solid #dbeafe',
+                                                    textTransform: 'uppercase'
+                                                }}>
+                                                    {zone}
+                                                </div>
+                                            )) : (
+                                                <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: '600' }}>Unassigned</span>
+                                            )}
                                         </div>
                                     </td>
                                     <td style={{ padding: '24px 40px' }}>
@@ -165,13 +171,15 @@ const StaffDirectory = () => {
                                         </span>
                                     </td>
                                     <td style={{ padding: '24px 40px', textAlign: 'center' }}>
-                                        <button style={{
-                                            padding: '10px', background: 'white', border: '1px solid #e2e8f0',
-                                            borderRadius: '12px', color: '#94a3b8', cursor: 'pointer',
-                                            transition: 'all 0.2s'
-                                        }} onMouseEnter={(e) => { e.currentTarget.style.color = '#1e293b'; e.currentTarget.style.borderColor = '#cbd5e1'; }}
-                                            onMouseLeave={(e) => { e.currentTarget.style.color = '#94a3b8'; e.currentTarget.style.borderColor = '#e2e8f0'; }}>
-                                            <MoreVertical size={18} />
+                                        <button
+                                            onClick={() => window.alert(`Zone Management for ${staff.name}\n\nCurrent Zones: ${staff.zones.length > 0 ? staff.zones.join(', ') : 'Unassigned'}\n\nTo manage duties, go to:\nStaff Operations → Duty Roster → + New Duty Allocation`)}
+                                            style={{
+                                                padding: '8px 16px', background: '#3b82f6', border: 'none',
+                                                borderRadius: '10px', color: 'white', cursor: 'pointer',
+                                                fontSize: '12px', fontWeight: '700', transition: 'all 0.2s'
+                                            }} onMouseEnter={(e) => e.currentTarget.style.background = '#2563eb'}
+                                            onMouseLeave={(e) => e.currentTarget.style.background = '#3b82f6'}>
+                                            Manage Duty
                                         </button>
                                     </td>
                                 </tr>

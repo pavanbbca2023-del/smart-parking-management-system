@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Slot, Attendance, Zone, ParkingSession, Payment, Vehicle, Dispute, Schedule, ShiftLog, Feedback
+from .models import User, Slot, Attendance, Zone, ParkingSession, Payment, Vehicle, Dispute, Schedule, ShiftLog, Feedback, BookingActivityLog
 
 class AttendanceSerializer(serializers.ModelSerializer):
     staff_name = serializers.CharField(source='staff.username', read_only=True)
@@ -10,11 +10,20 @@ class AttendanceSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     phone = serializers.CharField(source='phone_number', required=False)
     created_at = serializers.DateTimeField(source='date_joined', read_only=True)
+    assigned_zones = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'role', 'salary', 'position', 'phone', 'created_at', 'password')
+        fields = ('id', 'username', 'email', 'role', 'salary', 'position', 'phone', 'created_at', 'assigned_zones', 'password')
         extra_kwargs = {'password': {'write_only': True}}
+
+    def get_assigned_zones(self, obj):
+        if obj.role != 'STAFF':
+            return []
+        from .models import Schedule
+        # Get unique zones assigned to this staff member
+        zones = Schedule.objects.filter(staff=obj, is_active=True).values_list('zone__name', flat=True).distinct()
+        return list(zones)
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
@@ -28,21 +37,23 @@ class SlotSerializer(serializers.ModelSerializer):
 
 class ZoneSerializer(serializers.ModelSerializer):
     available_slots = serializers.ReadOnlyField()
+    occupied_slots = serializers.ReadOnlyField()
+    reserved_slots = serializers.ReadOnlyField()
     current_occupancy = serializers.SerializerMethodField()
     hourly_rate = serializers.DecimalField(source='base_price', max_digits=10, decimal_places=2, read_only=True)
 
     class Meta:
         model = Zone
-        fields = ('id', 'name', 'description', 'total_slots', 'available_slots', 'base_price', 'hourly_rate', 'is_active', 'current_occupancy', 'slots')
+        fields = ('id', 'name', 'description', 'total_slots', 'available_slots', 'occupied_slots', 'reserved_slots', 'base_price', 'hourly_rate', 'is_active', 'current_occupancy', 'slots')
     
     slots = SlotSerializer(many=True, read_only=True)
 
     def get_current_occupancy(self, obj):
-        occupied = obj.slots.filter(is_occupied=True).count()
         return {
             'total_slots': obj.total_slots,
-            'occupied': occupied,
-            'available': obj.total_slots - occupied
+            'occupied': obj.occupied_slots,
+            'reserved': obj.reserved_slots,
+            'available': obj.available_slots
         }
 
 class ParkingSessionSerializer(serializers.ModelSerializer):
@@ -59,7 +70,7 @@ class ParkingSessionSerializer(serializers.ModelSerializer):
         fields = ('id', 'vehicle_number', 'zone', 'zone_name', 'slot', 'slot_number', 'entry_time', 'exit_time', 
                   'initial_amount_paid', 'final_amount_paid', 'total_amount_paid',
                   'payment_method', 'payment_status', 'is_paid', 'duration', 'status', 'qr_code_data',
-                  'hourly_rate', 'estimated_total', 'estimated_balance')
+                  'hourly_rate', 'estimated_total', 'estimated_balance', 'guest_mobile', 'guest_email')
 
     def get_is_paid(self, obj):
         return obj.payment_status == 'paid'
@@ -123,10 +134,11 @@ class DisputeSerializer(serializers.ModelSerializer):
 
 class ScheduleSerializer(serializers.ModelSerializer):
     staff_name = serializers.CharField(source='staff.username', read_only=True)
+    zone_name = serializers.CharField(source='zone.name', read_only=True)
 
     class Meta:
         model = Schedule
-        fields = ('id', 'staff', 'staff_name', 'day', 'shift_type', 'shift_start', 'shift_end', 'is_active')
+        fields = ('id', 'staff', 'staff_name', 'zone', 'zone_name', 'day', 'shift_type', 'shift_start', 'shift_end', 'is_active')
 
 class ShiftLogSerializer(serializers.ModelSerializer):
     staff_name = serializers.CharField(source='staff.username', read_only=True)
@@ -139,3 +151,16 @@ class FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feedback
         fields = '__all__'
+
+class BookingActivityLogSerializer(serializers.ModelSerializer):
+    user_name = serializers.CharField(source='user.username', read_only=True)
+    user_phone = serializers.CharField(source='user.phone_number', read_only=True)
+    vehicle_number = serializers.CharField(source='session.vehicle_number', read_only=True)
+    zone_name = serializers.CharField(source='session.zone.name', read_only=True)
+    activity_type_display = serializers.CharField(source='get_activity_type_display', read_only=True)
+    
+    class Meta:
+        model = BookingActivityLog
+        fields = ('id', 'session', 'vehicle_number', 'zone_name', 'user', 'user_name', 'user_phone',
+                  'activity_type', 'activity_type_display', 'description', 'metadata', 'created_at')
+

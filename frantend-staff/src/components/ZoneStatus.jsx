@@ -162,7 +162,7 @@ const ZoneStatus = () => {
                 </div>
 
                 <div style={{ textAlign: 'center', fontSize: '0.9rem', fontWeight: '600', color: '#475569' }}>
-                  {Math.round(rate)}% Occupied
+                  {Math.round(rate)}% Occupied {occ.reserved > 0 && `(+${occ.reserved} Reserved)`}
                 </div>
               </div>
             );

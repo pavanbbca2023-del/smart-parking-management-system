@@ -136,3 +136,38 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
+
+# Cancellation Policy Settings
+CANCELLATION_FREE_WINDOW_MINUTES = 30  # 100% refund within 30 minutes
+CANCELLATION_PARTIAL_REFUND_HOURS = 2  # 50% refund within 2 hours
+CANCELLATION_PARTIAL_REFUND_PERCENTAGE = 50
+BOOKING_AUTO_CANCEL_HOURS = 24  # Auto-cancel reserved bookings after 24 hours
+SMS_WARNING_HOURS_BEFORE = 2  # Send SMS warning 2 hours before expiry
+
+# Fast2SMS Configuration
+# Get your API key from https://www.fast2sms.com/
+FAST2SMS_API_KEY = ''  # Add your Fast2SMS API key here
+FAST2SMS_SENDER_ID = 'FSTSMS'  # Default sender ID
+
+# Logging Configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'backend_core_api': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
+

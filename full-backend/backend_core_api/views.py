@@ -49,6 +49,16 @@ def home(request):
         }
     })
 
+def get_staff_zones(user):
+    """Helper function to get zones assigned to a staff member"""
+    if not user or user.role != 'STAFF':
+        return []
+    zone_ids = Schedule.objects.filter(
+        staff=user, 
+        is_active=True
+    ).values_list('zone_id', flat=True).distinct()
+    return list(zone_ids)
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -146,18 +156,28 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
     def book_parking(self, request):
         vehicle_number = request.data.get('vehicle_number')
         zone_id = request.data.get('zone_id')
+        guest_mobile = request.data.get('mobileNumber')
+        guest_email = request.data.get('email')
         
         try:
             zone = Zone.objects.get(id=zone_id)
-            if zone.available_slots <= 0:
+            slot = Slot.objects.filter(zone=zone, is_occupied=False, is_reserved=False, is_active=True).first()
+            if not slot:
                 return Response({'error': 'No slots available in this zone'}, status=400)
             
             session = ParkingSession.objects.create(
                 vehicle_number=vehicle_number,
                 zone=zone,
-                status='active',
-                user=request.user if request.user.is_authenticated else None
+                slot=slot,
+                status='reserved',
+                user=request.user if request.user.is_authenticated else None,
+                guest_mobile=guest_mobile,
+                guest_email=guest_email
             )
+            
+            # Mark slot as reserved
+            slot.is_reserved = True
+            slot.save()
             
             # Generate QR code data
             import json
@@ -165,7 +185,8 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
                 'session_id': session.id,
                 'vehicle_number': session.vehicle_number,
                 'zone': session.zone.name,
-                'entry_time': session.entry_time.isoformat(),
+                'slot_number': slot.slot_number,
+                'entry_time': (session.entry_time or timezone.now()).isoformat(),
                 'type': 'parking_session'
             }
             session.qr_code_data = json.dumps(qr_data)
@@ -198,17 +219,35 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
         if not session and vehicle_number:
             session = ParkingSession.objects.filter(vehicle_number=vehicle_number, status='active').first()
             
-        # 3. If session found, ensure it has a slot
+        # 3. If session found, check zone permissions for staff
         if session:
-            if session.status != 'active':
+            # Check if user is staff and has permission for this zone
+            if request.user and request.user.is_authenticated and request.user.role == 'STAFF':
+                staff_zones = get_staff_zones(request.user)
+                if staff_zones and session.zone_id not in staff_zones:
+                    return Response({
+                        'error': 'Zone Access Denied',
+                        'message': f'You can only process entries for your assigned zones. This vehicle is in {session.zone.name}.'
+                    }, status=403)
+            
+            if session.status not in ['active', 'reserved']:
                 return Response({'error': f'Session is in {session.status} status'}, status=400)
                 
-            if not session.slot:
-                slot = Slot.objects.filter(zone=session.zone, is_occupied=False, is_active=True).first()
+            if session.status == 'reserved' and session.slot:
+                # Transition from reserved to active occupancy
+                slot = session.slot
+                slot.is_reserved = False
+                slot.is_occupied = True
+                slot.save()
+                session.status = 'active'
+                session.save()
+            elif not session.slot:
+                slot = Slot.objects.filter(zone=session.zone, is_occupied=False, is_reserved=False, is_active=True).first()
                 if slot:
                     slot.is_occupied = True
                     slot.save()
                     session.slot = slot
+                    session.status = 'active'
                     session.save()
             return Response({'success': True, 'message': 'Entry verified', 'session_id': session.id})
             
@@ -216,7 +255,7 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
         if vehicle_number and zone_id:
             try:
                 zone = Zone.objects.get(id=zone_id)
-                slot = Slot.objects.filter(zone=zone, is_occupied=False, is_active=True).first()
+                slot = Slot.objects.filter(zone=zone, is_occupied=False, is_reserved=False, is_active=True).first()
                 if not slot:
                     return Response({'error': 'No slots available in this zone'}, status=400)
                 
@@ -284,6 +323,15 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
         if not session:
             return Response({'error': 'Active session not found'}, status=404)
 
+        # Check zone permissions for staff
+        if request.user and request.user.is_authenticated and request.user.role == 'STAFF':
+            staff_zones = get_staff_zones(request.user)
+            if staff_zones and session.zone_id not in staff_zones:
+                return Response({
+                    'error': 'Zone Access Denied',
+                    'message': f'You can only process exits for your assigned zones. This vehicle is in {session.zone.name}.'
+                }, status=403)
+
         session.exit_time = timezone.now()
         session.status = 'completed'
         
@@ -301,6 +349,7 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
         if session.slot:
             slot = session.slot
             slot.is_occupied = False
+            slot.is_reserved = False
             slot.save()
             
         session.save()
@@ -341,6 +390,263 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'], url_path='payment-status')
     def payment_status(self, request):
         return Response({'success': True, 'payment_status': 'paid'}, status=200)
+    
+    @action(detail=True, methods=['post'], url_path='cancel')
+    def cancel_booking(self, request, pk=None):
+        """Cancel a booking and process refund"""
+        from .services import CancellationService
+        
+        session = self.get_object()
+        reason = request.data.get('reason', 'User requested cancellation')
+        
+        success, message, refund_amount = CancellationService.process_cancellation(
+            session=session,
+            reason=reason,
+            user=request.user if request.user.is_authenticated else None,
+            cancellation_type='user_initiated'
+        )
+        
+        if success:
+            serializer = self.get_serializer(session)
+            return Response({
+                'success': True,
+                'message': message,
+                'refund_amount': float(refund_amount),
+                'session': serializer.data
+            })
+        else:
+            return Response({
+                'success': False,
+                'error': message
+            }, status=400)
+    
+    @action(detail=True, methods=['post'], url_path='extend')
+    def extend_booking(self, request, pk=None):
+        """Extend booking expiry time"""
+        from .services import CancellationService
+        
+        session = self.get_object()
+        hours = int(request.data.get('hours', 2))  # Default 2 hours
+        
+        if hours not in [2, 6, 24]:
+            return Response({
+                'success': False,
+                'error': 'Invalid extension duration. Choose 2, 6, or 24 hours.'
+            }, status=400)
+        
+        success, message = CancellationService.process_extension(
+            session=session,
+            hours=hours,
+            user=request.user if request.user.is_authenticated else None
+        )
+        
+        if success:
+            serializer = self.get_serializer(session)
+            return Response({
+                'success': True,
+                'message': message,
+                'new_expiry_time': session.booking_expiry_time.isoformat() if session.booking_expiry_time else None,
+                'extension_count': session.extension_count,
+                'session': serializer.data
+            })
+        else:
+            return Response({
+                'success': False,
+                'error': message
+            }, status=400)
+    
+    @action(detail=True, methods=['get'], url_path='can-cancel')
+    def check_cancellation(self, request, pk=None):
+        """Check if booking can be cancelled and calculate refund"""
+        session = self.get_object()
+        
+        can_cancel, message = session.can_cancel()
+        refund_amount = session.calculate_refund() if can_cancel else 0
+        
+        return Response({
+            'can_cancel': can_cancel,
+            'message': message,
+            'refund_amount': float(refund_amount),
+            'refund_percentage': int((refund_amount / session.initial_amount_paid * 100) if session.initial_amount_paid > 0 else 0)
+        })
+    
+    @action(detail=False, methods=['get'], url_path='activity-logs')
+    def get_activity_logs(self, request):
+        """Get booking activity logs for admin/staff monitoring"""
+        from .models import BookingActivityLog
+        from .serializers import BookingActivityLogSerializer
+        from django.db.models import Q
+        
+        # Get query parameters
+        activity_type = request.query_params.get('activity_type')
+        date_from = request.query_params.get('date_from')
+        date_to = request.query_params.get('date_to')
+        user_id = request.query_params.get('user_id')
+        zone_id = request.query_params.get('zone_id')
+        search = request.query_params.get('search')
+        
+        # Base queryset
+        queryset = BookingActivityLog.objects.all()
+        
+        # Apply filters
+        if activity_type:
+            queryset = queryset.filter(activity_type=activity_type)
+        
+        if date_from:
+            queryset = queryset.filter(created_at__gte=date_from)
+        
+        if date_to:
+            queryset = queryset.filter(created_at__lte=date_to)
+        
+        if user_id:
+            queryset = queryset.filter(user_id=user_id)
+        
+        if zone_id:
+            queryset = queryset.filter(session__zone_id=zone_id)
+        
+        if search:
+            queryset = queryset.filter(
+                Q(session__vehicle_number__icontains=search) |
+                Q(description__icontains=search) |
+                Q(user__username__icontains=search)
+            )
+        
+        # Pagination
+        page_size = int(request.query_params.get('page_size', 50))
+        page = int(request.query_params.get('page', 1))
+        start = (page - 1) * page_size
+        end = start + page_size
+        
+        total_count = queryset.count()
+        logs = queryset[start:end]
+        
+        serializer = BookingActivityLogSerializer(logs, many=True)
+        
+        return Response({
+            'success': True,
+            'activity_logs': serializer.data,
+            'total_count': total_count,
+            'page': page,
+            'page_size': page_size,
+            'total_pages': (total_count + page_size - 1) // page_size
+        })
+    
+    @action(detail=False, methods=['get'], url_path='cancellation-report')
+    def cancellation_report(self, request):
+        """Get cancellation statistics and reports"""
+        from django.db.models import Count, Sum, Avg
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        # Get time range
+        range_type = request.query_params.get('range', 'today')  # today, week, month
+        now = timezone.now()
+        
+        if range_type == 'today':
+            start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        elif range_type == 'week':
+            start_date = now - timedelta(days=7)
+        else:  # month
+            start_date = now - timedelta(days=30)
+        
+        # Get cancelled sessions
+        cancelled_sessions = ParkingSession.objects.filter(
+            status='cancelled',
+            cancelled_at__gte=start_date
+        )
+        
+        # Calculate statistics
+        total_cancellations = cancelled_sessions.count()
+        user_initiated = cancelled_sessions.filter(cancellation_type='user_initiated').count()
+        auto_cancelled = cancelled_sessions.filter(cancellation_type='auto_cancelled').count()
+        admin_cancelled = cancelled_sessions.filter(cancellation_type='admin_cancelled').count()
+        
+        total_refunds = cancelled_sessions.aggregate(Sum('refund_amount'))['refund_amount__sum'] or 0
+        avg_refund = cancelled_sessions.aggregate(Avg('refund_amount'))['refund_amount__avg'] or 0
+        
+        # Top users who cancelled
+        from django.db.models import Count
+        top_users = cancelled_sessions.values(
+            'user__username', 'user__id'
+        ).annotate(
+            cancel_count=Count('id')
+        ).order_by('-cancel_count')[:10]
+        
+        # Cancellations by zone
+        by_zone = cancelled_sessions.values(
+            'zone__name'
+        ).annotate(
+            count=Count('id')
+        ).order_by('-count')
+        
+        # Cancellation reasons breakdown
+        reasons = cancelled_sessions.values(
+            'cancellation_reason'
+        ).annotate(
+            count=Count('id')
+        ).order_by('-count')[:10]
+        
+        return Response({
+            'success': True,
+            'summary': {
+                'total_cancellations': total_cancellations,
+                'user_initiated': user_initiated,
+                'auto_cancelled': auto_cancelled,
+                'admin_cancelled': admin_cancelled,
+                'total_refunds': float(total_refunds),
+                'average_refund': float(avg_refund),
+            },
+            'top_users': list(top_users),
+            'by_zone': list(by_zone),
+            'cancellation_reasons': list(reasons),
+            'range': range_type
+        })
+    
+    @action(detail=False, methods=['get'], url_path='extension-report')
+    def extension_report(self, request):
+        """Get time extension statistics and reports"""
+        from django.db.models import Count, Avg
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        # Get time range
+        range_type = request.query_params.get('range', 'today')
+        now = timezone.now()
+        
+        if range_type == 'today':
+            start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        elif range_type == 'week':
+            start_date = now - timedelta(days=7)
+        else:  # month
+            start_date = now - timedelta(days=30)
+        
+        # Get sessions with extensions
+        extended_sessions = ParkingSession.objects.filter(
+            extension_count__gt=0,
+            entry_time__gte=start_date
+        )
+        
+        total_extensions = extended_sessions.aggregate(Sum('extension_count'))['extension_count__sum'] or 0
+        avg_extensions = extended_sessions.aggregate(Avg('extension_count'))['extension_count__avg'] or 0
+        
+        # Top users who extended
+        top_users = extended_sessions.values(
+            'user__username', 'user__id'
+        ).annotate(
+            total_ext=Sum('extension_count')
+        ).order_by('-total_ext')[:10]
+        
+        return Response({
+            'success': True,
+            'summary': {
+                'total_sessions_extended': extended_sessions.count(),
+                'total_extensions': int(total_extensions),
+                'average_extensions_per_booking': float(avg_extensions),
+            },
+            'top_users': list(top_users),
+            'range': range_type
+        })
+
 
 class VehicleViewSet(viewsets.ModelViewSet):
     queryset = Vehicle.objects.all()
@@ -368,8 +674,12 @@ class ScheduleViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.get_queryset()
+        zone_id = request.query_params.get('zone')
         
+        if zone_id:
+            queryset = queryset.filter(zone_id=zone_id)
+            
         # Group schedules by day
         days_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
         schedule_by_day = {day: {} for day in days_order}
@@ -377,12 +687,15 @@ class ScheduleViewSet(viewsets.ModelViewSet):
         for schedule in queryset:
             day = schedule.day
             if day in schedule_by_day:
-                if schedule.shift_type == 'Alpha':
-                    schedule_by_day[day]['shift1_name'] = schedule.staff.username
-                elif schedule.shift_type == 'Bravo':
-                    schedule_by_day[day]['shift2_name'] = schedule.staff.username
-                elif schedule.shift_type == 'Charlie':
-                    schedule_by_day[day]['shift3_name'] = schedule.staff.username
+                staff_info = f"{schedule.staff.username} ({schedule.zone.name if schedule.zone else 'General'})"
+                shift_key = ''
+                if schedule.shift_type == 'Alpha': shift_key = 'shift1_name'
+                elif schedule.shift_type == 'Bravo': shift_key = 'shift2_name'
+                elif schedule.shift_type == 'Charlie': shift_key = 'shift3_name'
+                
+                if shift_key:
+                    current = schedule_by_day[day].get(shift_key, '')
+                    schedule_by_day[day][shift_key] = f"{current}, {staff_info}" if current else staff_info
         
         # Convert to list format expected by frontend
         result = []
@@ -394,7 +707,11 @@ class ScheduleViewSet(viewsets.ModelViewSet):
                 'shift3_name': schedule_by_day[day].get('shift3_name', '')
             })
         
-        return Response(result)
+        return Response({
+            'success': True,
+            'schedules': result,
+            'zone_id': zone_id
+        })
 
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()

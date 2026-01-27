@@ -285,13 +285,19 @@ class ApiService {
     return response.data;
   }
 
-  async adminGetAllSchedules() {
-    const response = await apiClient.get('/api/admin/schedules/');
+  async adminGetAllSchedules(zoneId = null) {
+    const params = zoneId ? { zone: zoneId } : {};
+    const response = await apiClient.get(API_CONFIG.ENDPOINTS.ADMIN.SCHEDULES, { params });
     return response.data;
   }
 
-  async adminUpdateSchedule(id, data) {
-    const response = await apiClient.patch(`/api/admin/schedules/${id}/`, data);
+  async adminCreateSchedule(scheduleData) {
+    const response = await apiClient.post(API_CONFIG.ENDPOINTS.ADMIN.SCHEDULES, scheduleData);
+    return response.data;
+  }
+
+  async adminDeleteSchedule(id) {
+    const response = await apiClient.delete(`${API_CONFIG.ENDPOINTS.ADMIN.SCHEDULES}${id}/`);
     return response.data;
   }
 
