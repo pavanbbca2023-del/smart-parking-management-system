@@ -1,0 +1,18 @@
+PLACEHOLDER IMAGE FILE
+======================
+
+Filename: car.webp
+Purpose: Background image for Landing page
+Recommended dimensions: 1920x1080 or higher
+Recommended file type: WebP
+
+This file should be replaced with an actual parking/car background image.
+Currently used by:
+- Landing.jsx
+
+To add the actual image:
+1. Place your car/parking background image in this assets folder
+2. Name it as "car.webp"
+3. Update the import paths in the components if needed
+
+Note: WebP format is recommended for better compression and performance

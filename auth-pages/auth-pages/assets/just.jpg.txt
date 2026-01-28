@@ -1,0 +1,17 @@
+PLACEHOLDER IMAGE FILE
+======================
+
+Filename: just.jpg
+Purpose: Background image for Login and Signup components
+Recommended dimensions: 1920x1080 or higher
+Recommended file type: JPG/JPEG
+
+This file should be replaced with an actual parking/background image.
+Currently used by:
+- Login.jsx
+- Signup.jsx
+
+To add the actual image:
+1. Place your parking background image in this assets folder
+2. Name it as "just.jpg"
+3. Update the import paths in the components if needed

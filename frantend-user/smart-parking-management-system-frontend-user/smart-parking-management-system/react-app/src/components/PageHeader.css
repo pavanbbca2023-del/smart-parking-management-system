@@ -1,0 +1,131 @@
+/* ============================================
+   PAGE HEADER STYLES - CONTAINER ALIGNED
+   ============================================ */
+
+.page-header {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  padding: 24px 32px;
+  margin: 32px auto;
+  max-width: 1200px;
+  width: calc(100% - 48px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Header Left Section */
+.header-left h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #1e293b;
+  margin: 0;
+}
+
+.header-left p {
+  font-size: 1rem;
+  color: #64748b;
+  font-weight: 500;
+  margin: 4px 0 0 0;
+}
+
+/* Header Right Section */
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.status-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+/* Status Items */
+.weather-status,
+.time-status,
+.date-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.weather-emoji,
+.clock-emoji,
+.calendar-emoji {
+  font-size: 1.1rem;
+}
+
+.weather-text,
+.time-text,
+.date-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.time-text {
+  font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+    padding: 20px 24px;
+    width: calc(100% - 32px);
+    margin: 24px auto;
+  }
+  
+  .header-left h1 {
+    font-size: 1.8rem;
+  }
+  
+  .status-bar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header {
+    padding: 16px 20px;
+    width: calc(100% - 24px);
+    margin: 16px auto;
+  }
+  
+  .header-left h1 {
+    font-size: 1.5rem;
+  }
+  
+  .header-left p {
+    font-size: 0.9rem;
+  }
+  
+  .status-bar {
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .weather-status,
+  .time-status,
+  .date-status {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+}

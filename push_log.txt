@@ -1,0 +1,28 @@
+POST git-receive-pack (369913 bytes)
+remote: error: GH013: Repository rule violations found for refs/heads/project_test.        
+remote: 
+remote: - GITHUB PUSH PROTECTION        
+remote:   —————————————————————————————————————————        
+remote:     Resolve the following violations before pushing again        
+remote: 
+remote:     - Push cannot contain secrets        
+remote: 
+remote:             
+remote:      (?) Learn how to resolve a blocked push        
+remote:      https://docs.github.com/code-security/secret-scanning/working-with-secret-scanning-and-push-protection/working-with-push-protection-from-the-command-line#resolving-a-blocked-push        
+remote:             
+remote:             
+remote:       —— Twilio Account String Identifier ——————————————————        
+remote:        locations:        
+remote:          - commit: 4f300b2f24a551017a189ac888a57e64518a4519        
+remote:            path: full-backend/smart_parking/settings.py:154        
+remote:             
+remote:        (?) To push, remove secret from commit(s) or follow this URL to allow the secret.        
+remote:        https://github.com/pavanbbca2023-del/smart-parking-management-system/security/secret-scanning/unblock-secret/38sXuMplw7Qi8YfdOhOS0aNz8e0        
+remote:             
+remote: 
+remote: 
+Pushing to https://github.com/pavanbbca2023-del/smart-parking-management-system.git
+To https://github.com/pavanbbca2023-del/smart-parking-management-system.git
+ ! [remote rejected]   project_test -> project_test (push declined due to repository rule violations)
+error: failed to push some refs to 'https://github.com/pavanbbca2023-del/smart-parking-management-system.git'
