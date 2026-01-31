@@ -1,0 +1,1169 @@
+[
+{
+  "model": "backend_core_api.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$UDmcMboapvaVb9nO28B8yZ$4yorwmnnQ7qZTQygm/uyhChfZzAX6qjmxnQKos7NF8Y=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin@example.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-01-31T07:15:17.713Z",
+    "role": "ADMIN",
+    "salary": "0.00",
+    "position": null,
+    "phone_number": null,
+    "plain_password": null,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "backend_core_api.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$TTFcDyXVwmrbYPxUS0D14r$7EenDcdXxr3ZPQ1mE4zxaWvTgSTyUVqdFEe2q6puXb0=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "staff1",
+    "first_name": "",
+    "last_name": "",
+    "email": "staff1@parking.io",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-01-31T07:15:28.570Z",
+    "role": "STAFF",
+    "salary": "30000.00",
+    "position": "Senior Warden",
+    "phone_number": null,
+    "plain_password": null,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "backend_core_api.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$skBopjwEXCRHwoW0QfaehJ$NbtWunugGiAtxSJC9fGaoYdTno9LU1KnKiHXGHhmJ30=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "staff2",
+    "first_name": "",
+    "last_name": "",
+    "email": "staff2@parking.io",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-01-31T07:15:31.151Z",
+    "role": "STAFF",
+    "salary": "25000.00",
+    "position": "Security Officer",
+    "phone_number": null,
+    "plain_password": null,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "backend_core_api.attendance",
+  "pk": 1,
+  "fields": {
+    "staff": 2,
+    "entry_time": "2026-01-31T07:21:22.801Z",
+    "exit_time": null,
+    "status": "on-duty"
+  }
+},
+{
+  "model": "backend_core_api.attendance",
+  "pk": 2,
+  "fields": {
+    "staff": 2,
+    "entry_time": "2026-01-31T11:42:21.607Z",
+    "exit_time": null,
+    "status": "on-duty"
+  }
+},
+{
+  "model": "backend_core_api.attendance",
+  "pk": 3,
+  "fields": {
+    "staff": 2,
+    "entry_time": "2026-01-31T14:28:52.154Z",
+    "exit_time": null,
+    "status": "on-duty"
+  }
+},
+{
+  "model": "backend_core_api.attendance",
+  "pk": 4,
+  "fields": {
+    "staff": 2,
+    "entry_time": "2026-01-31T14:36:43.681Z",
+    "exit_time": null,
+    "status": "on-duty"
+  }
+},
+{
+  "model": "backend_core_api.attendance",
+  "pk": 5,
+  "fields": {
+    "staff": 2,
+    "entry_time": "2026-01-31T14:37:56.088Z",
+    "exit_time": null,
+    "status": "on-duty"
+  }
+},
+{
+  "model": "backend_core_api.attendance",
+  "pk": 6,
+  "fields": {
+    "staff": 2,
+    "entry_time": "2026-01-31T14:42:03.231Z",
+    "exit_time": null,
+    "status": "on-duty"
+  }
+},
+{
+  "model": "backend_core_api.attendance",
+  "pk": 7,
+  "fields": {
+    "staff": 1,
+    "entry_time": "2026-01-31T14:42:09.887Z",
+    "exit_time": null,
+    "status": "on-duty"
+  }
+},
+{
+  "model": "backend_core_api.zone",
+  "pk": 1,
+  "fields": {
+    "name": "Zone A",
+    "description": null,
+    "total_slots": 20,
+    "base_price": "20.00",
+    "is_active": true,
+    "created_at": "2026-01-31T07:15:20.848Z"
+  }
+},
+{
+  "model": "backend_core_api.zone",
+  "pk": 2,
+  "fields": {
+    "name": "Zone B",
+    "description": null,
+    "total_slots": 15,
+    "base_price": "30.00",
+    "is_active": true,
+    "created_at": "2026-01-31T07:15:23.922Z"
+  }
+},
+{
+  "model": "backend_core_api.zone",
+  "pk": 3,
+  "fields": {
+    "name": "VIP Zone",
+    "description": null,
+    "total_slots": 5,
+    "base_price": "100.00",
+    "is_active": true,
+    "created_at": "2026-01-31T07:15:27.139Z"
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 1,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-01",
+    "is_occupied": true,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 2,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-02",
+    "is_occupied": false,
+    "is_reserved": true,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 3,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-03",
+    "is_occupied": false,
+    "is_reserved": true,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 4,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-04",
+    "is_occupied": false,
+    "is_reserved": true,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 5,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-05",
+    "is_occupied": false,
+    "is_reserved": true,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 6,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-06",
+    "is_occupied": false,
+    "is_reserved": true,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 7,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-07",
+    "is_occupied": false,
+    "is_reserved": true,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 8,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-08",
+    "is_occupied": false,
+    "is_reserved": true,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 9,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-09",
+    "is_occupied": false,
+    "is_reserved": true,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 10,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-10",
+    "is_occupied": false,
+    "is_reserved": true,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 11,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-11",
+    "is_occupied": false,
+    "is_reserved": true,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 12,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-12",
+    "is_occupied": false,
+    "is_reserved": true,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 13,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-13",
+    "is_occupied": false,
+    "is_reserved": true,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 14,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-14",
+    "is_occupied": false,
+    "is_reserved": true,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 15,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-15",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 16,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-16",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 17,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-17",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 18,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-18",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 19,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-19",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 20,
+  "fields": {
+    "zone": 1,
+    "slot_number": "A-20",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 21,
+  "fields": {
+    "zone": 2,
+    "slot_number": "B-01",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 22,
+  "fields": {
+    "zone": 2,
+    "slot_number": "B-02",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 23,
+  "fields": {
+    "zone": 2,
+    "slot_number": "B-03",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 24,
+  "fields": {
+    "zone": 2,
+    "slot_number": "B-04",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 25,
+  "fields": {
+    "zone": 2,
+    "slot_number": "B-05",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 26,
+  "fields": {
+    "zone": 2,
+    "slot_number": "B-06",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 27,
+  "fields": {
+    "zone": 2,
+    "slot_number": "B-07",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 28,
+  "fields": {
+    "zone": 2,
+    "slot_number": "B-08",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 29,
+  "fields": {
+    "zone": 2,
+    "slot_number": "B-09",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 30,
+  "fields": {
+    "zone": 2,
+    "slot_number": "B-10",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 31,
+  "fields": {
+    "zone": 2,
+    "slot_number": "B-11",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 32,
+  "fields": {
+    "zone": 2,
+    "slot_number": "B-12",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 33,
+  "fields": {
+    "zone": 2,
+    "slot_number": "B-13",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 34,
+  "fields": {
+    "zone": 2,
+    "slot_number": "B-14",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 35,
+  "fields": {
+    "zone": 2,
+    "slot_number": "B-15",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 36,
+  "fields": {
+    "zone": 3,
+    "slot_number": "o-01",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 37,
+  "fields": {
+    "zone": 3,
+    "slot_number": "o-02",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 38,
+  "fields": {
+    "zone": 3,
+    "slot_number": "o-03",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 39,
+  "fields": {
+    "zone": 3,
+    "slot_number": "o-04",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.slot",
+  "pk": 40,
+  "fields": {
+    "zone": 3,
+    "slot_number": "o-05",
+    "is_occupied": false,
+    "is_reserved": false,
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.parkingsession",
+  "pk": 1,
+  "fields": {
+    "vehicle_number": "MH-01-AB-1234",
+    "zone": 1,
+    "entry_time": "2026-01-31T07:15:35.758Z",
+    "exit_time": null,
+    "initial_amount_paid": "20.00",
+    "final_amount_paid": "0.00",
+    "total_amount_paid": "20.00",
+    "payment_method": null,
+    "payment_status": "partially_paid",
+    "status": "active",
+    "qr_code_data": null,
+    "user": null,
+    "slot": 1,
+    "guest_mobile": null,
+    "guest_email": null,
+    "cancellation_reason": null,
+    "cancelled_at": null,
+    "cancellation_type": null,
+    "refund_amount": "0.00",
+    "refund_status": "not_applicable",
+    "booking_expiry_time": null,
+    "extension_count": 0,
+    "sms_notification_sent": false
+  }
+},
+{
+  "model": "backend_core_api.parkingsession",
+  "pk": 2,
+  "fields": {
+    "vehicle_number": "DL-05-CD-5678",
+    "zone": 2,
+    "entry_time": "2026-01-31T07:15:35.963Z",
+    "exit_time": "2026-01-31T07:15:35.961Z",
+    "initial_amount_paid": "30.00",
+    "final_amount_paid": "120.00",
+    "total_amount_paid": "150.00",
+    "payment_method": null,
+    "payment_status": "paid",
+    "status": "completed",
+    "qr_code_data": null,
+    "user": null,
+    "slot": null,
+    "guest_mobile": null,
+    "guest_email": null,
+    "cancellation_reason": null,
+    "cancelled_at": null,
+    "cancellation_type": null,
+    "refund_amount": "0.00",
+    "refund_status": "not_applicable",
+    "booking_expiry_time": null,
+    "extension_count": 0,
+    "sms_notification_sent": false
+  }
+},
+{
+  "model": "backend_core_api.parkingsession",
+  "pk": 3,
+  "fields": {
+    "vehicle_number": "DL03AB1234",
+    "zone": 1,
+    "entry_time": "2026-01-31T07:36:30.752Z",
+    "exit_time": null,
+    "initial_amount_paid": "0.00",
+    "final_amount_paid": "0.00",
+    "total_amount_paid": "0.00",
+    "payment_method": null,
+    "payment_status": "pending",
+    "status": "reserved",
+    "qr_code_data": "{\"session_id\": 3, \"vehicle_number\": \"DL03AB1234\", \"zone\": \"Zone A\", \"slot_number\": \"A-02\", \"entry_time\": \"2026-01-31T07:36:30.752592+00:00\", \"type\": \"parking_session\"}",
+    "user": 1,
+    "slot": 2,
+    "guest_mobile": "9753901480",
+    "guest_email": "",
+    "cancellation_reason": null,
+    "cancelled_at": null,
+    "cancellation_type": null,
+    "refund_amount": "0.00",
+    "refund_status": "not_applicable",
+    "booking_expiry_time": "2026-02-01T07:36:30.751Z",
+    "extension_count": 0,
+    "sms_notification_sent": false
+  }
+},
+{
+  "model": "backend_core_api.parkingsession",
+  "pk": 4,
+  "fields": {
+    "vehicle_number": "DL03AB1234",
+    "zone": 1,
+    "entry_time": "2026-01-31T07:36:33.201Z",
+    "exit_time": null,
+    "initial_amount_paid": "0.00",
+    "final_amount_paid": "0.00",
+    "total_amount_paid": "0.00",
+    "payment_method": null,
+    "payment_status": "pending",
+    "status": "reserved",
+    "qr_code_data": "{\"session_id\": 4, \"vehicle_number\": \"DL03AB1234\", \"zone\": \"Zone A\", \"slot_number\": \"A-03\", \"entry_time\": \"2026-01-31T07:36:33.201778+00:00\", \"type\": \"parking_session\"}",
+    "user": 1,
+    "slot": 3,
+    "guest_mobile": "9753901480",
+    "guest_email": "",
+    "cancellation_reason": null,
+    "cancelled_at": null,
+    "cancellation_type": null,
+    "refund_amount": "0.00",
+    "refund_status": "not_applicable",
+    "booking_expiry_time": "2026-02-01T07:36:33.201Z",
+    "extension_count": 0,
+    "sms_notification_sent": false
+  }
+},
+{
+  "model": "backend_core_api.parkingsession",
+  "pk": 5,
+  "fields": {
+    "vehicle_number": "DL03AB1234",
+    "zone": 1,
+    "entry_time": "2026-01-31T07:36:34.552Z",
+    "exit_time": null,
+    "initial_amount_paid": "0.00",
+    "final_amount_paid": "0.00",
+    "total_amount_paid": "0.00",
+    "payment_method": null,
+    "payment_status": "pending",
+    "status": "reserved",
+    "qr_code_data": "{\"session_id\": 5, \"vehicle_number\": \"DL03AB1234\", \"zone\": \"Zone A\", \"slot_number\": \"A-04\", \"entry_time\": \"2026-01-31T07:36:34.552938+00:00\", \"type\": \"parking_session\"}",
+    "user": 1,
+    "slot": 4,
+    "guest_mobile": "9753901480",
+    "guest_email": "",
+    "cancellation_reason": null,
+    "cancelled_at": null,
+    "cancellation_type": null,
+    "refund_amount": "0.00",
+    "refund_status": "not_applicable",
+    "booking_expiry_time": "2026-02-01T07:36:34.552Z",
+    "extension_count": 0,
+    "sms_notification_sent": false
+  }
+},
+{
+  "model": "backend_core_api.parkingsession",
+  "pk": 6,
+  "fields": {
+    "vehicle_number": "DL03AB1234",
+    "zone": 1,
+    "entry_time": "2026-01-31T07:36:38.702Z",
+    "exit_time": null,
+    "initial_amount_paid": "0.00",
+    "final_amount_paid": "0.00",
+    "total_amount_paid": "0.00",
+    "payment_method": null,
+    "payment_status": "pending",
+    "status": "reserved",
+    "qr_code_data": "{\"session_id\": 6, \"vehicle_number\": \"DL03AB1234\", \"zone\": \"Zone A\", \"slot_number\": \"A-05\", \"entry_time\": \"2026-01-31T07:36:38.702937+00:00\", \"type\": \"parking_session\"}",
+    "user": 1,
+    "slot": 5,
+    "guest_mobile": "9753901480",
+    "guest_email": "",
+    "cancellation_reason": null,
+    "cancelled_at": null,
+    "cancellation_type": null,
+    "refund_amount": "0.00",
+    "refund_status": "not_applicable",
+    "booking_expiry_time": "2026-02-01T07:36:38.702Z",
+    "extension_count": 0,
+    "sms_notification_sent": false
+  }
+},
+{
+  "model": "backend_core_api.parkingsession",
+  "pk": 7,
+  "fields": {
+    "vehicle_number": "DL03AB1234",
+    "zone": 1,
+    "entry_time": "2026-01-31T07:36:39.919Z",
+    "exit_time": null,
+    "initial_amount_paid": "0.00",
+    "final_amount_paid": "0.00",
+    "total_amount_paid": "0.00",
+    "payment_method": null,
+    "payment_status": "pending",
+    "status": "reserved",
+    "qr_code_data": "{\"session_id\": 7, \"vehicle_number\": \"DL03AB1234\", \"zone\": \"Zone A\", \"slot_number\": \"A-06\", \"entry_time\": \"2026-01-31T07:36:39.919232+00:00\", \"type\": \"parking_session\"}",
+    "user": 1,
+    "slot": 6,
+    "guest_mobile": "9753901480",
+    "guest_email": "",
+    "cancellation_reason": null,
+    "cancelled_at": null,
+    "cancellation_type": null,
+    "refund_amount": "0.00",
+    "refund_status": "not_applicable",
+    "booking_expiry_time": "2026-02-01T07:36:39.918Z",
+    "extension_count": 0,
+    "sms_notification_sent": false
+  }
+},
+{
+  "model": "backend_core_api.parkingsession",
+  "pk": 8,
+  "fields": {
+    "vehicle_number": "DL03AB1234",
+    "zone": 1,
+    "entry_time": "2026-01-31T07:36:41.313Z",
+    "exit_time": null,
+    "initial_amount_paid": "0.00",
+    "final_amount_paid": "0.00",
+    "total_amount_paid": "0.00",
+    "payment_method": null,
+    "payment_status": "pending",
+    "status": "reserved",
+    "qr_code_data": "{\"session_id\": 8, \"vehicle_number\": \"DL03AB1234\", \"zone\": \"Zone A\", \"slot_number\": \"A-07\", \"entry_time\": \"2026-01-31T07:36:41.313286+00:00\", \"type\": \"parking_session\"}",
+    "user": 1,
+    "slot": 7,
+    "guest_mobile": "9753901480",
+    "guest_email": "",
+    "cancellation_reason": null,
+    "cancelled_at": null,
+    "cancellation_type": null,
+    "refund_amount": "0.00",
+    "refund_status": "not_applicable",
+    "booking_expiry_time": "2026-02-01T07:36:41.312Z",
+    "extension_count": 0,
+    "sms_notification_sent": false
+  }
+},
+{
+  "model": "backend_core_api.parkingsession",
+  "pk": 9,
+  "fields": {
+    "vehicle_number": "DL03AB1234",
+    "zone": 1,
+    "entry_time": "2026-01-31T07:36:41.314Z",
+    "exit_time": null,
+    "initial_amount_paid": "0.00",
+    "final_amount_paid": "0.00",
+    "total_amount_paid": "0.00",
+    "payment_method": null,
+    "payment_status": "pending",
+    "status": "reserved",
+    "qr_code_data": "{\"session_id\": 9, \"vehicle_number\": \"DL03AB1234\", \"zone\": \"Zone A\", \"slot_number\": \"A-07\", \"entry_time\": \"2026-01-31T07:36:41.314975+00:00\", \"type\": \"parking_session\"}",
+    "user": 1,
+    "slot": 7,
+    "guest_mobile": "9753901480",
+    "guest_email": "",
+    "cancellation_reason": null,
+    "cancelled_at": null,
+    "cancellation_type": null,
+    "refund_amount": "0.00",
+    "refund_status": "not_applicable",
+    "booking_expiry_time": "2026-02-01T07:36:41.314Z",
+    "extension_count": 0,
+    "sms_notification_sent": false
+  }
+},
+{
+  "model": "backend_core_api.parkingsession",
+  "pk": 10,
+  "fields": {
+    "vehicle_number": "DL03AB1234",
+    "zone": 1,
+    "entry_time": "2026-01-31T07:36:42.791Z",
+    "exit_time": null,
+    "initial_amount_paid": "0.00",
+    "final_amount_paid": "0.00",
+    "total_amount_paid": "0.00",
+    "payment_method": null,
+    "payment_status": "pending",
+    "status": "reserved",
+    "qr_code_data": "{\"session_id\": 10, \"vehicle_number\": \"DL03AB1234\", \"zone\": \"Zone A\", \"slot_number\": \"A-08\", \"entry_time\": \"2026-01-31T07:36:42.791168+00:00\", \"type\": \"parking_session\"}",
+    "user": 1,
+    "slot": 8,
+    "guest_mobile": "9753901480",
+    "guest_email": "",
+    "cancellation_reason": null,
+    "cancelled_at": null,
+    "cancellation_type": null,
+    "refund_amount": "0.00",
+    "refund_status": "not_applicable",
+    "booking_expiry_time": "2026-02-01T07:36:42.789Z",
+    "extension_count": 0,
+    "sms_notification_sent": false
+  }
+},
+{
+  "model": "backend_core_api.parkingsession",
+  "pk": 11,
+  "fields": {
+    "vehicle_number": "DL03AB1234",
+    "zone": 1,
+    "entry_time": "2026-01-31T07:36:43.780Z",
+    "exit_time": null,
+    "initial_amount_paid": "0.00",
+    "final_amount_paid": "0.00",
+    "total_amount_paid": "0.00",
+    "payment_method": null,
+    "payment_status": "pending",
+    "status": "reserved",
+    "qr_code_data": "{\"session_id\": 11, \"vehicle_number\": \"DL03AB1234\", \"zone\": \"Zone A\", \"slot_number\": \"A-09\", \"entry_time\": \"2026-01-31T07:36:43.780760+00:00\", \"type\": \"parking_session\"}",
+    "user": 1,
+    "slot": 9,
+    "guest_mobile": "9753901480",
+    "guest_email": "",
+    "cancellation_reason": null,
+    "cancelled_at": null,
+    "cancellation_type": null,
+    "refund_amount": "0.00",
+    "refund_status": "not_applicable",
+    "booking_expiry_time": "2026-02-01T07:36:43.780Z",
+    "extension_count": 0,
+    "sms_notification_sent": false
+  }
+},
+{
+  "model": "backend_core_api.parkingsession",
+  "pk": 12,
+  "fields": {
+    "vehicle_number": "DL03AB1234",
+    "zone": 1,
+    "entry_time": "2026-01-31T07:36:45.113Z",
+    "exit_time": null,
+    "initial_amount_paid": "0.00",
+    "final_amount_paid": "0.00",
+    "total_amount_paid": "0.00",
+    "payment_method": null,
+    "payment_status": "pending",
+    "status": "reserved",
+    "qr_code_data": "{\"session_id\": 12, \"vehicle_number\": \"DL03AB1234\", \"zone\": \"Zone A\", \"slot_number\": \"A-10\", \"entry_time\": \"2026-01-31T07:36:45.113833+00:00\", \"type\": \"parking_session\"}",
+    "user": 1,
+    "slot": 10,
+    "guest_mobile": "9753901480",
+    "guest_email": "",
+    "cancellation_reason": null,
+    "cancelled_at": null,
+    "cancellation_type": null,
+    "refund_amount": "0.00",
+    "refund_status": "not_applicable",
+    "booking_expiry_time": "2026-02-01T07:36:45.113Z",
+    "extension_count": 0,
+    "sms_notification_sent": false
+  }
+},
+{
+  "model": "backend_core_api.parkingsession",
+  "pk": 13,
+  "fields": {
+    "vehicle_number": "DL03AB1234",
+    "zone": 1,
+    "entry_time": "2026-01-31T07:36:42.796Z",
+    "exit_time": null,
+    "initial_amount_paid": "0.00",
+    "final_amount_paid": "0.00",
+    "total_amount_paid": "0.00",
+    "payment_method": null,
+    "payment_status": "pending",
+    "status": "reserved",
+    "qr_code_data": "{\"session_id\": 13, \"vehicle_number\": \"DL03AB1234\", \"zone\": \"Zone A\", \"slot_number\": \"A-08\", \"entry_time\": \"2026-01-31T07:36:42.796202+00:00\", \"type\": \"parking_session\"}",
+    "user": 1,
+    "slot": 8,
+    "guest_mobile": "9753901480",
+    "guest_email": "",
+    "cancellation_reason": null,
+    "cancelled_at": null,
+    "cancellation_type": null,
+    "refund_amount": "0.00",
+    "refund_status": "not_applicable",
+    "booking_expiry_time": "2026-02-01T07:36:42.795Z",
+    "extension_count": 0,
+    "sms_notification_sent": false
+  }
+},
+{
+  "model": "backend_core_api.parkingsession",
+  "pk": 14,
+  "fields": {
+    "vehicle_number": "TEST-BOOK-01",
+    "zone": 1,
+    "entry_time": "2026-01-31T07:41:29.700Z",
+    "exit_time": null,
+    "initial_amount_paid": "0.00",
+    "final_amount_paid": "0.00",
+    "total_amount_paid": "0.00",
+    "payment_method": null,
+    "payment_status": "pending",
+    "status": "reserved",
+    "qr_code_data": "{\"session_id\": 14, \"vehicle_number\": \"TEST-BOOK-01\", \"zone\": \"Zone A\", \"slot_number\": \"A-11\", \"entry_time\": \"2026-01-31T07:41:29.700436+00:00\", \"type\": \"parking_session\"}",
+    "user": null,
+    "slot": 11,
+    "guest_mobile": "9988776655",
+    "guest_email": "test@example.com",
+    "cancellation_reason": null,
+    "cancelled_at": null,
+    "cancellation_type": null,
+    "refund_amount": "0.00",
+    "refund_status": "not_applicable",
+    "booking_expiry_time": "2026-02-01T07:41:29.700Z",
+    "extension_count": 0,
+    "sms_notification_sent": false
+  }
+},
+{
+  "model": "backend_core_api.parkingsession",
+  "pk": 15,
+  "fields": {
+    "vehicle_number": "CHK-1191",
+    "zone": 1,
+    "entry_time": "2026-01-31T14:36:32.577Z",
+    "exit_time": null,
+    "initial_amount_paid": "0.00",
+    "final_amount_paid": "0.00",
+    "total_amount_paid": "0.00",
+    "payment_method": null,
+    "payment_status": "pending",
+    "status": "active",
+    "qr_code_data": "{\"session_id\": 15, \"vehicle_number\": \"CHK-1191\", \"zone\": \"Zone A\", \"slot_number\": \"A-12\", \"entry_time\": \"2026-01-31T14:36:32.577082+00:00\", \"type\": \"parking_session\"}",
+    "user": null,
+    "slot": 12,
+    "guest_mobile": "9876543210",
+    "guest_email": "verify@test.com",
+    "cancellation_reason": null,
+    "cancelled_at": null,
+    "cancellation_type": null,
+    "refund_amount": "0.00",
+    "refund_status": "not_applicable",
+    "booking_expiry_time": "2026-02-01T14:36:32.576Z",
+    "extension_count": 0,
+    "sms_notification_sent": false
+  }
+},
+{
+  "model": "backend_core_api.parkingsession",
+  "pk": 16,
+  "fields": {
+    "vehicle_number": "CHK-1550",
+    "zone": 1,
+    "entry_time": "2026-01-31T14:37:48.452Z",
+    "exit_time": null,
+    "initial_amount_paid": "0.00",
+    "final_amount_paid": "0.00",
+    "total_amount_paid": "0.00",
+    "payment_method": null,
+    "payment_status": "pending",
+    "status": "active",
+    "qr_code_data": "{\"session_id\": 16, \"vehicle_number\": \"CHK-1550\", \"zone\": \"Zone A\", \"slot_number\": \"A-13\", \"entry_time\": \"2026-01-31T14:37:48.452302+00:00\", \"type\": \"parking_session\"}",
+    "user": null,
+    "slot": 13,
+    "guest_mobile": "9876543210",
+    "guest_email": "verify@test.com",
+    "cancellation_reason": null,
+    "cancelled_at": null,
+    "cancellation_type": null,
+    "refund_amount": "0.00",
+    "refund_status": "not_applicable",
+    "booking_expiry_time": "2026-02-01T14:37:48.451Z",
+    "extension_count": 0,
+    "sms_notification_sent": false
+  }
+},
+{
+  "model": "backend_core_api.parkingsession",
+  "pk": 17,
+  "fields": {
+    "vehicle_number": "CHK-7464",
+    "zone": 1,
+    "entry_time": "2026-01-31T14:41:56.917Z",
+    "exit_time": null,
+    "initial_amount_paid": "0.00",
+    "final_amount_paid": "0.00",
+    "total_amount_paid": "0.00",
+    "payment_method": null,
+    "payment_status": "pending",
+    "status": "active",
+    "qr_code_data": "{\"session_id\": 17, \"vehicle_number\": \"CHK-7464\", \"zone\": \"Zone A\", \"slot_number\": \"A-14\", \"entry_time\": \"2026-01-31T14:41:56.917367+00:00\", \"type\": \"parking_session\"}",
+    "user": null,
+    "slot": 14,
+    "guest_mobile": "9876543210",
+    "guest_email": "verify@test.com",
+    "cancellation_reason": null,
+    "cancelled_at": null,
+    "cancellation_type": null,
+    "refund_amount": "0.00",
+    "refund_status": "not_applicable",
+    "booking_expiry_time": "2026-02-01T14:41:56.916Z",
+    "extension_count": 0,
+    "sms_notification_sent": false
+  }
+},
+{
+  "model": "backend_core_api.vehicle",
+  "pk": 1,
+  "fields": {
+    "vehicle_number": "MH-01-AB-1234",
+    "user": 1,
+    "vehicle_type": "Car",
+    "created_at": "2026-01-31T07:15:35.203Z"
+  }
+},
+{
+  "model": "backend_core_api.vehicle",
+  "pk": 2,
+  "fields": {
+    "vehicle_number": "DL-05-CD-5678",
+    "user": 1,
+    "vehicle_type": "SUV",
+    "created_at": "2026-01-31T07:15:35.378Z"
+  }
+},
+{
+  "model": "backend_core_api.dispute",
+  "pk": 1,
+  "fields": {
+    "session": 2,
+    "user": 1,
+    "reason": "Incorrect slot assignment",
+    "severity": "Medium",
+    "dispute_type": "Operations",
+    "status": "Open",
+    "created_at": "2026-01-31T07:15:36.108Z"
+  }
+},
+{
+  "model": "backend_core_api.schedule",
+  "pk": 1,
+  "fields": {
+    "staff": 2,
+    "zone": null,
+    "day": "Monday",
+    "shift_type": "Alpha",
+    "shift_start": "09:00:00",
+    "shift_end": "17:00:00",
+    "is_active": true
+  }
+},
+{
+  "model": "backend_core_api.schedule",
+  "pk": 2,
+  "fields": {
+    "staff": 3,
+    "zone": null,
+    "day": "Monday",
+    "shift_type": "Alpha",
+    "shift_start": "09:00:00",
+    "shift_end": "17:00:00",
+    "is_active": true
+  }
+}
+]

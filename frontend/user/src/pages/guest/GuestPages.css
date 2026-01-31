@@ -1,0 +1,1690 @@
+/* ============================================
+   PAGE NAVIGATION BUTTONS
+   ============================================ */
+
+.page-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 16px;
+}
+
+.nav-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.back-btn {
+  background: #6b7280;
+  color: white;
+}
+
+.back-btn:hover {
+  background: #4b5563;
+  transform: translateY(-2px);
+}
+
+.booking-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.booking-btn:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .page-navigation {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .nav-btn {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+  }
+}
+
+/* ============================================
+   GUEST PAGES STYLES - CONSISTENT SPACING
+   ============================================ */
+
+/* Base page container with consistent spacing */
+.guest-page {
+  padding: 0;
+  max-width: 100%;
+  margin: 0;
+  min-height: 100vh;
+}
+
+/* Universal container for content alignment */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* Universal section spacing */
+.page-section {
+  padding: 40px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Consistent spacing for all major sections */
+.status-section,
+.features-section,
+.actions-section,
+.instructions-section,
+.cta-section,
+.pricing-section,
+.additional-charges-section,
+.offers-section,
+.zones-header,
+.filter-section,
+.slots-summary,
+.slots-container,
+.legend,
+.page-actions,
+.checkout-container,
+.receipt-container,
+.booking-layout {
+  padding: 40px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Smaller sections with reduced padding */
+.info-box,
+.legend,
+.page-actions {
+  padding: 24px;
+  margin: 24px auto;
+  max-width: 1000px;
+}
+
+/* Grid containers consistent spacing */
+.status-grid,
+.features-list,
+.actions-grid,
+.pricing-grid,
+.offers-grid,
+.slots-grid,
+.zones-grid,
+.zones-summary {
+  gap: 24px;
+  margin: 24px 0;
+}
+
+/* Card elements consistent padding */
+.status-card,
+.feature-item,
+.action-button,
+.pricing-card,
+.offer-card,
+.slot-card,
+.zone-card,
+.summary-card {
+  padding: 24px;
+  margin-bottom: 16px;
+}
+
+/* Form sections consistent spacing */
+.form-section,
+.form-group,
+.booking-form,
+.payment-form {
+  margin-bottom: 24px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+/* Table containers */
+.charges-table-container,
+.slots-table-container {
+  margin: 24px 0;
+  padding: 0 24px;
+}
+
+/* Button groups */
+.form-actions {
+  margin-top: 24px;
+  padding: 0;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  border-top: none;
+}
+
+/* ============================================
+   HOME PAGE CONSISTENT SPACING
+   ============================================ */
+
+.home-page {
+  padding: 0;
+}
+
+.status-section {
+  background: #f8fafc;
+}
+
+.status-section h2,
+.features-section h2,
+.actions-section h2,
+.instructions-section h2,
+.pricing-section h2,
+.additional-charges-section h2,
+.offers-section h2 {
+  text-align: center;
+  margin-bottom: 32px;
+  font-size: 2rem;
+  color: #1e293b;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.status-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s ease;
+  padding: 32px 24px;
+  border: 2px solid transparent;
+}
+
+.status-card:hover {
+  transform: translateY(-4px);
+  border-color: #3b82f6;
+}
+
+.status-card.total {
+  border-top: 4px solid #6b7280;
+}
+
+.status-card.available {
+  border-top: 4px solid #10b981;
+}
+
+.status-card.occupancy {
+  border-top: 4px solid #3b82f6;
+}
+
+.status-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.status-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 8px 0;
+  color: #3b82f6;
+}
+
+.status-label {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.features-section {
+  background: white;
+}
+
+.features-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  /* Fixed 4 columns for cleanliness */
+  gap: 32px;
+  /* Increased gap */
+}
+
+.feature-item {
+  text-align: center;
+}
+
+.feature-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.feature-item h4 {
+  margin: 16px 0 8px 0;
+  color: #1e293b;
+}
+
+.feature-item p {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.actions-section {
+  background: #f8fafc;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  /* 5 columns for 5 buttons */
+  gap: 24px;
+}
+
+.action-button {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.action-button:hover {
+  border-color: #3b82f6;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+}
+
+.button-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.action-button h3 {
+  margin: 16px 0 8px 0;
+  color: #1e293b;
+}
+
+.action-button p {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.instructions-section {
+  background: white;
+  padding-bottom: 60px;
+}
+
+.steps-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.step {
+  text-align: center;
+  flex: 1;
+  min-width: 150px;
+}
+
+.step-number {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 auto 16px;
+}
+
+.step h4 {
+  margin: 16px 0 8px 0;
+  color: #1e293b;
+}
+
+.step p {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.step-arrow {
+  font-size: 1.5rem;
+  color: #94a3b8;
+  margin: 0 10px;
+}
+
+.cta-section {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #1e293b;
+  text-align: center;
+  margin: 32px auto;
+  max-width: 1200px;
+  width: calc(100% - 48px);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  padding: 40px 32px;
+}
+
+.cta-section h2 {
+  margin-bottom: 16px;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.cta-section p {
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.cta-button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 16px 32px;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+/* ============================================
+   VIEW SLOTS PAGE CONSISTENT SPACING
+   ============================================ */
+.page-padding {
+  padding: 24px;
+}
+
+.view-slots-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+.view-slots-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.filter-section {
+  background: white;
+  margin: 32px auto;
+  max-width: 1200px;
+  width: calc(100% - 48px);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.filter-controls {
+  display: flex;
+  gap: 40px;
+  padding: 32px 40px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-group label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.filter-group select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  min-width: 180px;
+}
+
+.slots-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  background: #f8fafc;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.summary-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 0.9rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summary-card p {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.summary-card.available p {
+  color: #059669;
+}
+
+.summary-card.occupied p {
+  color: #dc2626;
+}
+
+.summary-card.reserved p {
+  color: #d97706;
+}
+
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.slot-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.slot-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.slot-card.available {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.slot-card.occupied {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.slot-card.reserved {
+  border-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.slot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.slot-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #1f2937;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.available {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-badge.occupied {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-badge.reserved {
+  background: #fed7aa;
+  color: #92400e;
+}
+
+.slot-details p {
+  margin: 8px 0;
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+
+.legend {
+  background: white;
+  border-radius: 12px;
+}
+
+.legend h3 {
+  margin: 0 0 16px 0;
+  color: #1f2937;
+}
+
+.legend-items {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.legend-dot.available {
+  background: #10b981;
+}
+
+.legend-dot.occupied {
+  background: #ef4444;
+}
+
+.legend-dot.reserved {
+  background: #f59e0b;
+}
+
+/* ============================================
+   PARKING ZONES PAGE STYLES
+   ============================================ */
+
+.parking-zones-page {
+  padding: 0;
+}
+
+.zones-header {
+  text-align: center;
+  background: white;
+}
+
+.zones-header h2 {
+  margin-bottom: 8px;
+  color: #1e293b;
+}
+
+.zones-header p {
+  color: #64748b;
+  margin: 0;
+}
+
+.zones-summary {
+  background: #f8fafc;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 24px;
+  margin: 24px 0;
+}
+
+.zones-grid {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  padding: 24px 32px;
+  margin: 32px auto;
+  max-width: 1200px;
+  width: calc(100% - 48px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.zones-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  margin: 0;
+}
+
+.zone-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  border-top: 4px solid #3b82f6;
+  padding: 24px;
+  margin-bottom: 16px;
+}
+
+.zone-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+  border-color: #3b82f6;
+}
+
+.zone-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.zone-card-header h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 1.25rem;
+}
+
+.zone-badge {
+  background: #eff6ff;
+  color: #3b82f6;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.zone-description {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
+.zone-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat {
+  text-align: center;
+  padding: 8px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.stat .label {
+  display: block;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.stat .value {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.stat .value.available {
+  color: #059669;
+}
+
+.stat .value.occupied {
+  color: #dc2626;
+}
+
+.zone-progress-small {
+  margin-bottom: 16px;
+}
+
+.progress-bar-small {
+  width: 100%;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #3b82f6;
+  transition: width 0.3s ease;
+}
+
+.available-fill {
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+}
+
+.occupancy-text {
+  font-size: 0.8rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+.zone-features-small {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.feature-tag {
+  background: #eff6ff;
+  color: #3b82f6;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.btn-primary-small {
+  width: 100%;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary-small:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.zone-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.zone-card-header h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 1.25rem;
+}
+
+.zone-badge {
+  background: #eff6ff;
+  color: #3b82f6;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.zone-description {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
+.zone-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat {
+  text-align: center;
+  padding: 8px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.stat .label {
+  display: block;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.stat .value {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.stat .value.available {
+  color: #059669;
+}
+
+.stat .value.occupied {
+  color: #dc2626;
+}
+
+.zone-progress-small {
+  margin-bottom: 16px;
+}
+
+.progress-bar-small {
+  width: 100%;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #3b82f6;
+  transition: width 0.3s ease;
+}
+
+.available-fill {
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+}
+
+.occupancy-text {
+  font-size: 0.8rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+.zone-features-small {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.feature-tag {
+  background: #eff6ff;
+  color: #3b82f6;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.btn-primary-small {
+  width: 100%;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary-small:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+/* Zone Detail View */
+.zone-detail-header {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  padding: 24px 32px;
+  margin: 32px auto;
+  max-width: 1200px;
+  width: calc(100% - 48px);
+  text-align: center;
+  border-top: 4px solid #3b82f6;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.zone-detail-header h2 {
+  margin: 0 0 8px 0;
+  color: #1e293b;
+  font-size: 2rem;
+}
+
+.zone-level {
+  color: #3b82f6;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+}
+
+.zone-detail-section,
+.zone-features-section,
+.zone-progress-section,
+.zone-actions-section {
+  padding: 40px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.zone-features-section {
+  background: white;
+}
+
+.zone-features-section h3,
+.zone-progress-section h3 {
+  margin: 0 0 24px 0;
+  color: #1e293b;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.zone-progress-section {
+  background: #f8fafc;
+}
+
+.zone-actions-section {
+  background: white;
+  text-align: center;
+}
+
+.zone-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.zone-stat-card {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.zone-stat-card h3 {
+  margin: 0 0 16px 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.zone-stat-card .stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.zone-stat-card .stat-value.available {
+  color: #059669;
+}
+
+.zone-stat-card .stat-value.occupied {
+  color: #dc2626;
+}
+
+.zone-stat-card p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.zone-features {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  margin-bottom: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.zone-features h3 {
+  margin: 0 0 16px 0;
+  color: #1e293b;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.feature-badge {
+  background: #eff6ff;
+  color: #3b82f6;
+  padding: 12px 16px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+  border: 1px solid #dbeafe;
+}
+
+.zone-progress {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  margin-bottom: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.zone-progress h3 {
+  margin: 0 0 16px 0;
+  color: #1e293b;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.progress-legend {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.zone-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.text-success {
+  color: #059669;
+}
+
+.text-danger {
+  color: #dc2626;
+}
+
+.charges-page {
+  padding: 0;
+}
+
+.pricing-section {
+  background: #f8fafc;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin: 24px 0;
+}
+
+.pricing-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.pricing-card:hover {
+  transform: translateY(-4px);
+  border-color: #3b82f6;
+}
+
+.pricing-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.vehicle-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.pricing-header h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.5rem;
+  color: #1e293b;
+}
+
+.description {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.price-list {
+  margin-bottom: 24px;
+}
+
+.price-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.price-item:last-child {
+  border-bottom: none;
+}
+
+.price-item span {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.price-item strong {
+  color: #3b82f6;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.additional-charges-section {
+  background: white;
+}
+
+.charges-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.charges-table thead {
+  background: #f8fafc;
+}
+
+.charges-table th {
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.charges-table td {
+  padding: 16px;
+  border-bottom: 1px solid #f3f4f6;
+  color: #4b5563;
+}
+
+.charges-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.text-primary {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.offers-section {
+  background: #f8fafc;
+}
+
+.offers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.offer-card {
+  background: white;
+  color: #1e293b;
+  border-radius: 16px;
+  text-align: center;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  padding: 12px 24px;
+  transition: all 0.3s ease;
+}
+
+.offer-card:hover {
+  transform: translateY(-4px);
+  border-color: #3b82f6;
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+}
+
+.offer-card h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.25rem;
+}
+
+.offer-card p {
+  margin: 0 0 16px 0;
+  opacity: 0.9;
+}
+
+.offer-code {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* ============================================
+   BOOK SLOT PAGE LAYOUT
+   ============================================ */
+
+.info-section {
+  padding: 0;
+}
+
+.booking-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.booking-left {
+  /* Remove box styling - just padding for spacing */
+  padding: 0;
+}
+
+.payment-methods {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.payment-option:hover {
+  border-color: #3b82f6;
+  background: #f0f9ff;
+}
+
+.payment-option input[type="radio"] {
+  margin: 0;
+  width: 14px;
+  height: 14px;
+}
+
+/* Form styling with larger font sizes */
+.booking-form input,
+.booking-form select,
+.booking-form label {
+  font-size: 18px;
+}
+
+.booking-form input,
+.booking-form select {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.booking-form label {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.booking-right {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.booking-right .info-box {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .booking-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .booking-left {
+    padding: 24px;
+  }
+
+  .booking-right .info-box {
+    padding: 20px;
+  }
+}
+
+.info-box {
+  background: #eff6ff;
+  border-left: 4px solid #3b82f6;
+  border-radius: 8px;
+}
+
+.info-box h3 {
+  margin: 0 0 16px 0;
+  color: #1e293b;
+}
+
+.info-box ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #4b5563;
+}
+
+.info-box li {
+  margin: 8px 0;
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+/* ============================================
+   BUTTONS CONSISTENT SPACING
+   ============================================ */
+
+.btn-primary,
+.btn-secondary,
+.btn-disabled {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  margin: 4px;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #1e293b;
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: #3b82f6;
+  color: white;
+  border: 1px solid #3b82f6;
+}
+
+.btn-secondary:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+  transform: translateY(-2px);
+}
+
+.btn-disabled {
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN - CONSISTENT SPACING
+   ============================================ */
+
+@media (max-width: 768px) {
+
+  /* Container adjustments for mobile */
+  .container {
+    padding: 0 16px;
+  }
+
+  /* Reduce section padding for mobile */
+  .page-section,
+  .status-section,
+  .features-section,
+  .actions-section,
+  .instructions-section,
+  .cta-section,
+  .pricing-section,
+  .additional-charges-section,
+  .offers-section,
+  .zones-header,
+  .filter-section,
+  .slots-summary,
+  .slots-container,
+  .checkout-container,
+  .receipt-container,
+  .booking-layout {
+    padding: 24px 0;
+  }
+
+  /* Reduce card padding */
+  .status-card,
+  .feature-item,
+  .action-button,
+  .pricing-card,
+  .offer-card,
+  .slot-card,
+  .zone-card,
+  .summary-card {
+    padding: 16px;
+  }
+
+  /* Reduce grid gaps */
+  .status-grid,
+  .features-list,
+  .actions-grid,
+  .pricing-grid,
+  .offers-grid,
+  .slots-grid,
+  .zones-grid,
+  .zones-summary {
+    gap: 16px;
+    margin: 16px 0;
+  }
+
+  /* Adjust info boxes and legends */
+  .info-box,
+  .legend {
+    padding: 16px;
+    margin: 16px auto;
+  }
+
+  /* Adjust form spacing */
+  .form-section,
+  .form-group,
+  .booking-form,
+  .payment-form {
+    margin-bottom: 16px;
+  }
+
+  /* Adjust button groups */
+  .form-actions,
+  .payment-actions,
+  .checkout-actions,
+  .page-actions {
+    margin-top: 24px;
+    padding: 0 16px;
+    gap: 12px;
+  }
+
+  /* Single column layouts */
+  .status-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .features-list,
+  .pricing-grid,
+  .offers-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .steps-container {
+    flex-direction: column;
+  }
+
+  .step-arrow {
+    transform: rotate(90deg);
+    margin: 10px 0;
+  }
+
+  .filter-section {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .legend-items {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  /* Container adjustments for small screens */
+  .container {
+    padding: 0 12px;
+  }
+
+  /* Further reduce spacing for small screens */
+  .page-section,
+  .status-section,
+  .features-section,
+  .actions-section,
+  .instructions-section,
+  .cta-section,
+  .pricing-section,
+  .additional-charges-section,
+  .offers-section,
+  .zones-header,
+  .filter-section,
+  .slots-summary,
+  .slots-container,
+  .checkout-container,
+  .receipt-container,
+  .booking-layout {
+    padding: 16px 0;
+  }
+
+  /* Minimal card padding */
+  .status-card,
+  .feature-item,
+  .action-button,
+  .pricing-card,
+  .offer-card,
+  .slot-card,
+  .zone-card,
+  .summary-card {
+    padding: 12px;
+  }
+
+  /* Tighter grid gaps */
+  .status-grid,
+  .features-list,
+  .actions-grid,
+  .pricing-grid,
+  .offers-grid,
+  .slots-grid,
+  .zones-grid,
+  .zones-summary {
+    gap: 12px;
+    margin: 12px 0;
+  }
+
+  /* Compact info boxes */
+  .info-box,
+  .legend {
+    padding: 12px;
+    margin: 12px auto;
+  }
+
+  /* Compact forms */
+  .form-section,
+  .form-group {
+    margin-bottom: 12px;
+  }
+
+  /* Compact buttons */
+  .form-actions,
+  .payment-actions,
+  .checkout-actions,
+  .page-actions {
+    margin-top: 16px;
+    padding: 0 12px;
+    gap: 8px;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  /* Mobile status grid - single column */
+  .status-grid,
+  .actions-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* Compact slot cards */
+  .slots-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .slot-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  /* Compact tables */
+  .charges-table {
+    font-size: 0.8rem;
+  }
+
+  .charges-table th,
+  .charges-table td {
+    padding: 8px;
+  }
+}

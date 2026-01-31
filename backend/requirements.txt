@@ -1,0 +1,12 @@
+Django>=5.0.0
+djangorestframework
+djangorestframework-simplejwt
+requests
+twilio
+razorpay
+gunicorn
+whitenoise
+python-dotenv
+dj-database-url
+psycopg2-binary
+django-cors-headers
