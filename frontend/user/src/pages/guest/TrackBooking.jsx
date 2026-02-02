@@ -40,6 +40,7 @@ const TrackBooking = ({ onNavigate }) => {
                         : (latestSession.booking_expiry_time
                             ? new Date(latestSession.booking_expiry_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                             : 'N/A'),
+                    duration: latestSession.duration,
                     totalAmount: latestSession.estimated_total,
                     amountPaid: latestSession.initial_amount_paid,
                     remainingBalance: latestSession.estimated_balance,

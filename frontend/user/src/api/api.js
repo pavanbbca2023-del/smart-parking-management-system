@@ -83,7 +83,8 @@ export const parkingApi = {
                 zone_id: bookingData.selectedZone,
                 mobileNumber: bookingData.mobileNumber,
                 email: bookingData.email,
-                vehicleType: bookingData.vehicleType
+                vehicleType: bookingData.vehicleType,
+                exitTime: bookingData.exitTime
             });
             return response.data;
         } catch (error) {

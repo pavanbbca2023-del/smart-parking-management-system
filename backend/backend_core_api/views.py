@@ -267,8 +267,13 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
                     h, m = map(int, exit_time_str.split(':'))
                     now_local = timezone.localtime(timezone.now())
                     booking_expiry = now_local.replace(hour=h, minute=m, second=0, microsecond=0)
+                    
+                    # If the selected time is earlier than now, assume it's for tomorrow
                     if booking_expiry <= now_local:
-                        return Response({'error': 'Exit time must be in the future'}, status=400)
+                        booking_expiry += timedelta(days=1)
+                        
+                    # Still check to prevent invalid very close times if needed, 
+                    # but the main goal is to allow next-day bookings.
                 except ValueError:
                     return Response({'error': 'Invalid time format'}, status=400)
 
