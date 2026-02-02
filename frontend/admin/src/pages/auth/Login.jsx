@@ -266,7 +266,7 @@ const Login = () => {
                     <div style={{ ...styles.footer, marginTop: '16px' }}>
                         <button
                             type="button"
-                            onClick={() => window.location.href = 'http://localhost:5173'}
+                            onClick={() => window.location.href = import.meta.env.VITE_USER_URL || 'http://localhost:5173'}
                             style={{
                                 background: 'none',
                                 border: 'none',

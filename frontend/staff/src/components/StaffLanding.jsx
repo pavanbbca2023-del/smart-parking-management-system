@@ -32,7 +32,7 @@ const StaffLanding = () => {
                 </div>
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                     <button
-                        onClick={() => window.location.href = 'http://localhost:5173'}
+                        onClick={() => window.location.href = import.meta.env.VITE_USER_URL || 'http://localhost:5173'}
                         style={{
                             padding: '10px 16px',
                             backgroundColor: 'transparent',
@@ -61,10 +61,10 @@ const StaffLanding = () => {
                         Login
                     </button>
                 </div>
-            </nav>
+            </nav >
 
             {/* Hero Section */}
-            <div style={{
+            < div style={{
                 maxWidth: '1200px',
                 margin: '60px auto',
                 padding: '0 40px',
@@ -151,10 +151,10 @@ const StaffLanding = () => {
                         }}
                     />
                 </div>
-            </div>
+            </div >
 
             {/* Features Grid */}
-            <div style={{ backgroundColor: '#f8fafc', padding: '80px 40px' }}>
+            < div style={{ backgroundColor: '#f8fafc', padding: '80px 40px' }}>
                 <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
                     <div style={{ textAlign: 'center', marginBottom: '60px' }}>
                         <h2 style={{ fontSize: '32px', fontWeight: '700', color: '#0f172a', marginBottom: '16px' }}>
@@ -214,8 +214,8 @@ const StaffLanding = () => {
                         ))}
                     </div>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 
