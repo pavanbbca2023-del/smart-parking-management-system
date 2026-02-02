@@ -5,7 +5,7 @@ import './Login.css';
 
 const Login = () => {
     const navigate = useNavigate();
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -23,7 +23,7 @@ const Login = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    email: email,
+                    username: username,
                     password: password
                 })
             });
@@ -49,7 +49,7 @@ const Login = () => {
         <div className="login-container" style={{ backgroundImage: `url(${loginBg})` }}>
             <div className="login-box">
                 <h1>Quick Park</h1>
-                <h2>Staff Login Portal</h2>
+                <h2>Member Login</h2>
 
                 {error && (
                     <div className="login-error">
@@ -59,13 +59,13 @@ const Login = () => {
 
                 <form onSubmit={handleLogin}>
                     <div className="form-group">
-                        <label>Email Address</label>
+                        <label>Staff ID / Username</label>
                         <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             required
-                            placeholder="Enter your email"
+                            placeholder="Enter your username"
                         />
                     </div>
 

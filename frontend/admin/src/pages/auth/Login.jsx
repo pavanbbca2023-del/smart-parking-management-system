@@ -259,9 +259,25 @@ const Login = () => {
                         {loading ? 'Signing in...' : 'Sign In'}
                     </button>
 
-                    < div style={styles.footer}>
+                    <div style={styles.footer}>
                         Don't have an account?
                         <Link to="/signup" style={styles.link}> Create Account</Link>
+                    </div>
+                    <div style={{ ...styles.footer, marginTop: '16px' }}>
+                        <button
+                            type="button"
+                            onClick={() => window.location.href = 'http://localhost:5173'}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                color: '#64748b',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                textDecoration: 'underline'
+                            }}
+                        >
+                            Back to Main Site
+                        </button>
                     </div>
                 </form>
             </div>

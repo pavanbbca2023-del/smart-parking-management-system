@@ -30,7 +30,21 @@ const StaffLanding = () => {
                     </div>
                     <span style={{ fontSize: '24px', fontWeight: '800', color: '#1e293b' }}>PARK-PRO</span>
                 </div>
-                <div style={{ display: 'flex', gap: '16px' }}>
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                    <button
+                        onClick={() => window.location.href = 'http://localhost:5173'}
+                        style={{
+                            padding: '10px 16px',
+                            backgroundColor: 'transparent',
+                            color: '#64748b',
+                            border: 'none',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            fontSize: '15px'
+                        }}
+                    >
+                        Back to Main Site
+                    </button>
                     <button
                         onClick={() => navigate('/login')}
                         style={{
@@ -46,7 +60,6 @@ const StaffLanding = () => {
                     >
                         Login
                     </button>
-
                 </div>
             </nav>
 

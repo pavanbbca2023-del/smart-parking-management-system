@@ -37,13 +37,22 @@ const Landing = () => {
                             <span>🚗</span> Book Parking
                         </button>
                         <button
-                            onClick={() => navigate('/login')}
+                            onClick={() => window.location.href = 'http://localhost:5174'}
                             className="hero-btn hero-btn-secondary"
                         >
-                            <span>👤</span> Staff/Admin Login
+                            <span>👤</span> Staff Portal
                         </button>
-
-
+                        <button
+                            onClick={() => window.location.href = 'http://localhost:5175'}
+                            className="hero-btn hero-btn-admin"
+                            style={{
+                                backgroundColor: '#1e293b',
+                                color: 'white',
+                                borderColor: '#1e293b'
+                            }}
+                        >
+                            <span>🛠️</span> Admin Portal
+                        </button>
                     </div>
                 </div>
             </div>

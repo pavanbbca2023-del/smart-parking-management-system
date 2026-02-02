@@ -212,7 +212,7 @@ const Login = () => {
     return (
         <div style={styles.container}>
             {/* Brand Section - Visible on desktop */}
-            <div style={styles.brandSection} className="hidden md:flex">
+            <div style={styles.brandSection}>
                 <div style={styles.circle1} />
                 <div style={styles.circle2} />
 
