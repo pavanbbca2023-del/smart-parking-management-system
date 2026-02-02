@@ -36,6 +36,13 @@ const Landing = () => {
                         >
                             <span>🚗</span> Book Parking
                         </button>
+                        <button
+                            onClick={() => navigate('/login')}
+                            className="hero-btn hero-btn-secondary"
+                        >
+                            <span>👤</span> Staff/Admin Login
+                        </button>
+
 
                     </div>
                 </div>
