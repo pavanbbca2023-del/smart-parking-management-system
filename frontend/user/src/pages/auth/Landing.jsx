@@ -37,13 +37,20 @@ const Landing = () => {
                             <span>🚗</span> Book Parking
                         </button>
                         <button
-                            onClick={() => window.location.href = 'http://localhost:5174'}
+                            onClick={() => navigate('/login')}
                             className="hero-btn hero-btn-secondary"
                         >
-                            <span>👤</span> Staff Portal
+                            <span>👤</span> Member Login
                         </button>
                         <button
-                            onClick={() => window.location.href = 'http://localhost:5175'}
+                            onClick={() => window.location.href = import.meta.env.VITE_STAFF_URL || 'http://localhost:5174'}
+                            className="hero-btn hero-btn-secondary"
+                            style={{ backgroundColor: 'rgba(59, 130, 246, 0.2)' }}
+                        >
+                            <span>💼</span> Staff Portal
+                        </button>
+                        <button
+                            onClick={() => window.location.href = import.meta.env.VITE_ADMIN_URL || 'http://localhost:5175'}
                             className="hero-btn hero-btn-admin"
                             style={{
                                 backgroundColor: '#1e293b',
