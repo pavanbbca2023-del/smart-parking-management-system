@@ -88,7 +88,7 @@ const BookingConfirmation = ({ bookingData, onNavigate }) => {
                   <div>
                     <span style={{ color: '#64748b', fontSize: '13px', display: 'block' }}>Entry Time</span>
                     <span style={{ fontWeight: '600' }}>
-                      {bookingData.status === 'RESERVED' ?
+                      {['RESERVED', 'PENDING_PAYMENT'].includes(bookingData.status) ?
                         <span style={{ color: '#f59e0b' }}>On Arrival</span> :
                         (bookingData.entryTime ? new Date(bookingData.entryTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Not specified')
                       }
@@ -170,7 +170,7 @@ const BookingConfirmation = ({ bookingData, onNavigate }) => {
               </div>
               <p style={{ margin: '0', fontSize: '14px', color: '#64748b' }}>Scan at entry for verification</p>
               <div style={{ marginTop: '20px', fontSize: '12px', color: '#94a3b8' }}>
-                {bookingData.status === 'RESERVED'
+                {['RESERVED', 'PENDING_PAYMENT'].includes(bookingData.status)
                   ? (bookingData.fullExpiryTime
                     ? `Booking expires on ${new Date(bookingData.fullExpiryTime).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}`
                     : `Booking expires at ${bookingData.exitTime}`)
