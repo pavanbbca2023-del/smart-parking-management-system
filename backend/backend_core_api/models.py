@@ -141,6 +141,14 @@ class ParkingSession(models.Model):
             self.booking_expiry_time = timezone.now() + timedelta(hours=24)
         
         super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        # Release the slot when session is deleted
+        if self.slot:
+            self.slot.is_occupied = False
+            self.slot.is_reserved = False
+            self.slot.save()
+        super().delete(*args, **kwargs)
     
     @property
     def is_paid_status(self):

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Home, Users, Building, DollarSign, Car, UserCheck, 
+import {
+  Home, Users, Building, DollarSign, Car, UserCheck,
   RefreshCw, Calendar, TrendingUp, BarChart3, Settings,
   Bell, Plus, FileText, Eye, Edit, AlertCircle
 } from 'lucide-react';
@@ -22,19 +22,19 @@ const AdminDashboard = ({ onPageChange }) => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch analytics data
       const analyticsRes = await apiService.getAnalyticsDashboard();
       const analytics = analyticsRes.data || analyticsRes || {};
-      
+
       // Fetch zones data
       const zonesRes = await apiService.adminGetAllZones();
       const zones = Array.isArray(zonesRes) ? zonesRes : zonesRes.data || [];
-      
+
       // Fetch sessions data with zone details
       const sessionsRes = await apiService.getSessions();
       const allSessions = sessionsRes.sessions || sessionsRes.data || [];
-      
+
       // Calculate today's bookings
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -42,7 +42,7 @@ const AdminDashboard = ({ onPageChange }) => {
         const sessionDate = new Date(session.entry_time || session.created_at);
         return sessionDate >= today;
       }).length;
-      
+
       // Calculate today's revenue
       const todayRevenue = allSessions
         .filter(session => {
@@ -50,10 +50,10 @@ const AdminDashboard = ({ onPageChange }) => {
           return sessionDate >= today && session.payment_status === 'paid';
         })
         .reduce((sum, session) => sum + (parseFloat(session.total_amount_paid) || parseFloat(session.initial_amount_paid) || 0), 0);
-      
-      // Get active sessions with proper zone/slot mapping
-      const activeSessions = allSessions.filter(s => s.status === 'active');
-      
+
+      // Get active/reserved sessions with proper zone/slot mapping
+      const activeSessions = allSessions.filter(s => ['active', 'reserved', 'pending_payment'].includes(s.status));
+
       // Map sessions with zone names
       const sessionsWithZones = activeSessions.map(session => {
         const zone = zones.find(z => z.id === session.zone_id || z.id === session.zone);
@@ -63,7 +63,7 @@ const AdminDashboard = ({ onPageChange }) => {
           slotNumber: session.slot?.slot_number || session.slot_number || 'N/A'
         };
       });
-      
+
       // Calculate metrics
       const totalSlots = zones.reduce((sum, zone) => sum + (zone.total_slots || 0), 0);
       const occupiedSlots = zones.reduce((sum, zone) => sum + (zone.occupied_slots || 0), 0);
@@ -71,7 +71,7 @@ const AdminDashboard = ({ onPageChange }) => {
       const occupancyRate = totalSlots > 0 ? Math.round((occupiedSlots / totalSlots) * 100) : 0;
       const availableZones = zones.filter(zone => (zone.total_slots - zone.occupied_slots) > 0).length;
       const vehiclesReserved = allSessions.filter(s => s.status === 'reserved' || s.status === 'pending_payment').length;
-      
+
       setDashboardData({
         todayBookings: todayBookings,
         currentRevenue: Math.round(todayRevenue),
@@ -90,7 +90,7 @@ const AdminDashboard = ({ onPageChange }) => {
         })),
         sessions: sessionsWithZones.slice(0, 5)
       });
-      
+
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     } finally {
@@ -131,7 +131,7 @@ const AdminDashboard = ({ onPageChange }) => {
           </h1>
           <p style={{ color: '#64748b', fontSize: '16px' }}>Real-time parking management overview</p>
         </div>
-        <button 
+        <button
           onClick={fetchDashboardData}
           style={{
             display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px',
@@ -246,7 +246,7 @@ const AdminDashboard = ({ onPageChange }) => {
                     {zone.occupancyPercent}% Occupied
                   </div>
                 </div>
-                <button 
+                <button
                   onClick={() => onPageChange('zone-management')}
                   style={{
                     padding: '6px 12px', fontSize: '12px', backgroundColor: '#3b82f6',
@@ -358,7 +358,7 @@ const AdminDashboard = ({ onPageChange }) => {
           </table>
         </div>
         <div style={{ marginTop: '16px', textAlign: 'right' }}>
-          <button 
+          <button
             onClick={() => onPageChange('parking-operations')}
             style={{
               padding: '8px 16px', fontSize: '14px', backgroundColor: '#3b82f6',
