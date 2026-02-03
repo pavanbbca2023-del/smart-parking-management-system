@@ -100,12 +100,7 @@ const Layout = () => {
             <Profile />
           </div>
         );
-      case 'financial-report':
-        return (
-          <div className="page-content">
-            <Financial />
-          </div>
-        );
+
       case 'parking-operations':
         return (
           <div className="page-content">
