@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Slot, Attendance, Zone, ParkingSession, Payment, Vehicle, Dispute, Schedule, ShiftLog, Feedback, BookingActivityLog
+from .models import User, Slot, Attendance, Zone, ParkingSession, Payment
 
 @admin.register(Slot)
 class SlotAdmin(admin.ModelAdmin):
@@ -42,42 +42,4 @@ class AttendanceAdmin(admin.ModelAdmin):
     list_display = ('staff', 'entry_time', 'exit_time', 'status')
     list_filter = ('status', 'entry_time')
     search_fields = ('staff__username',)
-
-@admin.register(Vehicle)
-class VehicleAdmin(admin.ModelAdmin):
-    list_display = ('vehicle_number', 'user', 'vehicle_type', 'created_at')
-    search_fields = ('vehicle_number', 'user__username')
-
-@admin.register(Dispute)
-class DisputeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'session', 'user', 'status', 'created_at')
-    list_filter = ('status',)
-    search_fields = ('user__username', 'reason')
-
-@admin.register(Schedule)
-class ScheduleAdmin(admin.ModelAdmin):
-    list_display = ('staff', 'day', 'shift_start', 'shift_end', 'is_active')
-    list_filter = ('day', 'is_active')
-    search_fields = ('staff__username',)
-
-@admin.register(ShiftLog)
-class ShiftLogAdmin(admin.ModelAdmin):
-    list_display = ('staff', 'shift_start', 'shift_end', 'entry_count', 'exit_count', 'revenue_collected')
-    list_filter = ('staff', 'shift_start')
-
-@admin.register(Feedback)
-class FeedbackAdmin(admin.ModelAdmin):
-    list_display = ('session', 'rating', 'created_at')
-    list_filter = ('rating', 'created_at')
-
-@admin.register(BookingActivityLog)
-class BookingActivityLogAdmin(admin.ModelAdmin):
-    list_display = ('session', 'vehicle_number_display', 'user', 'activity_type', 'created_at')
-    list_filter = ('activity_type', 'created_at')
-    search_fields = ('session__vehicle_number', 'user__username', 'description')
-    readonly_fields = ('session', 'user', 'activity_type', 'description', 'metadata', 'created_at')
-    
-    def vehicle_number_display(self, obj):
-        return obj.session.vehicle_number
-    vehicle_number_display.short_description = 'Vehicle Number'
 

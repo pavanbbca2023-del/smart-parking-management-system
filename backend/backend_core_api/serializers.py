@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Slot, Attendance, Zone, ParkingSession, Payment, Vehicle, Dispute, Schedule, ShiftLog, Feedback, BookingActivityLog
+from .models import User, Slot, Attendance, Zone, ParkingSession, Payment
 
 class AttendanceSerializer(serializers.ModelSerializer):
     staff_name = serializers.CharField(source='staff.username', read_only=True)
@@ -168,52 +168,4 @@ class PaymentSerializer(serializers.ModelSerializer):
             'id', 'session', 'session_vehicle', 'amount', 'payment_method', 
             'payment_type', 'transaction_id', 'status', 'payment_time'
         ]
-
-class VehicleSerializer(serializers.ModelSerializer):
-    owner_name = serializers.CharField(source='user.username', read_only=True)
-
-    class Meta:
-        model = Vehicle
-        fields = ('id', 'vehicle_number', 'user', 'owner_name', 'vehicle_type', 'created_at')
-
-class DisputeSerializer(serializers.ModelSerializer):
-    user_name = serializers.CharField(source='user.username', read_only=True)
-    description = serializers.CharField(source='reason')
-    type = serializers.CharField(source='dispute_type')
-
-    class Meta:
-        model = Dispute
-        fields = ('id', 'session', 'user', 'user_name', 'reason', 'description', 'severity', 'type', 'status', 'created_at')
-
-class ScheduleSerializer(serializers.ModelSerializer):
-    staff_name = serializers.CharField(source='staff.username', read_only=True)
-    zone_name = serializers.CharField(source='zone.name', read_only=True)
-
-    class Meta:
-        model = Schedule
-        fields = ('id', 'staff', 'staff_name', 'zone', 'zone_name', 'day', 'shift_type', 'shift_start', 'shift_end', 'is_active')
-
-class ShiftLogSerializer(serializers.ModelSerializer):
-    staff_name = serializers.CharField(source='staff.username', read_only=True)
-    class Meta:
-        model = ShiftLog
-        fields = '__all__'
-
-class FeedbackSerializer(serializers.ModelSerializer):
-    vehicle_number = serializers.CharField(source='session.vehicle_number', read_only=True)
-    class Meta:
-        model = Feedback
-        fields = '__all__'
-
-class BookingActivityLogSerializer(serializers.ModelSerializer):
-    user_name = serializers.CharField(source='user.username', read_only=True)
-    user_phone = serializers.CharField(source='user.phone_number', read_only=True)
-    vehicle_number = serializers.CharField(source='session.vehicle_number', read_only=True)
-    zone_name = serializers.CharField(source='session.zone.name', read_only=True)
-    activity_type_display = serializers.CharField(source='get_activity_type_display', read_only=True)
-    
-    class Meta:
-        model = BookingActivityLog
-        fields = ('id', 'session', 'vehicle_number', 'zone_name', 'user', 'user_name', 'user_phone',
-                  'activity_type', 'activity_type_display', 'description', 'metadata', 'created_at')
 
