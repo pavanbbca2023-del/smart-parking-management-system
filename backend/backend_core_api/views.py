@@ -497,7 +497,16 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
         session = None
         if session_id:
             try:
-                session = ParkingSession.objects.get(id=session_id, status='active')
+                # First check for active session
+                session = ParkingSession.objects.get(id=session_id)
+                if session.status == 'reserved':
+                    return Response({
+                        'error': 'Vehicle Not Entered',
+                        'message': 'This booking is confirmed but the vehicle has not entered yet. Please scan at ENTRY gate first.'
+                    }, status=400)
+                if session.status != 'active':
+                     return Response({'error': f'Session is {session.status}'}, status=400)
+                     
             except ParkingSession.DoesNotExist:
                 pass
                 
@@ -505,6 +514,13 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
             session = ParkingSession.objects.filter(vehicle_number=vehicle_number, status='active').last()
             
         if not session:
+            # Check if there is a reserved session for this vehicle
+            reserved = ParkingSession.objects.filter(vehicle_number=vehicle_number, status='reserved').first()
+            if reserved:
+                 return Response({
+                        'error': 'Vehicle Not Entered',
+                        'message': 'This vehicle has a reservation but has not entered yet. Please scan at ENTRY gate first.'
+                    }, status=400)
             return Response({'error': 'Active session not found'}, status=404)
 
         # Check zone permissions for staff

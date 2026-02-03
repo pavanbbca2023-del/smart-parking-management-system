@@ -27,7 +27,7 @@ const TrackBooking = ({ onNavigate }) => {
             // Get the latest session
             const latestSession = sessions[0];
 
-            if (['active', 'reserved'].includes(latestSession.status.toLowerCase())) {
+            if (['active', 'reserved', 'pending_payment'].includes(latestSession.status.toLowerCase())) {
                 const bookingData = {
                     bookingId: latestSession.id,
                     vehicleNumber: latestSession.vehicle_number,

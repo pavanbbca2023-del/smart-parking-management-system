@@ -332,14 +332,14 @@ const Reports = () => {
 
   const viewVehicleHistory = async () => {
     try {
-      // Use the staff API instead of the custom reportApi
-      const response = await fetch('/api/core/sessions/', {
+      // Use the configured API base URL
+      const response = await fetch(`${API_BASE_URL}/core/sessions/`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
           'Content-Type': 'application/json'
         }
       }).then(res => res.json());
-      
+
       const sessions = response.sessions || [];
       setHistoryResults(sessions);
       setShowResultsModal(true);
@@ -353,13 +353,13 @@ const Reports = () => {
     if (!vehicleInput) return;
 
     try {
-      const response = await fetch(`/api/core/sessions/?vehicle_number=${vehicleInput}`, {
+      const response = await fetch(`${API_BASE_URL}/core/sessions/?vehicle_number=${vehicleInput}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
           'Content-Type': 'application/json'
         }
       }).then(res => res.json());
-      
+
       const sessions = response.sessions || [];
       setHistoryResults(sessions);
       setShowHistoryModal(false);

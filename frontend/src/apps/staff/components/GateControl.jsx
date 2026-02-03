@@ -96,9 +96,9 @@ const GateControl = () => {
         try {
             setLoading(true);
             // Send the request with proper field names expected by backend
-            const response = await parkingApi.processEntry({ 
+            const response = await parkingApi.processEntry({
                 session_id: qrCodeInput,
-                zone_id: entryData.zoneId 
+                zone_id: entryData.zoneId
             });
             if (response.data.success) {
                 alert(`✅ Entry Verified!\nSession ID: ${qrCodeInput}\n\nGATE OPENING... 🚪🚀`);
@@ -160,7 +160,9 @@ const GateControl = () => {
                 setExitQrInput('');
             }
         } catch (error) {
-            alert('❌ Invalid Token');
+            const msg = error.response?.data?.message || error.response?.data?.error || 'Invalid Token';
+            alert(`❌ ${msg}`);
+            console.error('Exit Scan Error:', error);
         } finally {
             setLoading(false);
         }
