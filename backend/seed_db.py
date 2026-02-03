@@ -118,9 +118,10 @@ def seed():
             )
         else:
              # Refresh payment date
-             p = Payment.objects.get(session=session_complete)
-             p.created_at = timezone.now()
-             p.save()
+             p = Payment.objects.filter(session=session_complete).first()
+             if p:
+                p.created_at = timezone.now()
+                p.save()
 
     # Pending payment session
     session_pending = ParkingSession.objects.filter(vehicle_number='MP42NG4850').first()
