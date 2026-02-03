@@ -58,8 +58,13 @@ def seed():
     print("Staff created")
 
     # 4. Create Sample Sessions (only if none exist)
+    if not zones:
+        print("No zones available, skipping session creation")
+        return
+
+    zone_a = zones[0]
+
     if not ParkingSession.objects.filter(vehicle_number='MP41NG4850').exists():
-        zone_a = zones[0]
         s1_slot = Slot.objects.filter(zone=zone_a, is_occupied=False).first()
         if s1_slot:
             s1_slot.is_occupied = True
