@@ -45,12 +45,15 @@ def seed():
             print(f"Creating {obj.name}...")
             obj = Zone.objects.create(**z)
         
-        # Ensure slots exist
-        current_slots = Slot.objects.filter(zone=obj).count()
-        if current_slots < z['total_slots']:
-            print(f"Adding {z['total_slots'] - current_slots} slots to {obj.name}")
-            for i in range(current_slots + 1, z['total_slots'] + 1):
-                Slot.objects.create(zone=obj, slot_number=f"{obj.name[5] if len(obj.name) > 5 else obj.name[0]}{i:03d}")
+        # Ensure all slots exist sequentially
+        print(f"Ensuring slots for {obj.name}...")
+        for i in range(1, z['total_slots'] + 1):
+            slot_number = f"{obj.name[5] if len(obj.name) > 5 else obj.name[0]}{i:03d}"
+            Slot.objects.get_or_create(
+                zone=obj,
+                slot_number=slot_number,
+                defaults={'is_active': True}
+            )
         
         zones.append(obj)
 
