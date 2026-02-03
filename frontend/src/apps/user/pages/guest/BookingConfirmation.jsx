@@ -88,12 +88,9 @@ const BookingConfirmation = ({ bookingData, onNavigate }) => {
                   <div>
                     <span style={{ color: '#64748b', fontSize: '13px', display: 'block' }}>Entry Time</span>
                     <span style={{ fontWeight: '600' }}>
-                      {bookingData.entryTime ? 
-                        new Date(bookingData.entryTime).toLocaleString([], { 
-                          dateStyle: 'short', 
-                          timeStyle: 'short' 
-                        }) : 
-                        'Not specified'
+                      {bookingData.status === 'RESERVED' ?
+                        <span style={{ color: '#f59e0b' }}>On Arrival</span> :
+                        (bookingData.entryTime ? new Date(bookingData.entryTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Not specified')
                       }
                     </span>
                   </div>
@@ -102,35 +99,25 @@ const BookingConfirmation = ({ bookingData, onNavigate }) => {
                     <span style={{ color: '#64748b', fontSize: '13px', display: 'block' }}>Booked For</span>
                     <span style={{ fontWeight: '600' }}>
                       {bookingData.bookedDuration || (() => {
-                        if (!bookingData.entryTime || !bookingData.exitTime) return 'N/A';
-                        const [eh, em] = bookingData.entryTime.split(':').map(Number);
-                        const [xh, xm] = bookingData.exitTime.split(':').map(Number);
-                        let mins = (xh * 60 + xm) - (eh * 60 + em);
-                        if (mins < 0) mins += 24 * 60;
-                        const hrs = Math.floor(mins / 60);
-                        const remMins = mins % 60;
-                        if (hrs === 0) return `${remMins} minutes`;
-                        if (remMins === 0) return `${hrs} hours`;
-                        return `${hrs}h ${remMins}m`;
-                      })()} 
+                        if (bookingData.fullExpiryTime && bookingData.bookingTime) {
+                          const start = new Date(bookingData.bookingTime);
+                          const end = new Date(bookingData.fullExpiryTime);
+                          const diffMs = end - start;
+                          const diffMins = Math.round(diffMs / 60000);
+                          const hrs = Math.floor(diffMins / 60);
+                          const mins = diffMins % 60;
+                          if (hrs === 0) return `${mins} mins`;
+                          return `${hrs}h ${mins}m`;
+                        }
+                        return '1 hour (Default)';
+                      })()}
                     </span>
                   </div>
 
                   <div>
                     <span style={{ color: '#64748b', fontSize: '13px', display: 'block' }}>Duration</span>
                     <span style={{ fontWeight: '600' }}>
-                      {bookingData.duration || (() => {
-                        if (!bookingData.entryTime || !bookingData.exitTime) return 'N/A';
-                        const [eh, em] = bookingData.entryTime.split(':').map(Number);
-                        const [xh, xm] = bookingData.exitTime.split(':').map(Number);
-                        let mins = (xh * 60 + xm) - (eh * 60 + em);
-                        if (mins < 0) mins += 24 * 60; // Handle next day crossing if needed (though backend rejects now)
-                        const hrs = Math.floor(mins / 60);
-                        const remMins = mins % 60;
-                        if (hrs === 0) return `${remMins} mins`;
-                        if (remMins === 0) return `${hrs} hours`;
-                        return `${hrs}h ${remMins}m`;
-                      })()}
+                      {bookingData.duration || '0h 0m'}
                     </span>
                   </div>
 

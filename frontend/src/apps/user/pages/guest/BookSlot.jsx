@@ -178,7 +178,8 @@ const BookSlot = ({ onNavigate, bookingData }) => {
         remainingBalance: charges.estimatedAmount - charges.initialPayment,
         bookingId: bookingId,
         qrCode: qrData,
-        bookingTime: new Date().toLocaleString(),
+        bookingTime: response.booking_time, // Use backend time
+        fullExpiryTime: response.booking_expiry_time, // Pass expiry time
         status: 'RESERVED',
         backendSessionId: response.id
       };
