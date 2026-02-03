@@ -53,41 +53,39 @@ def seed():
             user.save()
     print("Staff created")
 
-    # 4. Create Sample Sessions
-    zone_a = zones[0]
-    s1_slot = Slot.objects.filter(zone=zone_a, is_occupied=False).first()
-    if s1_slot:
-        s1_slot.is_occupied = True
-        s1_slot.save()
-        ParkingSession.objects.get_or_create(
-            vehicle_number='MP41NG4850',
-            defaults={
-                'zone': zone_a, 
-                'slot': s1_slot, 
-                'status': 'completed',
-                'initial_amount_paid': 15.00,
-                'final_amount_paid': 45.00,
-                'total_amount_paid': 60.00,
-                'payment_status': 'paid',
-                'exit_time': timezone.now()
-            }
-        )
+    # 4. Create Sample Sessions (only if none exist)
+    if not ParkingSession.objects.filter(vehicle_number='MP41NG4850').exists():
+        zone_a = zones[0]
+        s1_slot = Slot.objects.filter(zone=zone_a, is_occupied=False).first()
+        if s1_slot:
+            s1_slot.is_occupied = True
+            s1_slot.save()
+            ParkingSession.objects.create(
+                vehicle_number='MP41NG4850',
+                zone=zone_a, 
+                slot=s1_slot, 
+                status='completed',
+                initial_amount_paid=15.00,
+                final_amount_paid=45.00,
+                total_amount_paid=60.00,
+                payment_status='paid',
+                exit_time=timezone.now()
+            )
 
     # Pending payment session
-    s2_slot = Slot.objects.filter(zone=zone_a, is_occupied=False, is_reserved=False).first()
-    if s2_slot:
-        s2_slot.is_reserved = True
-        s2_slot.save()
-        ParkingSession.objects.get_or_create(
-            vehicle_number='MP42NG4850',
-            defaults={
-                'zone': zone_a,
-                'slot': s2_slot,
-                'status': 'pending_payment',
-                'initial_amount_paid': 0.00,
-                'payment_status': 'pending'
-            }
-        )
+    if not ParkingSession.objects.filter(vehicle_number='MP42NG4850').exists():
+        s2_slot = Slot.objects.filter(zone=zone_a, is_occupied=False, is_reserved=False).first()
+        if s2_slot:
+            s2_slot.is_reserved = True
+            s2_slot.save()
+            ParkingSession.objects.create(
+                vehicle_number='MP42NG4850',
+                zone=zone_a,
+                slot=s2_slot,
+                status='pending_payment',
+                initial_amount_paid=0.00,
+                payment_status='pending'
+            )
     print("Sample sessions created")
 
 if __name__ == '__main__':
