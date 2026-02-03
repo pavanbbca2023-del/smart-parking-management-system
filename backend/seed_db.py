@@ -34,12 +34,16 @@ def seed():
     ]
     zones = []
     for z in zones_data:
-        obj, created = Zone.objects.get_or_create(name=z['name'], defaults=z)
-        zones.append(obj)
-        if created:
+        # Check for existing zone to avoid MultipleObjectsReturned
+        obj = Zone.objects.filter(name=z['name']).first()
+        if not obj:
+            obj = Zone.objects.create(**z)
             for i in range(1, z['total_slots'] + 1):
                 Slot.objects.create(zone=obj, slot_number=f"{obj.name[5] if len(obj.name) > 5 else obj.name[0]}{i:03d}")
-    print("Zones and Slots created")
+            print(f"Created {obj.name} and slots")
+        else:
+            print(f"{obj.name} already exists")
+        zones.append(obj)
 
     # 3. Create Staff Members
     staff_data = [
