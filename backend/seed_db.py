@@ -1,7 +1,7 @@
 import os
 import django
 from django.utils import timezone
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'smart_parking.settings')
 django.setup()
@@ -69,44 +69,78 @@ def seed():
             user.save()
     print("Staff created")
 
-    # 4. Create Sample Sessions (only if none exist)
+    # 4. Create Sample Sessions (Refresh dates if exist)
     if not zones:
         print("No zones available, skipping session creation")
         return
 
     zone_a = zones[0]
 
-    if not ParkingSession.objects.filter(vehicle_number='MP41NG4850').exists():
-        s1_slot = Slot.objects.filter(zone=zone_a, is_occupied=False).first()
-        if s1_slot:
-            s1_slot.is_occupied = True
-            s1_slot.save()
-            ParkingSession.objects.create(
-                vehicle_number='MP41NG4850',
-                zone=zone_a, 
-                slot=s1_slot, 
-                status='completed',
-                initial_amount_paid=15.00,
-                final_amount_paid=45.00,
-                total_amount_paid=60.00,
-                payment_status='paid',
-                exit_time=timezone.now()
+    # Completed Session
+    session_complete = ParkingSession.objects.filter(vehicle_number='MP41NG4850').first()
+    s1_slot = Slot.objects.filter(zone=zone_a, is_occupied=False).first()
+    
+    if not session_complete and s1_slot:
+        s1_slot.is_occupied = True
+        s1_slot.save()
+        session_complete = ParkingSession.objects.create(
+            vehicle_number='MP41NG4850',
+            zone=zone_a, 
+            slot=s1_slot, 
+            status='completed',
+            initial_amount_paid=15.00,
+            final_amount_paid=45.00,
+            total_amount_paid=60.00,
+            payment_status='paid',
+            payment_method='cash',
+            booking_time=timezone.now() - timedelta(hours=2),
+            entry_time=timezone.now() - timedelta(hours=1.5),
+            exit_time=timezone.now()
+        )
+    elif session_complete:
+        # Refresh dates to appear as "Today"
+        session_complete.booking_time = timezone.now() - timedelta(hours=2)
+        session_complete.entry_time = timezone.now() - timedelta(hours=1.5)
+        session_complete.exit_time = timezone.now()
+        session_complete.save()
+
+    if session_complete:
+        # Ensure Payment Record exists
+        Payment = apps.get_model('backend_core_api', 'Payment')
+        if not Payment.objects.filter(session=session_complete).exists():
+            Payment.objects.create(
+                session=session_complete,
+                amount=60.00,
+                payment_method='cash',
+                payment_type='FULL',
+                status='success',
+                transaction_id=f"TXN_{int(datetime.now().timestamp())}"
             )
+        else:
+             # Refresh payment date
+             p = Payment.objects.get(session=session_complete)
+             p.created_at = timezone.now()
+             p.save()
 
     # Pending payment session
-    if not ParkingSession.objects.filter(vehicle_number='MP42NG4850').exists():
-        s2_slot = Slot.objects.filter(zone=zone_a, is_occupied=False, is_reserved=False).first()
-        if s2_slot:
-            s2_slot.is_reserved = True
-            s2_slot.save()
-            ParkingSession.objects.create(
-                vehicle_number='MP42NG4850',
-                zone=zone_a,
-                slot=s2_slot,
-                status='pending_payment',
-                initial_amount_paid=0.00,
-                payment_status='pending'
-            )
+    session_pending = ParkingSession.objects.filter(vehicle_number='MP42NG4850').first()
+    s2_slot = Slot.objects.filter(zone=zone_a, is_occupied=False, is_reserved=False).first()
+
+    if not session_pending and s2_slot:
+        s2_slot.is_reserved = True
+        s2_slot.save()
+        ParkingSession.objects.create(
+            vehicle_number='MP42NG4850',
+            zone=zone_a,
+            slot=s2_slot,
+            status='pending_payment',
+            initial_amount_paid=0.00,
+            payment_status='pending',
+            booking_time=timezone.now() - timedelta(minutes=30)
+        )
+    elif session_pending:
+        session_pending.booking_time = timezone.now() - timedelta(minutes=30)
+        session_pending.save()
     print("Sample sessions created")
 
 if __name__ == '__main__':
