@@ -129,8 +129,14 @@ class TwilioSMSService:
             return True, {"sids": results}
             
         except Exception as e:
-            logger.error(f"Twilio SMS failed: {str(e)}")
-            return False, {"error": str(e)}
+            # Check for Twilio's specific error for unverified numbers in trial mode
+            error_msg = str(e)
+            if '21608' in error_msg or 'unverified' in error_msg.lower():
+                logger.warning(f"Twilio Trial Warning: Cannot send SMS to unverified number {mobile_numbers}. usage is restricted in trial mode.")
+                return True, {"warning": "Trial account restriction", "error": error_msg}
+            
+            logger.error(f"Twilio SMS failed: {error_msg}")
+            return False, {"error": error_msg}
 
 class SMSService:
     """

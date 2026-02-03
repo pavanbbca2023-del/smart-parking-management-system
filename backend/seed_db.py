@@ -42,7 +42,7 @@ def seed():
             obj.base_price = z['base_price']
             obj.save()
         else:
-            print(f"Creating {obj.name}...")
+            print(f"Creating {z['name']}...")
             obj = Zone.objects.create(**z)
         
         # Ensure all slots exist sequentially
