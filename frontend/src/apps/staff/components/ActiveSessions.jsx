@@ -17,7 +17,12 @@ const ActiveSessions = () => {
       setLoading(true);
       const response = await parkingApi.getActiveSessions();
       if (response.data.success) {
-        setActiveSessions(response.data.sessions || []);
+        const allSessions = response.data.sessions || [];
+        // Filter out completed and cancelled sessions
+        const filtered = allSessions.filter(s =>
+          ['active', 'reserved', 'pending_payment'].includes(s.status.toLowerCase())
+        );
+        setActiveSessions(filtered);
       }
     } catch (error) {
       console.error('Error fetching active sessions:', error);
