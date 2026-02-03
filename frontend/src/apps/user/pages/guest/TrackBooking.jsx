@@ -72,7 +72,7 @@ const TrackBooking = ({ onNavigate }) => {
             } else if (latestSession.status.toLowerCase() === 'cancelled') {
                 setError('This booking was cancelled.');
             } else {
-                setError('Found a record, but its status is unknown.');
+                setError(`Found a record, but its status is unknown (${latestSession.status}).`);
             }
         } catch (err) {
             console.error(err);
