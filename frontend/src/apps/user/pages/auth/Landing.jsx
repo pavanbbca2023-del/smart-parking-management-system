@@ -23,8 +23,8 @@ const Landing = () => {
                     </p>
                     <div className="hero-buttons">
                         <button
-                            onClick={() => navigate('/home')}
-                            className="hero-btn"
+                            onClick={() => navigate('/booking')}
+                            className="hero-btn hero-btn-primary"
                             style={{
                                 backgroundColor: '#ffd700',
                                 color: '#333',
@@ -36,12 +36,7 @@ const Landing = () => {
                         >
                             <span>🚗</span> Book Parking
                         </button>
-                        <button
-                            onClick={() => navigate('/login')}
-                            className="hero-btn hero-btn-secondary"
-                        >
-                            <span>👤</span> Member Login
-                        </button>
+
                         <button
                             onClick={() => navigate('/staff')}
                             className="hero-btn hero-btn-secondary"
@@ -180,7 +175,7 @@ const Landing = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

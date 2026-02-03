@@ -31,7 +31,8 @@ const Signup = () => {
         }
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/core/users/', {
+            const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+            const response = await fetch(`${API_BASE_URL}/api/core/users/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -47,7 +48,7 @@ const Signup = () => {
             const data = await response.json();
 
             if (response.ok) {
-                navigate('/login');
+                navigate('/admin/login');
             } else {
                 const messages = Object.keys(data).map(key => {
                     const val = data[key];
@@ -311,9 +312,9 @@ const Signup = () => {
                         {loading ? 'Creating Account...' : 'Sign Up'}
                     </button>
 
-                    < div style={styles.footer}>
+                    <div style={styles.footer}>
                         Already have an account?
-                        <Link to="/login" style={styles.link}> Sign in</Link>
+                        <Link to="/admin/login" style={styles.link}> Sign in</Link>
                     </div>
                 </form>
             </div>

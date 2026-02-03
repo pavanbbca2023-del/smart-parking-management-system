@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Dashboard from '../pages/user/Dashboard';
 import Booking from '../pages/user/Booking';
@@ -13,8 +14,16 @@ import './Layout.css';
 import '../pages/user/UserPages.css';
 
 const Layout = () => {
+  const location = useLocation();
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [userType, setUserType] = useState('user');
+
+  useEffect(() => {
+    const path = location.pathname.split('/').pop();
+    if (path && path !== 'user' && path !== 'dashboard') {
+      setCurrentPage(path);
+    }
+  }, [location]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);

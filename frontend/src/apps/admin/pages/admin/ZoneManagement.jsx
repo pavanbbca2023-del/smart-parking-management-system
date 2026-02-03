@@ -32,8 +32,9 @@ const ZoneManagement = () => {
       try {
         await apiService.adminCreateZone({
           name: newZone.name,
-          hourly_rate: newZone.rate,
-          capacity: parseInt(newZone.capacity)
+          base_price: newZone.rate,
+          total_slots: parseInt(newZone.capacity),
+          description: newZone.location
         });
         alert('✅ Zone created successfully!');
         setNewZone({ name: '', capacity: '', rate: '', location: '' });
@@ -79,9 +80,9 @@ const ZoneManagement = () => {
 
   return (
     <div style={{
-      padding: '24px',
+      padding: '32px',
       backgroundColor: '#f8fafc',
-      minHeight: '100vh',
+      minHeight: '100%',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
       {/* Header */}
@@ -330,7 +331,7 @@ const ZoneManagement = () => {
                         fontSize: '24px',
                         fontWeight: '700',
                         color: '#10b981'
-                      }}>₹{zone.hourly_rate}</div>
+                      }}>₹{zone.base_price || zone.hourly_rate}</div>
                       <div style={{
                         fontSize: '12px',
                         color: '#64748b'

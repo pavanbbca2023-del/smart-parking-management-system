@@ -4,13 +4,8 @@ import { Users, Mail, Phone, Shield, MoreVertical, Eye, EyeOff } from 'lucide-re
 
 
 const StaffDirectory = () => {
-    // Initial state with improved mock data for better visualization
-    const [staffList, setStaffList] = useState([
-        { id: 101, name: 'Admin User', email: 'admin@parking.io', role: 'Security Admin', status: 'Active', phone: '+91 99990 11110', joinDate: '2023-05-12' },
-        { id: 102, name: 'Vikram Singh', email: 'vikram@parking.io', role: 'Floor Supervisor', status: 'Active', phone: '+91 99990 11111', joinDate: '2023-08-20' },
-        { id: 103, name: 'Priya Sharma', email: 'priya@parking.io', role: 'Attendant', status: 'On Break', phone: '+91 99990 11112', joinDate: '2024-01-05' }
-    ]);
-    const [loading, setLoading] = useState(false);
+    const [staffList, setStaffList] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -20,22 +15,24 @@ const StaffDirectory = () => {
     const fetchStaff = async () => {
         try {
             setLoading(true);
-            const response = await apiService.adminGetAllUsers('STAFF').catch(() => []);
+            const response = await apiService.adminGetAllUsers('STAFF');
             if (response && response.length > 0) {
                 setStaffList(response.map(user => ({
-                    id: user.id || user.user_id,
-                    name: user.username || user.full_name || 'Anonymous Staff',
+                    id: user.id,
+                    name: user.username || 'Anonymous User',
                     email: user.email || 'N/A',
-                    role: user.role === 'STAFF' ? 'Attendant' : (user.role || 'Staff'),
-                    status: user.is_active ? 'Active' : 'Deactivated',
+                    role: 'Floor Supervisor',
+                    status: user.is_active !== false ? 'Active' : 'Inactive',
                     phone: user.phone || 'N/A',
                     joinDate: user.date_joined ? new Date(user.date_joined).toLocaleDateString() : 'N/A',
-                    zones: user.assigned_zones || []
+                    zones: user.assigned_zones || [],
+                    plain_password: user.plain_password
                 })));
             }
+            setError(null);
         } catch (err) {
             console.error('Error fetching staff:', err);
-            setError('Operational database synchronization failed');
+            setError('Failed to load staff data');
         } finally {
             setLoading(false);
         }
@@ -143,25 +140,23 @@ const StaffDirectory = () => {
                                                 <Phone size={13} style={{ color: '#94a3b8' }} /> {staff.phone}
                                             </span>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
-                                                <span style={{ fontSize: '13px', fontFamily: 'monospace', color: staff.plain_password ? '#166534' : '#64748b', fontWeight: staff.plain_password ? '700' : '400' }}>
-                                                    {staff.plain_password ? staff.plain_password : (staff.showPassword ? '🔒 Encrypted' : '••••••••')}
+                                                <span style={{ fontSize: '13px', fontFamily: 'monospace', color: '#64748b', fontWeight: '400' }}>
+                                                    {staff.showPassword ? (staff.plain_password || 'No Password Set') : '••••••••'}
                                                 </span>
-                                                {!staff.plain_password && (
-                                                    <button
-                                                        onClick={() => {
-                                                            const newStaffList = [...staffList];
-                                                            const index = newStaffList.findIndex(s => s.id === staff.id);
-                                                            if (index !== -1) {
-                                                                newStaffList[index].showPassword = !newStaffList[index].showPassword;
-                                                                setStaffList(newStaffList);
-                                                            }
-                                                        }}
-                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: '#94a3b8' }}
-                                                        title={staff.showPassword ? "Hide Status" : "Show Status"}
-                                                    >
-                                                        {staff.showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
-                                                    </button>
-                                                )}
+                                                <button
+                                                    onClick={() => {
+                                                        const newStaffList = [...staffList];
+                                                        const index = newStaffList.findIndex(s => s.id === staff.id);
+                                                        if (index !== -1) {
+                                                            newStaffList[index].showPassword = !newStaffList[index].showPassword;
+                                                            setStaffList(newStaffList);
+                                                        }
+                                                    }}
+                                                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: '#94a3b8' }}
+                                                    title={staff.showPassword ? "Hide Password" : "Show Password"}
+                                                >
+                                                    {staff.showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                                                </button>
                                             </div>
                                         </div>
                                     </td>
@@ -180,16 +175,6 @@ const StaffDirectory = () => {
                                     </td>
                                     <td style={{ padding: '24px 40px', textAlign: 'center' }}>
                                         <button
-                                            onClick={() => window.alert(`Zone Management for ${staff.name}\n\nCurrent Zones: ${staff.zones.length > 0 ? staff.zones.join(', ') : 'Unassigned'}\n\nTo manage duties, go to:\nStaff Operations → Duty Roster → + New Duty Allocation`)}
-                                            style={{
-                                                padding: '8px 16px', background: '#3b82f6', border: 'none',
-                                                borderRadius: '10px', color: 'white', cursor: 'pointer',
-                                                fontSize: '12px', fontWeight: '700', transition: 'all 0.2s'
-                                            }} onMouseEnter={(e) => e.currentTarget.style.background = '#2563eb'}
-                                            onMouseLeave={(e) => e.currentTarget.style.background = '#3b82f6'}>
-                                            Manage Duty
-                                        </button>
-                                        <button
                                             onClick={async () => {
                                                 const newPassword = prompt(`Enter new password for ${staff.name}:`);
                                                 if (newPassword) {
@@ -203,7 +188,6 @@ const StaffDirectory = () => {
                                                 }
                                             }}
                                             style={{
-                                                marginLeft: '8px',
                                                 padding: '8px 16px', background: '#f59e0b', border: 'none',
                                                 borderRadius: '10px', color: 'white', cursor: 'pointer',
                                                 fontSize: '12px', fontWeight: '700', transition: 'all 0.2s'

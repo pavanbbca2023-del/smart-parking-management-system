@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import './components/StaffPages.css';
 import Sidebar from './components/Sidebar';
 import StaffDashboard from './components/StaffDashboard';
 import VehicleEntry from './components/VehicleEntry';
@@ -18,7 +19,7 @@ import StaffLanding from './components/StaffLanding';
 const Layout = ({ children }) => {
     const location = useLocation();
     // Sidebar should be hidden on Landing, Login, and Signup pages
-    const isPublicPage = location.pathname === '/' || location.pathname === '/login';
+    const isPublicPage = location.pathname === '/staff' || location.pathname === '/staff/' || location.pathname === '/staff/login';
 
     if (isPublicPage) {
         // Public pages get a simple container or full width
@@ -47,7 +48,7 @@ const ProtectedRoute = ({ children }) => {
     const userRole = localStorage.getItem('user_role');
 
     if (!token) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/staff/login" replace />;
     }
 
     // Optional: Check role if needed
@@ -69,11 +70,6 @@ function App() {
                 <Route path="/dashboard" element={
                     <ProtectedRoute>
                         <StaffDashboard />
-                    </ProtectedRoute>
-                } />
-                <Route path="/payment" element={
-                    <ProtectedRoute>
-                        <Payment />
                     </ProtectedRoute>
                 } />
                 <Route path="/gate-control" element={

@@ -24,7 +24,7 @@ const Login = () => {
 
         try {
             // Use environment variable for API URL (supports both local and production)
-            const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
+            const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
             const response = await fetch(`${API_BASE_URL}/api/auth/login/`, {
                 method: 'POST',
                 headers: {
@@ -261,12 +261,12 @@ const Login = () => {
 
                     <div style={styles.footer}>
                         Don't have an account?
-                        <Link to="/signup" style={styles.link}> Create Account</Link>
+                        <Link to="/admin/signup" style={styles.link}> Create Account</Link>
                     </div>
                     <div style={{ ...styles.footer, marginTop: '16px' }}>
                         <button
                             type="button"
-                            onClick={() => navigate('/')}
+                            onClick={() => navigate('/admin')}
                             style={{
                                 background: 'none',
                                 border: 'none',

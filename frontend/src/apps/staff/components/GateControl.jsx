@@ -95,13 +95,18 @@ const GateControl = () => {
         if (!qrCodeInput) return;
         try {
             setLoading(true);
-            const response = await parkingApi.processEntry({ session_id: qrCodeInput });
+            // Send the request with proper field names expected by backend
+            const response = await parkingApi.processEntry({ 
+                session_id: qrCodeInput,
+                zone_id: entryData.zoneId 
+            });
             if (response.data.success) {
-                alert(`✅ QR Verified!\n\nGATE OPENING... 🚪🚀`);
+                alert(`✅ Entry Verified!\nSession ID: ${qrCodeInput}\n\nGATE OPENING... 🚪🚀`);
                 setQrCodeInput('');
             }
         } catch (error) {
-            alert('❌ Invalid QR');
+            console.error('Entry error:', error);
+            alert(`❌ ${error.response?.data?.error || 'Session not found or already processed'}`);
         } finally {
             setLoading(false);
         }

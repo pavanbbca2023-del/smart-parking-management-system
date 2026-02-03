@@ -28,13 +28,13 @@ const Sidebar = () => {
     };
 
     const menuItems = [
-        { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
-        { name: 'Gate Control', icon: <Building2 size={20} />, path: '/gate-control' },
-        { name: 'Reports', icon: <FileText size={20} />, path: '/reports' },
-        { name: 'Zone Status', icon: <Building2 size={20} />, path: '/zones' },
-        { name: 'Active Sessions', icon: <History size={20} />, path: '/active-sessions' },
-        { name: 'Alerts', icon: <AlertTriangle size={20} />, path: '/alerts' },
-        { name: 'Payments Mgmt', icon: <CreditCard size={20} />, path: '/payments-mgmt' },
+        { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/staff/dashboard' },
+        { name: 'Gate Control', icon: <Building2 size={20} />, path: '/staff/gate-control' },
+        { name: 'Reports', icon: <FileText size={20} />, path: '/staff/reports' },
+        { name: 'Zone Status', icon: <Building2 size={20} />, path: '/staff/zones' },
+        { name: 'Active Sessions', icon: <History size={20} />, path: '/staff/active-sessions' },
+        { name: 'Alerts', icon: <AlertTriangle size={20} />, path: '/staff/alerts' },
+        { name: 'Payments Mgmt', icon: <CreditCard size={20} />, path: '/staff/payments-mgmt' },
     ];
 
     return (

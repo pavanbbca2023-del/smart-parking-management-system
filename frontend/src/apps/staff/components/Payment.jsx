@@ -85,7 +85,7 @@ const Payment = () => {
             <div style="display: grid; grid-template-columns: 1.5fr 1fr 1.5fr; gap: 10px; padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 14px;">
                 <div style="font-weight: 600; color: #1e293b;">🚙 ${p.session_vehicle || 'Vehicle'}</div>
                 <div style="color: #166534; font-weight: 700;">₹${parseFloat(p.amount).toFixed(2)}</div>
-                <div style="color: #64748b; font-size: 12px;">${new Date(p.payment_time).toLocaleString()}</div>
+                <div style="color: #64748b; font-size: 12px;">${new Date(p.payment_time).toLocaleDateString('en-GB')} ${new Date(p.payment_time).toLocaleTimeString()}</div>
             </div>
         `;
     });
@@ -97,14 +97,10 @@ const Payment = () => {
                     <span style="background:#f0fdf4; color:#166534; padding:5px 12px; border-radius:20px; font-weight:700; font-size:14px;">LIVE SESSION</span>
                 </div>
 
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:30px;">
+                <div style="display:grid;grid-template-columns:1fr;gap:20px;margin-bottom:30px;">
                     <div style="background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);padding:25px;border-radius:12px;text-align:center; border: 1px solid #bbf7d0;">
                         <div style="font-size:28px;font-weight:800;color:#166534;margin-bottom:5px;">₹${cashStats.totalCash.toFixed(2)}</div>
                         <div style="color:#166534; font-weight:600; text-transform:uppercase; font-size:12px; letter-spacing:1px;">Total Cash Revenue</div>
-                    </div>
-                    <div style="background:linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);padding:25px;border-radius:12px;text-align:center; border: 1px solid #fde68a;">
-                        <div style="font-size:28px;font-weight:800;color:#92400e;margin-bottom:5px;">₹${cashStats.cashInHand.toFixed(2)}</div>
-                        <div style="color:#92400e; font-weight:600; text-transform:uppercase; font-size:12px; letter-spacing:1px;">Current in Drawer</div>
                     </div>
                 </div>
 
@@ -169,8 +165,13 @@ const Payment = () => {
     let rows = '';
     pendingSessions.forEach(s => {
       const duration = s.duration || '0h 0m';
-      // Fallback if backend doesn't send estimated_balance yet (though it should)
-      const pendingAmount = s.estimated_balance !== undefined ? parseFloat(s.estimated_balance).toFixed(2) : '0.00';
+      // Only show sessions that actually have pending balance
+      const pendingAmount = s.estimated_balance !== undefined ? parseFloat(s.estimated_balance).toFixed(2) : parseFloat(s.estimated_total - s.initial_amount_paid).toFixed(2);
+      
+      // Skip if payment is complete or no balance due
+      if (s.payment_status === 'paid' || parseFloat(pendingAmount) <= 0) {
+        return;
+      }
 
       rows += `
                 <div style="display:grid;grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr 1fr;gap:10px;padding:15px;border-bottom:1px solid #e2e8f0;align-items:center; font-size:14px;">

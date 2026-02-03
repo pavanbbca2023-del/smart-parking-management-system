@@ -24,24 +24,26 @@ const API_CONFIG = {
 
     // Analytics APIs (actual backend endpoints)
     ANALYTICS: {
-      DASHBOARD: '/api/analytics/dashboard/',
-      REVENUE: '/api/analytics/revenue/',
-      OCCUPANCY: '/api/analytics/zones/',
-      PEAK_HOURS: '/api/analytics/peak-hours/',
-      ACTIVE_SESSIONS: '/api/analytics/active-sessions/',
-      COMPLETED_SESSIONS: '/api/analytics/completed-sessions/',
-      PAYMENTS: '/api/analytics/payments/',
+      DASHBOARD: '/api/stats/dashboard/',
+      REVENUE: '/api/stats/revenue/',
+      OCCUPANCY: '/api/stats/zones/',
+      PEAK_HOURS: '/api/stats/peak-hours/',
+      ACTIVE_SESSIONS: '/api/stats/active-sessions/',
+      COMPLETED_SESSIONS: '/api/stats/completed-sessions/',
+      PAYMENTS: '/api/stats/payments/',
     },
 
     // Role-based APIs (Aligned with Backend)
     ADMIN: {
       USERS: '/api/core/users/',
+      CREATE_USER: '/api/core/staff/register/',
       STAFF: '/api/core/users/?role=STAFF',
-      REPORTS: '/api/analytics/revenue/',
+      REPORTS: '/api/stats/revenue/',
       PAYMENTS: '/api/core/payments/',
       ZONES: '/api/core/zones/',
       DISPUTES: '/api/core/disputes/',
       SCHEDULES: '/api/core/schedules/',
+      FEEDBACKS: '/api/core/feedbacks/',
     },
 
     STAFF: {

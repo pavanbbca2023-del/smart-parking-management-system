@@ -56,7 +56,13 @@ api.interceptors.response.use(
                 // If the error was due to invalid token on a public endpoint, retry without token
                 if (originalRequest && !originalRequest._retryWithoutAuth) {
                     originalRequest._retryWithoutAuth = true;
-                    delete originalRequest.headers.Authorization;
+                    // Safely remove Authorization header for Axios v1+
+                    if (originalRequest.headers && typeof originalRequest.headers.delete === 'function') {
+                        originalRequest.headers.delete('Authorization');
+                    } else {
+                        delete originalRequest.headers['Authorization'];
+                        originalRequest.headers['Authorization'] = undefined;
+                    }
                     return api(originalRequest);
                 }
 
@@ -105,10 +111,10 @@ export const parkingApi = {
 };
 
 export const analyticsApi = {
-    getDashboardSummary: () => api.get('analytics/dashboard/'),
-    getZoneAnalytics: () => api.get('analytics/zones/'),
-    getActiveSessions: () => api.get('analytics/active-sessions/'),
-    getRevenueAnalytics: (period = 'daily') => api.get(`analytics/revenue/?period=${period}`)
+    getDashboardSummary: () => api.get('stats/dashboard/'),
+    getZoneAnalytics: () => api.get('stats/zones/'),
+    getActiveSessions: () => api.get('stats/active-sessions/'),
+    getRevenueAnalytics: (period = 'daily') => api.get(`stats/revenue/?period=${period}`)
 };
 
 export default api;

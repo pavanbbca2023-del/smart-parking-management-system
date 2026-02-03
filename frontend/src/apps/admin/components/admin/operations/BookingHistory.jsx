@@ -14,17 +14,20 @@ const BookingHistory = () => {
     const fetchBookings = async () => {
         try {
             setLoading(true);
-            const response = await apiService.getCompletedSessions().catch(() => ({ data: [] }));
+            const response = await apiService.getSessions().catch(() => ({ data: [] }));
             const sessions = Array.isArray(response) ? response : (response.data || response.sessions || []);
 
-            const mappedBookings = sessions.map(item => ({
+            // Show all sessions instead of filtering
+            const bookingData = sessions;
+
+            const mappedBookings = bookingData.map(item => ({
                 ...item,
                 id: item.session_id || item.id
             }));
 
-            // Sort by newest first
+            // Sort by newest first (booking_time or entry_time)
             const sortedSessions = mappedBookings.sort((a, b) =>
-                new Date(b.entry_time) - new Date(a.entry_time)
+                new Date(b.booking_time || b.entry_time) - new Date(a.booking_time || a.entry_time)
             );
 
             setBookings(sortedSessions);
@@ -79,12 +82,12 @@ const BookingHistory = () => {
                 <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0' }}>
                     <thead>
                         <tr style={{ background: 'rgba(248, 250, 252, 0.5)' }}>
-                            <th style={{ padding: '16px 32px', textAlign: 'left', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Booking Reference</th>
-                            <th style={{ padding: '16px 32px', textAlign: 'left', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Timestamp</th>
-                            <th style={{ padding: '16px 32px', textAlign: 'left', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Vehicle</th>
-                            <th style={{ padding: '16px 32px', textAlign: 'left', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Duration</th>
-                            <th style={{ padding: '16px 32px', textAlign: 'left', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Financials</th>
-                            <th style={{ padding: '16px 32px', textAlign: 'left', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Verification</th>
+                            <th style={{ padding: '16px 32px', textAlign: 'left', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Booking ID</th>
+                            <th style={{ padding: '16px 32px', textAlign: 'left', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Booking Date</th>
+                            <th style={{ padding: '16px 32px', textAlign: 'left', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Vehicle Number</th>
+                            <th style={{ padding: '16px 32px', textAlign: 'left', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Zone</th>
+                            <th style={{ padding: '16px 32px', textAlign: 'left', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Amount Paid</th>
+                            <th style={{ padding: '16px 32px', textAlign: 'left', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -107,42 +110,44 @@ const BookingHistory = () => {
                                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
                                         <td style={{ padding: '20px 32px' }}>
                                             <span style={{ fontFamily: 'monospace', padding: '4px 8px', backgroundColor: '#f1f5f9', borderRadius: '6px', color: '#475569', fontSize: '13px', fontWeight: '600' }}>
-                                                BK-{String(booking.id).padStart(5, '0')}
+                                                #{String(booking.id).padStart(3, '0')}
                                             </span>
                                         </td>
                                         <td style={{ padding: '20px 32px' }}>
                                             <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                <span style={{ fontSize: '14px', fontWeight: '700', color: '#1e293b' }}>{entry.toLocaleDateString()}</span>
-                                                <span style={{ fontSize: '12px', color: '#94a3b8' }}>{entry.toLocaleTimeString()}</span>
+                                                <span style={{ fontSize: '14px', fontWeight: '700', color: '#1e293b' }}>
+                                                    {booking.booking_time ? new Date(booking.booking_time).toLocaleDateString() : new Date(booking.entry_time).toLocaleDateString()}
+                                                </span>
+                                                <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+                                                    {booking.booking_time ? new Date(booking.booking_time).toLocaleTimeString() : new Date(booking.entry_time).toLocaleTimeString()}
+                                                </span>
                                             </div>
                                         </td>
                                         <td style={{ padding: '20px 32px', color: '#334155', fontWeight: '700', fontSize: '15px' }}>
                                             {booking.vehicle_number}
                                         </td>
                                         <td style={{ padding: '20px 32px', color: '#64748b', fontSize: '14px' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                <Clock size={14} style={{ color: '#94a3b8' }} />
-                                                {durationHours} hrs
-                                            </div>
+                                            {booking.zone_name || `Zone ${booking.zone_id || '?'}`}
                                         </td>
                                         <td style={{ padding: '20px 32px' }}>
-                                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                <span style={{ fontSize: '15px', fontWeight: '800', color: '#0f172a' }}>₹{booking.amount_paid || 0}</span>
-                                                <span style={{ fontSize: '11px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                                    <CreditCard size={10} /> {booking.payment_method || 'DIGITAL'}
-                                                </span>
-                                            </div>
+                                            <span style={{ fontSize: '15px', fontWeight: '800', color: '#0f172a' }}>
+                                                ₹{parseFloat(booking.total_amount_paid || 0).toFixed(2)}
+                                            </span>
                                         </td>
                                         <td style={{ padding: '20px 32px' }}>
-                                            {booking.is_paid || booking.amount_paid > 0 ? (
-                                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', px: '10px', py: '5px', borderRadius: '8px', fontSize: '11px', fontWeight: '700', backgroundColor: '#ecfdf5', color: '#059669', border: '1px solid #d1fae5', padding: '4px 10px', textTransform: 'uppercase' }}>
-                                                    <CheckCircle size={12} /> Confirmed
-                                                </span>
-                                            ) : (
-                                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', px: '10px', py: '5px', borderRadius: '8px', fontSize: '11px', fontWeight: '700', backgroundColor: '#fff7ed', color: '#d97706', border: '1px solid #ffedd5', padding: '4px 10px', textTransform: 'uppercase' }}>
-                                                    <Clock size={12} /> Reconciliation
-                                                </span>
-                                            )}
+                                            <span style={{
+                                                display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px',
+                                                borderRadius: '8px', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase',
+                                                backgroundColor: booking.status === 'completed' ? '#dcfce7' : booking.status === 'reserved' ? '#fef9c3' : '#fff7ed',
+                                                color: booking.status === 'completed' ? '#166534' : booking.status === 'reserved' ? '#854d0e' : '#d97706',
+                                                border: booking.status === 'completed' ? '1px solid #bbf7d0' : booking.status === 'reserved' ? '1px solid #fef08a' : '1px solid #ffedd5'
+                                            }}>
+                                                <Clock size={12} /> 
+                                                {booking.status === 'completed' ? 'Completed' : 
+                                                 booking.status === 'reserved' ? 'Reserved' : 
+                                                 booking.status === 'active' ? 'Active' :
+                                                 'Pending Payment'}
+                                            </span>
                                         </td>
                                     </tr>
                                 );

@@ -813,7 +813,7 @@ const Dashboard = () => {
                   fontWeight: '600',
                   color: '#374151',
                   borderBottom: '1px solid #e5e7eb'
-                }}>Zone/Slot</th>
+                }}>Zone</th>
                 <th style={{
                   padding: '16px',
                   textAlign: 'left',
@@ -821,7 +821,31 @@ const Dashboard = () => {
                   fontWeight: '600',
                   color: '#374151',
                   borderBottom: '1px solid #e5e7eb'
-                }}>Duration</th>
+                }}>Booking Time</th>
+                <th style={{
+                  padding: '16px',
+                  textAlign: 'left',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  borderBottom: '1px solid #e5e7eb'
+                }}>Booking Time</th>
+                <th style={{
+                  padding: '16px',
+                  textAlign: 'left',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  borderBottom: '1px solid #e5e7eb'
+                }}>Exit Time</th>
+                <th style={{
+                  padding: '16px',
+                  textAlign: 'left',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  borderBottom: '1px solid #e5e7eb'
+                }}>Status</th>
                 <th style={{
                   padding: '16px',
                   textAlign: 'left',
@@ -849,16 +873,34 @@ const Dashboard = () => {
                   <tr key={session.session_id} style={{ borderBottom: '1px solid #f3f4f6' }}>
                     <td style={{ padding: '16px', fontSize: '14px', color: '#1f2937' }}>{session.vehicle_number}</td>
                     <td style={{ padding: '16px', fontSize: '14px', color: '#1f2937' }}>{session.zone_name}</td>
-                    <td style={{ padding: '16px', fontSize: '14px', color: '#1f2937' }}>{duration}</td>
+                    <td style={{ padding: '16px', fontSize: '14px', color: '#1f2937' }}>
+                      {session.booking_time ? new Date(session.booking_time).toLocaleString() : (session.entry_time ? new Date(session.entry_time).toLocaleString() : '-')}
+                    </td>
+                    <td style={{ padding: '16px', fontSize: '14px', color: '#1f2937' }}>
+                      {session.status === 'active' && session.entry_time ? new Date(session.entry_time).toLocaleString() : '-'}
+                    </td>
+                    <td style={{ padding: '16px', fontSize: '14px', color: '#1f2937' }}>
+                      {session.exit_time ? new Date(session.exit_time).toLocaleString() : '-'}
+                    </td>
                     <td style={{ padding: '16px' }}>
                       <span style={{
                         padding: '4px 12px',
                         borderRadius: '20px',
                         fontSize: '12px',
                         fontWeight: '500',
-                        backgroundColor: session.status === 'reserved' ? '#ebf5ff' : (session.payment_status === 'paid' ? '#dcfce7' : '#fef3c7'),
-                        color: session.status === 'reserved' ? '#1e40af' : (session.payment_status === 'paid' ? '#166534' : '#92400e')
-                      }}>{session.status === 'reserved' ? 'Reserved' : (session.payment_status.charAt(0).toUpperCase() + session.payment_status.slice(1))}</span>
+                        backgroundColor: session.status === 'reserved' ? '#fef9c3' : (session.status === 'active' ? '#dcfce7' : '#f3f4f6'),
+                        color: session.status === 'reserved' ? '#92400e' : (session.status === 'active' ? '#166534' : '#6b7280')
+                      }}>{session.status.charAt(0).toUpperCase() + session.status.slice(1)}</span>
+                    </td>
+                    <td style={{ padding: '16px' }}>
+                      <span style={{
+                        padding: '4px 12px',
+                        borderRadius: '20px',
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        backgroundColor: session.payment_status === 'paid' ? '#dcfce7' : '#fef3c7',
+                        color: session.payment_status === 'paid' ? '#166534' : '#92400e'
+                      }}>{session.payment_status}</span>
                     </td>
                     <td style={{ padding: '16px', textAlign: 'center' }}>
                       <button style={{
@@ -885,7 +927,7 @@ const Dashboard = () => {
                 );
               }) : (
                 <tr>
-                  <td colSpan="5" style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+                  <td colSpan="7" style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
                     No active or reserved parking sessions found.
                   </td>
                 </tr>

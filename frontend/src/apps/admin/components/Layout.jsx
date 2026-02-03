@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import Dashboard from '../pages/user/Dashboard';
 import Booking from '../pages/user/Booking';
 import Profile from '../pages/user/Profile';
 import UserManagement from '../pages/admin/UserManagement';
@@ -9,19 +9,34 @@ import Financial from '../pages/admin/Financial';
 import ParkingOperations from '../pages/admin/ParkingOperations';
 import StaffManagement from '../pages/admin/StaffManagement';
 import AdminDashboard from '../pages/admin/AdminDashboard';
-import StaffDashboard from '../pages/staff/StaffDashboard';
-import QRScan from '../pages/staff/QRScan';
-import VehicleEntry from '../pages/staff/VehicleEntry';
-import ExitBilling from '../pages/staff/ExitBilling';
-import Receipt from '../pages/staff/Receipt';
+import Reviews from '../pages/admin/Reviews';
+import StaffDashboard from '../../staff/components/StaffDashboard';
+import VehicleEntry from '../../staff/components/VehicleEntry';
+import ExitBilling from '../../staff/components/ExitBilling';
+import Receipt from '../../staff/components/Receipt';
 import './Layout.css';
 
 const Layout = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [userType, setUserType] = useState('admin');
 
+  useEffect(() => {
+    const path = location.pathname.split('/').pop();
+    if (path && path !== 'admin') {
+      setCurrentPage(path);
+    }
+  }, [location]);
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
+    // Sync URL with page change
+    if (page === 'dashboard') {
+      navigate('/admin/dashboard');
+    } else {
+      navigate(`/admin/${page}`);
+    }
   };
 
   const handleUserTypeChange = (type) => {
@@ -70,7 +85,7 @@ const Layout = () => {
         }
         return (
           <div className="page-content">
-            <Dashboard onPageChange={handlePageChange} />
+            <AdminDashboard onPageChange={handlePageChange} />
           </div>
         );
       case 'booking':
@@ -98,6 +113,7 @@ const Layout = () => {
           </div>
         );
       case 'financial':
+      case 'financial-report':
         return (
           <div className="page-content">
             <Financial />
@@ -158,7 +174,10 @@ const Layout = () => {
       case 'qr-scanner':
         return (
           <div className="page-content">
-            <QRScan />
+            <div style={{ padding: '20px' }}>
+              <h2>QR Scanner</h2>
+              <p>Scanner integration for Admin view is handled via Staff modules.</p>
+            </div>
           </div>
         );
       case 'exit-billing':
@@ -176,12 +195,30 @@ const Layout = () => {
       case 'history':
         return (
           <div className="page-content">
-            <h1>Booking History</h1>
-            <p>View your past parking bookings</p>
+            <h1>Activity History</h1>
+            <p>View your past administrative actions and system history</p>
+          </div>
+        );
+      case 'reviews':
+        return (
+          <div className="page-content">
+            <Reviews />
+          </div>
+        );
+      case 'overview':
+      case 'analytics':
+      case 'quick-stats':
+        return (
+          <div className="page-content">
+            <AdminDashboard onPageChange={handlePageChange} />
           </div>
         );
       default:
-        return <Dashboard />;
+        return (
+          <div className="page-content">
+            <AdminDashboard onPageChange={handlePageChange} />
+          </div>
+        );
     }
   };
 

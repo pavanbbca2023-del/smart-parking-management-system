@@ -113,6 +113,7 @@ const EntryExitLogs = () => {
                     <thead>
                         <tr style={{ background: 'rgba(248, 250, 252, 0.5)' }}>
                             <th style={{ padding: '16px 32px', textAlign: 'left', fontSize: '12px', fontWeight: '700', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Vehicle Details</th>
+                            <th style={{ padding: '16px 32px', textAlign: 'left', fontSize: '12px', fontWeight: '700', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Booking Time</th>
                             <th style={{ padding: '16px 32px', textAlign: 'left', fontSize: '12px', fontWeight: '700', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Entry Timeline</th>
                             <th style={{ padding: '16px 32px', textAlign: 'left', fontSize: '12px', fontWeight: '700', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Exit Timeline</th>
                             <th style={{ padding: '16px 32px', textAlign: 'left', fontSize: '12px', fontWeight: '700', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Assigned Zone</th>
@@ -122,7 +123,7 @@ const EntryExitLogs = () => {
                     <tbody>
                         {logs.length === 0 ? (
                             <tr>
-                                <td colSpan="5" style={{ padding: '80px 32px', textAlign: 'center', color: '#94a3b8' }}>
+                                <td colSpan="6" style={{ padding: '80px 32px', textAlign: 'center', color: '#94a3b8' }}>
                                     <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.3 }}>📂</div>
                                     <p style={{ fontSize: '18px', fontWeight: '500' }}>No entry/exit records found in database</p>
                                     <p style={{ fontSize: '14px' }}>Try refreshing or check system connectivity</p>
@@ -158,12 +159,38 @@ const EntryExitLogs = () => {
                                     </td>
                                     <td style={{ padding: '20px 32px' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#475569' }}>
-                                            <ArrowRight size={16} style={{ color: '#10b981' }} />
+                                            <ArrowRight size={16} style={{ color: '#f59e0b' }} />
                                             <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                <span style={{ fontWeight: '600', fontSize: '14px' }}>{new Date(log.entry_time).toLocaleDateString()}</span>
-                                                <span style={{ fontSize: '12px', color: '#64748b' }}>{new Date(log.entry_time).toLocaleTimeString()}</span>
+                                                <span style={{ fontWeight: '600', fontSize: '14px' }}>
+                                                    {log.booking_time ? new Date(log.booking_time).toLocaleDateString() : new Date(log.entry_time).toLocaleDateString()}
+                                                </span>
+                                                <span style={{ fontSize: '12px', color: '#64748b' }}>
+                                                    {log.booking_time ? new Date(log.booking_time).toLocaleTimeString() : new Date(log.entry_time).toLocaleTimeString()}
+                                                </span>
                                             </div>
                                         </div>
+                                    </td>
+                                    <td style={{ padding: '20px 32px' }}>
+                                        {log.entry_time ? (
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#475569' }}>
+                                                <ArrowRight size={16} style={{ color: '#10b981' }} />
+                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <span style={{ fontWeight: '600', fontSize: '14px' }}>{new Date(log.entry_time).toLocaleDateString()}</span>
+                                                    <span style={{ fontSize: '12px', color: '#64748b' }}>{new Date(log.entry_time).toLocaleTimeString()}</span>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <span style={{
+                                                fontSize: '13px',
+                                                color: '#cbd5e1',
+                                                fontStyle: 'italic',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '6px'
+                                            }}>
+                                                <Clock size={14} /> Pending Entry
+                                            </span>
+                                        )}
                                     </td>
                                     <td style={{ padding: '20px 32px' }}>
                                         {log.exit_time ? (

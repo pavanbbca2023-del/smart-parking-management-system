@@ -3,9 +3,7 @@ import { parkingApi } from '../../api/api';
 import PageHeader from '../../components/PageHeader';
 import './Payment.css';
 
-const RazorpayKey = 'rzp_test_McYq7U16tKqjNa';
-
-const Payment = ({ bookingData, onNavigate }) => {
+const Payment = ({ onNavigate, bookingData = {} }) => {
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [formData, setFormData] = useState({
     cardNumber: '4242 4242 4242 4242',
@@ -15,6 +13,9 @@ const Payment = ({ bookingData, onNavigate }) => {
     upiId: 'test@quickpay',
     bankName: ''
   });
+  // State for Mock Mode
+  const [showMockUI, setShowMockUI] = useState(false);
+  const [mockOrder, setMockOrder] = useState(null);
   const [loading, setLoading] = useState(false);
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [receiptId, setReceiptId] = useState('');
@@ -69,11 +70,46 @@ const Payment = ({ bookingData, onNavigate }) => {
     }));
   };
 
+  const handleMockSuccess = async () => {
+    setLoading(true);
+    try {
+      console.log('DEBUG: Verifying Mock Payment...');
+      const verifyResponse = await parkingApi.verifyRazorpayPayment({
+        razorpay_payment_id: `pay_mock_${Date.now()}`,
+        razorpay_order_id: mockOrder.id,
+        razorpay_signature: 'mock_signature_bypass',
+        session_id: bookingData.bookingId, // Ensure ID is correct
+        amount: initialPaid
+      });
+
+      if (verifyResponse.data.success) {
+        console.log('DEBUG: Mock Payment Verified');
+        onNavigate('payment-success');
+      } else {
+        alert("Mock Verification Failed: " + verifyResponse.data.error);
+      }
+    } catch (err) {
+      console.error("Mock Verification Error:", err);
+      alert("Mock Payment Failed. See console.");
+    } finally {
+      setLoading(false);
+      setShowMockUI(false);
+    }
+  };
+
+  const handleMockFailure = () => {
+    alert("Simulated Payment Failure");
+    setLoading(false);
+    setShowMockUI(false);
+  };
+
   const handlePayment = async (e) => {
     e.preventDefault();
+    console.log("DEBUG: Pay Now Button Clicked"); // Added Debug
     setLoading(true);
 
     try {
+      console.log("DEBUG: Booking Data:", bookingData); // Added Debug
       const bookingId = bookingData?.id || bookingData?.bookingId || bookingData?.backendSessionId;
       console.log('DEBUG: Initiating payment for Booking ID:', bookingId);
 
@@ -86,9 +122,18 @@ const Payment = ({ bookingData, onNavigate }) => {
       const order = response.data.order;
       console.log('DEBUG: Razorpay Order created:', order);
 
-      // 2. Open Razorpay Checkout
+      // 2. Open Razorpay Checkout or Mock UI
+      // CHECK FOR MOCK ORDER (Bypass Razorpay SDK if mock)
+      if (order.id && order.id.startsWith('order_mock_')) {
+        console.log('DEBUG: Mock Order detected, Enable Mock UI');
+        setMockOrder(order);
+        setShowMockUI(true); // SHOW UI instead of auto-bypass
+        return;
+      }
+
+      // 3. Open Razorpay Checkout
       const options = {
-        key: RazorpayKey,
+        key: response.data.key_id, // Use key from backend response
         amount: order.amount,
         currency: order.currency,
         name: "Smart Parking System",
@@ -138,8 +183,7 @@ const Payment = ({ bookingData, onNavigate }) => {
       console.error("Payment Initiation Error:", error);
       const errorMsg = error.response?.data?.error || error.message;
       alert(`Payment Error: ${errorMsg}`);
-    } finally {
-      setLoading(false);
+      setLoading(false); // Reset loading if error
     }
   };
 
@@ -255,6 +299,25 @@ const Payment = ({ bookingData, onNavigate }) => {
         description="Finalize your booking by making payment"
         icon="💳"
       />
+
+      {/* MOCK UI OVERLAY */}
+      {showMockUI && (
+        <div className="mock-payment-overlay">
+          <div className="mock-payment-card">
+            <h3>🛠️ Mock Payment Mode</h3>
+            <p><strong>Reason:</strong> API Keys are missing in backend/.env</p>
+            <p>This is a simulation. No real money will be deducted.</p>
+            <div className="mock-actions">
+              <button className="btn-success" onClick={handleMockSuccess}>
+                ✅ Simulate Success
+              </button>
+              <button className="btn-danger" onClick={handleMockFailure}>
+                ❌ Simulate Failure
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="payment-container">
         <div className="payment-details-section">

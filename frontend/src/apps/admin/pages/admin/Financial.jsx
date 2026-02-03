@@ -35,99 +35,54 @@ const Financial = () => {
       const zones = zonesRes.zones || [];
 
 
-      // Expenses removed as per user request
-      const totalExpenses = 0;
-
-      // Apply filtering
+      // Don't filter sessions by date - show today's sessions only
       const now = new Date();
       const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-      sessions = sessions.filter(session => {
-        const sessionDate = new Date(session.entry_time || session.created_at);
-
-        if (timeFilter === 'today') {
+      
+      if (timeFilter === 'today') {
+        sessions = sessions.filter(session => {
+          const sessionDate = new Date(session.booking_time || session.entry_time || session.created_at);
           return sessionDate >= startOfToday;
-        }
-
-        if (timeFilter === 'week') {
-          const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-          return sessionDate >= sevenDaysAgo;
-        }
-
-        if (timeFilter === 'month') {
-          return sessionDate.getMonth() === now.getMonth() &&
-            sessionDate.getFullYear() === now.getFullYear();
-        }
-
-        if (timeFilter === 'year') {
-          return sessionDate.getFullYear() === now.getFullYear();
-        }
-
-        if (timeFilter === 'custom') {
-          // Filter by specific date
-          if (customDate) {
-            const selectedDate = new Date(customDate);
-            return sessionDate.toDateString() === selectedDate.toDateString();
-          }
-
-          // Filter by month
-          if (customMonth) {
-            const [year, month] = customMonth.split('-');
-            return sessionDate.getFullYear() === parseInt(year) &&
-              sessionDate.getMonth() === parseInt(month) - 1;
-          }
-
-          // Filter by year
-          if (customYear) {
-            return sessionDate.getFullYear() === parseInt(customYear);
-          }
-        }
-
-        return true; // Default show all if no filter matches
+        });
+      }
+      
+      // Sort sessions by booking_time descending to show latest first
+      sessions = sessions.sort((a, b) => {
+        const dateA = new Date(a.booking_time || a.entry_time || a.created_at);
+        const dateB = new Date(b.booking_time || b.entry_time || b.created_at);
+        return dateB - dateA;
       });
 
-      // Calculate real financial data
-      const paidSessions = sessions.filter(s => parseFloat(s.total_amount_paid || 0) > 0);
-      const totalRevenue = paidSessions.reduce((sum, s) => sum + parseFloat(s.total_amount_paid || 0), 0);
+      // Calculate revenue from filtered sessions
+      const paidSessions = sessions.filter(s => s.payment_status === 'paid');
+      const totalRevenue = paidSessions.reduce((sum, s) => sum + (parseFloat(s.total_amount_paid) || parseFloat(s.initial_amount_paid) || 0), 0);
       const totalTransactions = paidSessions.length;
       const avgTransaction = totalTransactions > 0 ? Math.round(totalRevenue / totalTransactions) : 0;
 
-      // Calculate zone-wise revenue
-      // Sessions have zone_name (string), zones have name and id
-      console.log('DEBUG: Zones from API:', zones);
-      console.log('DEBUG: Sample session:', sessions[0]);
-      console.log('DEBUG: Total paid sessions:', paidSessions.length);
-
+      // Calculate zone-wise revenue using filtered sessions
       const zoneRevenue = zones.map(zone => {
         const zoneName = zone.name || `Zone ${zone.id}`;
-        // Match by zone_name (string) or zone_id (if available)
-        const zoneSessions = sessions.filter(s => {
+        const zoneSessions = paidSessions.filter(s => {
           const sessionZoneName = s.zone_name || s.zone?.name || '';
           const sessionZoneId = s.zone_id || s.zone?.id;
-          const matches = (sessionZoneName === zoneName || sessionZoneId === zone.id) && parseFloat(s.total_amount_paid || 0) > 0;
-          return matches;
+          return sessionZoneName === zoneName || sessionZoneId === zone.id;
         });
-        const revenue = zoneSessions.reduce((sum, s) => sum + parseFloat(s.total_amount_paid || 0), 0);
-        console.log(`DEBUG: Zone "${zoneName}" - Sessions: ${zoneSessions.length}, Revenue: ${revenue}`);
+        const revenue = zoneSessions.reduce((sum, s) => sum + (parseFloat(s.total_amount_paid) || parseFloat(s.initial_amount_paid) || 0), 0);
         return {
           zone: zoneName,
-          revenue: revenue,
+          revenue: Math.round(revenue),
           sessions: zoneSessions.length,
           percentage: totalRevenue > 0 ? Math.round((revenue / totalRevenue) * 100) : 0
         };
       }).filter(z => z.revenue > 0);
 
-      console.log('DEBUG: Final zoneRevenue:', zoneRevenue);
-
       // Calculate payment methods distribution
-      const methods = sessions.reduce((acc, s) => {
-        const amount = parseFloat(s.total_amount_paid || 0);
-        if (amount > 0) {
-          const method = s.payment_method || 'UPI';
-          if (!acc[method]) acc[method] = { amount: 0, count: 0 };
-          acc[method].amount += amount;
-          acc[method].count += 1;
-        }
+      const methods = paidSessions.reduce((acc, s) => {
+        const amount = parseFloat(s.total_amount_paid) || parseFloat(s.initial_amount_paid) || 0;
+        const method = s.payment_method || 'UPI';
+        if (!acc[method]) acc[method] = { amount: 0, count: 0 };
+        acc[method].amount += amount;
+        acc[method].count += 1;
         return acc;
       }, {});
 
@@ -151,7 +106,7 @@ const Financial = () => {
 
       setData({
         revenue: {
-          total: totalRevenue,
+          total: Math.round(totalRevenue),
           transactions: totalTransactions,
           avgTransaction: avgTransaction
         },
@@ -159,12 +114,12 @@ const Financial = () => {
           total: 0
         },
         profit: {
-          net: netProfit,
-          margin: profitMargin
+          net: Math.round(totalRevenue),
+          margin: 100
         },
         zones: zoneRevenue,
         paymentMethods: formattedMethods,
-        sessions: paidSessions.slice(0, 10), // Latest 10 transactions
+        sessions: sessions.slice(0, 20), // Show more sessions, not just paid ones
         loading: false
       });
 
@@ -285,9 +240,9 @@ const Financial = () => {
 
   return (
     <div style={{
-      padding: '24px',
+      padding: '32px',
       backgroundColor: '#f8fafc',
-      minHeight: '100vh',
+      minHeight: '100%',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
       {/* Header */}
@@ -840,7 +795,7 @@ const Financial = () => {
                     color: '#374151',
                     borderBottom: '1px solid #e5e7eb'
                   }}>
-                    Transaction ID</th>
+                    Booking ID</th>
                   <th style={{
                     padding: '16px 24px',
                     textAlign: 'left',
@@ -848,7 +803,7 @@ const Financial = () => {
                     fontWeight: '600',
                     color: '#374151',
                     borderBottom: '1px solid #e5e7eb'
-                  }}>Date</th>
+                  }}>Booking Date</th>
                   <th style={{
                     padding: '16px 24px',
                     textAlign: 'left',
@@ -856,7 +811,7 @@ const Financial = () => {
                     fontWeight: '600',
                     color: '#374151',
                     borderBottom: '1px solid #e5e7eb'
-                  }}>Time</th>
+                  }}>Vehicle Number</th>
                   <th style={{
                     padding: '16px 24px',
                     textAlign: 'left',
@@ -864,7 +819,7 @@ const Financial = () => {
                     fontWeight: '600',
                     color: '#374151',
                     borderBottom: '1px solid #e5e7eb'
-                  }}>Amount</th>
+                  }}>Amount Paid</th>
                   <th style={{
                     padding: '16px 24px',
                     textAlign: 'left',
@@ -893,26 +848,27 @@ const Financial = () => {
               </thead>
               <tbody>
                 {data.sessions.map((session, index) => {
-                  const status = session.is_paid ? 'completed' : 'pending';
+                  const status = session.payment_status === 'paid' ? 'completed' : 'pending';
                   const statusColors = getStatusColor(status);
+                  const sessionDate = new Date(session.booking_time || session.entry_time || Date.now());
                   return (
                     <tr key={session.id || index} style={{
                       borderBottom: index < data.sessions.length - 1 ? '1px solid #f3f4f6' : 'none'
                     }}>
                       <td style={{ padding: '16px 24px', fontSize: '14px', color: '#1f2937', fontWeight: '500' }}>
-                        TXN{String(session.id || index).padStart(3, '0')}
+                        #{session.id || (index + 1)}
                       </td>
                       <td style={{ padding: '16px 24px', fontSize: '14px', color: '#64748b', fontWeight: '500' }}>
-                        {new Date(session.entry_time || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        {sessionDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                       </td>
                       <td style={{ padding: '16px 24px', fontSize: '14px', color: '#64748b' }}>
-                        {new Date(session.entry_time || Date.now()).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                        {session.vehicle_number || 'N/A'}
                       </td>
                       <td style={{ padding: '16px 24px', fontSize: '14px', color: '#1f2937', fontWeight: '600' }}>
-                        ₹{parseFloat(session.amount_paid || 0).toFixed(0)}
+                        ₹{parseFloat(session.total_amount_paid || session.initial_amount_paid || 0).toFixed(2)}
                       </td>
                       <td style={{ padding: '16px 24px', fontSize: '14px', color: '#64748b' }}>
-                        {session.payment_method || 'UPI'}
+                        {session.payment_method || '-'}
                       </td>
                       <td style={{ padding: '16px 24px', fontSize: '14px', color: '#64748b' }}>
                         {session.zone_name || 'Zone A'}
@@ -927,7 +883,7 @@ const Financial = () => {
                           color: statusColors.text,
                           textTransform: 'capitalize'
                         }}>
-                          {status}
+                          {session.status === 'pending_payment' ? 'Pending Payment' : status}
                         </span>
                       </td>
                     </tr>

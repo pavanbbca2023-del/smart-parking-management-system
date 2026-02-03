@@ -112,8 +112,6 @@ const BookSlot = ({ onNavigate, bookingData }) => {
         if (formData.selectedZone) {
           const zone = availableZones.find(z => z.id.toString() === formData.selectedZone.toString());
           if (zone) rate = parseFloat(zone.base_price || 30);
-        } else {
-          rate = formData.vehicleType === 'Bike' ? 10 : (formData.vehicleType === 'Auto' ? 15 : 30);
         }
 
         const amount = durationHours * rate;

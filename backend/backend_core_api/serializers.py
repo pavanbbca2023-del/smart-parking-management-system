@@ -23,16 +23,16 @@ class UserSerializer(serializers.ModelSerializer):
     def get_assigned_zones(self, obj):
         if obj.role != 'STAFF':
             return []
-        from .models import Schedule
-        # Get unique zones assigned to this staff member
-        zones = Schedule.objects.filter(staff=obj, is_active=True).values_list('zone__name', flat=True).distinct()
-        return list(zones)
+        # Return empty list since Schedule model is not being used
+        return []
 
     def create(self, validated_data):
-        password = validated_data.get('password')
+        password = validated_data.pop('password', None)
+        user = User(**validated_data)
         if password:
-            validated_data['plain_password'] = password
-        user = User.objects.create_user(**validated_data)
+            user.plain_password = password
+            user.set_password(password)  # Still hash for Django auth
+        user.save()
         return user
 
     def update(self, instance, validated_data):
@@ -85,7 +85,7 @@ class ParkingSessionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ParkingSession
-        fields = ('id', 'vehicle_number', 'zone', 'zone_name', 'slot', 'slot_number', 'entry_time', 'exit_time', 
+        fields = ('id', 'vehicle_number', 'zone', 'zone_name', 'slot', 'slot_number', 'booking_time', 'entry_time', 'exit_time', 
                   'initial_amount_paid', 'final_amount_paid', 'total_amount_paid',
                   'payment_method', 'payment_status', 'is_paid', 'duration', 'status', 'qr_code_data',
                   'hourly_rate', 'estimated_total', 'estimated_balance', 'guest_mobile', 'guest_email', 'booking_expiry_time')
@@ -94,11 +94,12 @@ class ParkingSessionSerializer(serializers.ModelSerializer):
         return obj.payment_status == 'paid'
 
     def get_duration(self, obj):
+        start_time = obj.entry_time or obj.booking_time
         if not obj.exit_time:
             from django.utils import timezone
-            duration = timezone.now() - obj.entry_time
+            duration = timezone.now() - start_time
         else:
-            duration = obj.exit_time - obj.entry_time
+            duration = obj.exit_time - start_time
         
         hours = int(duration.total_seconds() // 3600)
         minutes = int((duration.total_seconds() % 3600) // 60)
@@ -112,12 +113,13 @@ class ParkingSessionSerializer(serializers.ModelSerializer):
         import math
         
         # For active or reserved sessions, calculate based on time
+        start_time = obj.entry_time or obj.booking_time
         if obj.status == 'reserved' and obj.booking_expiry_time:
-            # For reserved, use entry_time to expiry_time
-            duration_delta = obj.booking_expiry_time - obj.entry_time
+            # For reserved, use start_time to expiry_time
+            duration_delta = obj.booking_expiry_time - start_time
         else:
-            # For active, use entry_time to now
-            duration_delta = timezone.now() - obj.entry_time
+            # For active, use start_time to now
+            duration_delta = timezone.now() - start_time
             
         hours = duration_delta.total_seconds() / 3600
         billable_hours = max(1, math.ceil(hours))

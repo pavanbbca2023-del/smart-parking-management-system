@@ -8,6 +8,7 @@ const StaffDashboard = () => {
   const [stats, setStats] = useState({
     vehiclesEntered: 0,
     vehiclesExited: 0,
+    vehiclesReserved: 0,
     currentOccupancy: 0,
     totalRevenue: 0,
     totalSlots: 0,
@@ -35,6 +36,7 @@ const StaffDashboard = () => {
         setStats({
           vehiclesEntered: d.vehicles_entered,
           vehiclesExited: d.completed_sessions,
+          vehiclesReserved: d.vehicles_reserved || 0,
           currentOccupancy: Math.round(d.occupancy_rate),
           totalRevenue: d.total_revenue,
           cashRevenue: d.cash_revenue,
@@ -302,6 +304,33 @@ const StaffDashboard = () => {
               color: '#64748b',
               margin: '0 0 16px 0',
               textTransform: 'uppercase'
+            }}>Vehicles Reserved</h3>
+            <div style={{
+              fontSize: '32px',
+              fontWeight: '700',
+              color: '#1e293b',
+              marginBottom: '8px'
+            }}>{stats.vehiclesReserved}</div>
+            <p style={{
+              fontSize: '14px',
+              color: '#f59e0b',
+              margin: '0',
+              fontWeight: '500'
+            }}>📅 Booked today</p>
+          </div>
+
+          <div style={{
+            backgroundColor: 'white',
+            padding: '24px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            border: '1px solid #e2e8f0'
+          }}>
+            <h3 style={{
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#64748b',
+              margin: '0 0 16px 0',
+              textTransform: 'uppercase'
             }}>Current Occupancy</h3>
             <div style={{
               fontSize: '32px',
@@ -364,7 +393,7 @@ const StaffDashboard = () => {
             gap: '16px'
           }}>
             <button
-              onClick={() => navigate('/gate-control', { state: { mode: 'entry' } })}
+              onClick={() => navigate('/staff/gate-control', { state: { mode: 'entry' } })}
               style={{
                 backgroundColor: '#10b981',
                 color: 'white',
@@ -379,7 +408,7 @@ const StaffDashboard = () => {
               🚗 Vehicle Entry
             </button>
             <button
-              onClick={() => navigate('/gate-control', { state: { mode: 'exit' } })}
+              onClick={() => navigate('/staff/gate-control', { state: { mode: 'exit' } })}
               style={{
                 backgroundColor: '#ef4444',
                 color: 'white',
@@ -394,7 +423,7 @@ const StaffDashboard = () => {
               🏁 Vehicle Exit
             </button>
             <button
-              onClick={() => navigate('/payments-mgmt')}
+              onClick={() => navigate('/staff/payments-mgmt')}
               style={{
                 backgroundColor: '#8b5cf6',
                 color: 'white',

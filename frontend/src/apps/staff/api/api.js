@@ -69,19 +69,20 @@ api.interceptors.response.use(
 );
 
 export const alertApi = {
-    getAll: () => api.get('analytics/alerts/'),
-    markAsRead: (id) => api.patch(`analytics/alerts/${id}/`, { is_read: true }),
-    clearAll: () => api.post('analytics/alerts/clear_all/'),
+    getAll: () => api.get('stats/alerts/'),
+    markAsRead: (id) => api.patch(`stats/alerts/${id}/`, { is_read: true }),
+    clearAll: () => api.post('stats/alerts/clear_all/'),
 };
 
 export const parkingApi = {
-    getDashboardStats: () => api.get('analytics/dashboard/'),
+    getDashboardStats: () => api.get('stats/dashboard/'),
     getZones: () => api.get('core/zones/'),
     getActiveSessions: () => api.get('core/sessions/?status=active,reserved'),
     getCompletedSessions: () => api.get('core/sessions/?status=completed'),
     getAvailableSlots: (zoneId) => api.get(`core/slots/?zone=${zoneId}&is_occupied=false&is_active=true`),
     processEntry: (data) => api.post('core/sessions/scan-entry/', {
         vehicle_number: data.vehicleNumber,
+        session_id: data.session_id,
         zone_id: data.zoneId,
         initial_amount: data.initial_amount,
         payment_method: data.payment_method
@@ -100,9 +101,9 @@ export const attendanceApi = {
 
 export const reportApi = {
     getDailyShift: (date) => api.get(`core/shift-logs/?date=${date}`),
-    getRevenueSummary: (period = 'DAILY') => api.get(`analytics/revenue/?period=${period}`),
+    getRevenueSummary: (period = 'DAILY') => api.get(`stats/revenue/?period=${period}`),
     getVehicleHistory: (vehicleNumber) => api.get(`core/sessions/?vehicle_number=${vehicleNumber}`),
-    getZonePerformance: () => api.get('analytics/zones/'),
+    getZonePerformance: () => api.get('stats/zones/'),
 };
 
 export default api;

@@ -17,14 +17,13 @@ const ViewSlots = ({ onNavigate }) => {
           const fetchedZones = response.data.zones;
           setZones(fetchedZones);
 
-          // Map backend slots to frontend card format
           const mappedSlots = fetchedZones.flatMap(zone =>
             zone.slots.map(slot => ({
               id: slot.slot_number,
               zoneId: zone.id, // Store ID for matching
               zone: zone.name,
-              level: 'Ground Floor', // Default, or could be extracted from zone name
-              status: slot.is_occupied ? 'occupied' : 'available',
+              level: 'Ground Floor', // Default
+              status: slot.is_occupied ? 'occupied' : (slot.is_reserved ? 'reserved' : 'available'),
               type: 'Car', // Default
               rate: zone.base_price,
               is_active: slot.is_active
@@ -53,7 +52,7 @@ const ViewSlots = ({ onNavigate }) => {
       return slot.status === selectedFilter;
     }
     return slot.id === selectedFilter;
-  }).filter(slot => slot.status === 'available');
+  });
 
   const getStatusIcon = (status) => {
     switch (status) {

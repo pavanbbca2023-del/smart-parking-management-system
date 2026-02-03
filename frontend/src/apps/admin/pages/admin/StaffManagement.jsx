@@ -25,9 +25,9 @@ const StaffManagement = () => {
 
   return (
     <div style={{
-      padding: '40px',
-      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-      minHeight: '100vh',
+      padding: '32px',
+      backgroundColor: '#f8fafc',
+      minHeight: '100%',
       fontFamily: '"Inter", -apple-system, sans-serif'
     }}>
       {/* Premium Header */}

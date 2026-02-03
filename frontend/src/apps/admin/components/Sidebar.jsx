@@ -10,16 +10,7 @@ const Sidebar = ({ currentPage, onPageChange, userType, onUserTypeChange }) => {
     // Clear tokens
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-
-    // Determine redirect based on userType (optional, but good for safety)
-    if (userType === 'staff') {
-      // Redirect to Staff Dashboard (relative path supports production)
-      window.location.href = '/staff/dashboard';
-    } else {
-      // Default admin logout behavior - maybe refresh or redirect to login (if admin login exists)
-      // For now, reload or specific logic
-      window.location.href = '/login';
-    }
+    navigate('/admin/login');
   };
 
 
@@ -29,7 +20,8 @@ const Sidebar = ({ currentPage, onPageChange, userType, onUserTypeChange }) => {
     { id: 'zone-management', label: 'ZONE MANAGEMENT', icon: '🏢' },
     { id: 'financial', label: 'FINANCIAL REPORT', icon: '💰' },
     { id: 'parking-operations', label: 'PARKING OPERATIONS', icon: '🚗' },
-    { id: 'staff-management', label: 'STAFF MANAGEMENT', icon: '👮' }
+    { id: 'staff-management', label: 'STAFF MANAGEMENT', icon: '👮' },
+    { id: 'reviews', label: 'REVIEWS & FEEDBACK', icon: '⭐' }
   ];
 
   const staffMenuItems = [

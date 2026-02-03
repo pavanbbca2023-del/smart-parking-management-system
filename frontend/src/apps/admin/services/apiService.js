@@ -227,7 +227,10 @@ class ApiService {
   async adminGetAllUsers(role = null) {
     const params = role ? { role } : {};
     const response = await apiClient.get(API_CONFIG.ENDPOINTS.ADMIN.USERS, { params });
-    // Backend returns { users: [...] }, extract the array
+    // Handle DRF Pagination ({ count, results: [...] }) or custom wrappings
+    if (response.data.results && Array.isArray(response.data.results)) {
+      return response.data.results;
+    }
     return response.data.users || response.data || [];
   }
 
@@ -267,7 +270,11 @@ class ApiService {
   // Admin Zone Management
   async adminGetAllZones() {
     const response = await apiClient.get(API_CONFIG.ENDPOINTS.ADMIN.ZONES);
-    return response.data;
+    // Handle DRF Pagination
+    if (response.data.results && Array.isArray(response.data.results)) {
+      return response.data.results;
+    }
+    return response.data.zones || response.data || [];
   }
 
   async adminCreateZone(zoneData) {
@@ -315,6 +322,11 @@ class ApiService {
   async adminGetAllAttendance() {
     const response = await apiClient.get('/api/core/attendance/');
     // Handle both wrapped and unwrapped list responses
+    return response.data.results || response.data;
+  }
+
+  async getFeedbacks() {
+    const response = await apiClient.get(API_CONFIG.ENDPOINTS.ADMIN.FEEDBACKS);
     return response.data.results || response.data;
   }
 }

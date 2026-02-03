@@ -17,6 +17,7 @@ import dj_database_url
 
 # Load environment variables from .env file
 load_dotenv()
+# Trigger reload due to .env update
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

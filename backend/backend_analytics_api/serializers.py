@@ -4,6 +4,7 @@ class DashboardSummarySerializer(serializers.Serializer):
     active_sessions = serializers.IntegerField()
     completed_sessions = serializers.IntegerField()
     vehicles_entered = serializers.IntegerField()
+    vehicles_reserved = serializers.IntegerField()
     total_revenue = serializers.FloatField()
     cash_revenue = serializers.FloatField()
     online_revenue = serializers.FloatField()

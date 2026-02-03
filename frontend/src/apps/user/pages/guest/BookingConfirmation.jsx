@@ -86,6 +86,37 @@ const BookingConfirmation = ({ bookingData, onNavigate }) => {
                   </div>
 
                   <div>
+                    <span style={{ color: '#64748b', fontSize: '13px', display: 'block' }}>Entry Time</span>
+                    <span style={{ fontWeight: '600' }}>
+                      {bookingData.entryTime ? 
+                        new Date(bookingData.entryTime).toLocaleString([], { 
+                          dateStyle: 'short', 
+                          timeStyle: 'short' 
+                        }) : 
+                        'Not specified'
+                      }
+                    </span>
+                  </div>
+
+                  <div>
+                    <span style={{ color: '#64748b', fontSize: '13px', display: 'block' }}>Booked For</span>
+                    <span style={{ fontWeight: '600' }}>
+                      {bookingData.bookedDuration || (() => {
+                        if (!bookingData.entryTime || !bookingData.exitTime) return 'N/A';
+                        const [eh, em] = bookingData.entryTime.split(':').map(Number);
+                        const [xh, xm] = bookingData.exitTime.split(':').map(Number);
+                        let mins = (xh * 60 + xm) - (eh * 60 + em);
+                        if (mins < 0) mins += 24 * 60;
+                        const hrs = Math.floor(mins / 60);
+                        const remMins = mins % 60;
+                        if (hrs === 0) return `${remMins} minutes`;
+                        if (remMins === 0) return `${hrs} hours`;
+                        return `${hrs}h ${remMins}m`;
+                      })()} 
+                    </span>
+                  </div>
+
+                  <div>
                     <span style={{ color: '#64748b', fontSize: '13px', display: 'block' }}>Duration</span>
                     <span style={{ fontWeight: '600' }}>
                       {bookingData.duration || (() => {

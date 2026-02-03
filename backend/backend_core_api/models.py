@@ -32,7 +32,7 @@ class Zone(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
     total_slots = models.IntegerField(default=0)
-    base_price = models.DecimalField(max_digits=10, decimal_places=2, default=20.00)
+    base_price = models.DecimalField(max_digits=10, decimal_places=2)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -71,6 +71,7 @@ class ParkingSession(models.Model):
         ('active', 'Active'),
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled'),
+        ('pending_payment', 'Pending Payment'),
     )
     CANCELLATION_TYPE_CHOICES = (
         ('user_initiated', 'User Initiated'),
@@ -87,7 +88,8 @@ class ParkingSession(models.Model):
     # Original fields
     vehicle_number = models.CharField(max_length=20)
     zone = models.ForeignKey(Zone, on_delete=models.CASCADE)
-    entry_time = models.DateTimeField(auto_now_add=True)
+    booking_time = models.DateTimeField(auto_now_add=True)
+    entry_time = models.DateTimeField(null=True, blank=True)
     exit_time = models.DateTimeField(null=True, blank=True)
     initial_amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     final_amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -167,7 +169,7 @@ class ParkingSession(models.Model):
         if self.status != 'reserved':
             return Decimal('0.00')
         
-        time_since_booking = timezone.now() - self.entry_time
+        time_since_booking = timezone.now() - self.booking_time
         
         # Free cancellation within 30 minutes (100% refund)
         if time_since_booking <= timedelta(minutes=30):

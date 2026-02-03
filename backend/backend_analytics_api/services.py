@@ -10,25 +10,30 @@ class AnalyticsService:
         from django.apps import apps
         ParkingSession = apps.get_model('backend_core_api', 'ParkingSession')
         Zone = apps.get_model('backend_core_api', 'Zone')
-        Vehicle = apps.get_model('backend_core_api', 'Vehicle')
         Slot = apps.get_model('backend_core_api', 'Slot')
         try:
             Payment = apps.get_model('backend_core_api', 'Payment')
         except:
             Payment = None
-        return ParkingSession, Zone, Vehicle, Payment, Slot
+        return ParkingSession, Zone, Payment, Slot
     
     @staticmethod
     def get_dashboard_summary():
         try:
-            ParkingSession, Zone, Vehicle, Payment, Slot = AnalyticsService.get_models()
+            ParkingSession, Zone, Payment, Slot = AnalyticsService.get_models()
             now = timezone.now()
             local_now = timezone.localtime(now)
             today_start = local_now.replace(hour=0, minute=0, second=0, microsecond=0)
             
-            # Use filters consistently
-            vehicles_entered = ParkingSession.objects.filter(entry_time__gte=today_start).count()
+            # Use filters consistently - only count vehicles that actually entered
+            vehicles_entered = ParkingSession.objects.filter(
+                entry_time__gte=today_start, 
+                status__in=['active', 'completed']
+            ).count()
             vehicles_exited = ParkingSession.objects.filter(status='completed', exit_time__gte=today_start).count()
+            vehicles_reserved = ParkingSession.objects.filter(
+                status__in=['reserved', 'pending_payment']
+            ).count()
             active_sessions = ParkingSession.objects.filter(status='active').count()
             
             total_revenue = Decimal('0.00')
@@ -36,6 +41,7 @@ class AnalyticsService:
             online_revenue = Decimal('0.00')
             
             if Payment:
+                # Get today's payments only
                 today_payments = Payment.objects.filter(created_at__gte=today_start, status='success')
                 total_revenue = today_payments.aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
                 cash_revenue = today_payments.filter(payment_method__iexact='cash').aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
@@ -62,6 +68,7 @@ class AnalyticsService:
                 'active_sessions': active_sessions,
                 'completed_sessions': vehicles_exited,
                 'vehicles_entered': vehicles_entered,
+                'vehicles_reserved': vehicles_reserved,
                 'total_revenue': float(total_revenue),
                 'cash_revenue': float(cash_revenue),
                 'online_revenue': float(online_revenue),
@@ -81,7 +88,7 @@ class AnalyticsService:
     @staticmethod
     def get_zone_occupancy():
         try:
-            ParkingSession, Zone, Vehicle, Payment, Slot = AnalyticsService.get_models()
+            ParkingSession, Zone, Payment, Slot = AnalyticsService.get_models()
             zones_data = []
             for zone in Zone.objects.filter(is_active=True):
                 total_slots = zone.total_slots
@@ -108,25 +115,24 @@ class AnalyticsService:
     @staticmethod
     def get_revenue_report(from_date=None, to_date=None, period='ALL'):
         try:
-            ParkingSession, Zone, Vehicle, Payment, Slot = AnalyticsService.get_models()
+            ParkingSession, Zone, Payment, Slot = AnalyticsService.get_models()
             now = timezone.now()
             
             if not from_date:
                 if period == 'DAILY':
                     from_date = now.date()
                 else:
-                    from_date = now.date() - timedelta(days=30)
-            if not to_date: to_date = now.date()
+                    # For ALL period, get all data regardless of date
+                    from_date = now.date() - timedelta(days=365)
+            if not to_date: 
+                to_date = now.date() + timedelta(days=365)  # Include future dates
             
             from_datetime = datetime.combine(from_date, datetime.min.time())
             to_datetime = datetime.combine(to_date, datetime.max.time())
             
             if Payment:
-                # Still need sessions for count
-                sessions = ParkingSession.objects.filter(entry_time__range=[from_datetime, to_datetime], payment_status='paid')
-                
+                # Get all payments for broader data
                 payments_query = Payment.objects.filter(
-                    created_at__range=[from_datetime, to_datetime],
                     status='success'
                 )
                 
@@ -134,9 +140,10 @@ class AnalyticsService:
                 cash_revenue = payments_query.filter(payment_method__iexact='cash').aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
                 online_revenue = Decimal(total_revenue) - Decimal(cash_revenue)
                 
-                total_sessions = sessions.count()
+                # Count all paid sessions
+                total_sessions = ParkingSession.objects.filter(payment_status='paid').count()
                 
-                # Zone revenue still needs to join with session
+                # Zone revenue
                 zone_revenue = payments_query.values('session__zone__name').annotate(
                     revenue=Sum('amount'), 
                     session_count=Count('session', distinct=True)
@@ -182,7 +189,7 @@ class AnalyticsService:
     @staticmethod
     def get_peak_hours():
         try:
-            ParkingSession, Zone, Vehicle, Payment, Slot = AnalyticsService.get_models()
+            ParkingSession, Zone, Payment, Slot = AnalyticsService.get_models()
             sessions = ParkingSession.objects.filter(entry_time__gte=timezone.now() - timedelta(days=30))
             hourly_data = {}
             for session in sessions:
@@ -197,7 +204,7 @@ class AnalyticsService:
     @staticmethod
     def get_active_sessions():
         try:
-            ParkingSession, Zone, Vehicle, Payment, Slot = AnalyticsService.get_models()
+            ParkingSession, Zone, Payment, Slot = AnalyticsService.get_models()
             return ParkingSession.objects.filter(status__in=['active', 'reserved']).select_related('zone').order_by('-entry_time')
         except Exception as e:
             return []

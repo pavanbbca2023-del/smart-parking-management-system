@@ -17,7 +17,7 @@ urlpatterns = [
     
     # Unified App Includes
     path('api/core/', include('backend_core_api.urls')),
-    path('api/analytics/', include('backend_analytics_api.urls')),
+    path('api/stats/', include('backend_analytics_api.urls')),
     
     # Dashboard Aliases
     path('api/dashboard/', CoreDashboardView.as_view(), name='core-dashboard'),

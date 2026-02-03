@@ -46,7 +46,7 @@ const StaffLanding = () => {
                         Back to Main Site
                     </button>
                     <button
-                        onClick={() => navigate('/login')}
+                        onClick={() => navigate('/staff/login')}
                         style={{
                             padding: '10px 24px',
                             backgroundColor: 'white',
@@ -104,7 +104,7 @@ const StaffLanding = () => {
                         Streamline operational workflows, manage vehicle entries, and monitor zone status in real-time. The ultimate tool for parking staff.
                     </p>
                     <button
-                        onClick={() => navigate('/login')}
+                        onClick={() => navigate('/staff/login')}
                         style={{
                             padding: '16px 32px',
                             backgroundColor: '#3b82f6',

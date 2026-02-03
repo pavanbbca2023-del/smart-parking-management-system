@@ -27,7 +27,7 @@ class ZoneAdmin(admin.ModelAdmin):
 
 @admin.register(ParkingSession)
 class ParkingSessionAdmin(admin.ModelAdmin):
-    list_display = ('vehicle_number', 'zone', 'entry_time', 'exit_time', 'status', 'payment_status')
+    list_display = ('vehicle_number', 'zone', 'booking_time', 'entry_time', 'exit_time', 'status', 'payment_status')
     list_filter = ('status', 'payment_status', 'zone')
     search_fields = ('vehicle_number',)
 

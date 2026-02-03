@@ -17,10 +17,11 @@ const AddStaffForm = () => {
         e.preventDefault();
         try {
             const userData = {
-                username: formData.username.trim(),
+                staff_id: formData.username.trim(),
                 email: formData.email,
                 phone: formData.phone,
-                role: 'STAFF',
+                first_name: formData.firstName,
+                last_name: formData.lastName,
                 password: formData.password
             };
 
@@ -32,7 +33,7 @@ const AddStaffForm = () => {
             });
         } catch (error) {
             console.error('Error adding staff:', error);
-            alert('❌ Registration failure: ' + (error.response?.data?.username?.[0] || error.message));
+            alert('❌ Registration failure: ' + (error.response?.data?.error || error.message));
         }
     };
 

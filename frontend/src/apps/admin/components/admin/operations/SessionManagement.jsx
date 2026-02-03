@@ -52,6 +52,7 @@ const SessionManagement = () => {
     };
 
     const calculateDuration = (startTime) => {
+        if (!startTime) return '0h 0m';
         const start = new Date(startTime);
         const now = new Date();
         const diff = Math.floor((now - start) / (1000 * 60)); // minutes
@@ -84,10 +85,10 @@ const SessionManagement = () => {
                 <div>
                     <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '12px', margin: 0 }}>
                         <Timer style={{ width: '28px', height: '28px', color: '#10b981' }} />
-                        Live Active Sessions
+                        Current Parking Sessions
                     </h2>
                     <p style={{ fontSize: '14px', color: '#64748b', margin: '4px 0 0 40px' }}>
-                        {sessions.length} active vehicle{sessions.length !== 1 ? 's' : ''} currently parked
+                        {sessions.length} vehicle{sessions.length !== 1 ? 's' : ''} with active bookings
                     </p>
                 </div>
                 <button
@@ -158,10 +159,10 @@ const SessionManagement = () => {
                             <div style={{ backgroundColor: '#f8fafc', borderRadius: '16px', padding: '16px', marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
                                     <span style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <Timer size={14} /> Current Duration
+                                        <Timer size={14} /> {session.status === 'reserved' ? 'Booking Status' : 'Parked Duration'}
                                     </span>
                                     <span style={{ fontWeight: '800', color: '#10b981' }}>
-                                        {calculateDuration(session.entry_time)}
+                                        {session.status === 'reserved' ? 'Awaiting Entry' : calculateDuration(session.entry_time)}
                                     </span>
                                 </div>
 

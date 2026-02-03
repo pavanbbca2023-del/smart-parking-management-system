@@ -1,20 +1,24 @@
 /* Layout Styles */
 .layout {
   display: flex;
+  flex-direction: row;
+  width: 100%;
   min-height: 100vh;
   background: transparent;
-  width: 100%;
   overflow: hidden;
 }
 
 .main-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   background: transparent;
-  min-height: 100vh;
-  max-height: 100vh;
+  height: 100vh;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 1rem;
+  padding: 0;
+  margin: 0;
+  /* Zero-Tolerance for spacing */
   box-sizing: border-box;
 }
 
@@ -40,18 +44,22 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .main-content {
-    padding: 1rem;
-  }
+  /* Sidebar width handled in Sidebar.css */
 }
 
 @media (max-width: 768px) {
-  .main-content {
-    padding: 1rem;
+  .layout {
+    display: flex;
+    /* Switch to flex column for mobile */
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
   }
 
-  .layout {
-    flex-direction: column;
+  .main-content {
+    padding: 1rem;
+    height: auto;
+    overflow-y: visible;
   }
 }
 

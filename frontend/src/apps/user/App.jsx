@@ -1,5 +1,8 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
+import './App.css';
+import './components/Layout.css';
+import './components/Navbar.css';
 import Layout from './components/Layout';
 import GuestLayout from './components/GuestLayout';
 
@@ -18,6 +21,7 @@ function App() {
 
       {/* Guest Routes */}
       <Route path="/home" element={<GuestLayout />} />
+      <Route path="/booking" element={<GuestLayout initialPage="book-slot" />} />
       <Route path="/payment-success" element={<GuestLayout initialPage="payment-success" />} />
       <Route path="/payment-cancelled" element={<GuestLayout initialPage="payment-cancelled" />} />
       <Route path="/guest/*" element={<GuestLayout />} />

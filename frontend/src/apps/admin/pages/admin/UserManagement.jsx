@@ -197,9 +197,9 @@ const UserManagement = () => {
   );
   return (
     <div style={{
-      padding: '24px',
+      padding: '32px',
       backgroundColor: '#f8fafc',
-      minHeight: '100vh',
+      minHeight: '100%',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
       {/* Header */}

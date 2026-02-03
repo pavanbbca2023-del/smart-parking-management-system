@@ -3,7 +3,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 // API configuration
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL}/api` : 'http://localhost:8000/api';
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '') + '/api';
 
 const reportApi = {
   getDailyShift: (date) =>
@@ -11,7 +11,7 @@ const reportApi = {
       .then(res => res.json()),
 
   getRevenueSummary: () =>
-    fetch(`${API_BASE_URL}/analytics/revenue/`)
+    fetch(`${API_BASE_URL}/stats/revenue/`)
       .then(res => res.json()),
 
   getVehicleHistory: (vehicleNumber) =>
@@ -19,7 +19,7 @@ const reportApi = {
       .then(res => res.json()),
 
   getZonePerformance: () =>
-    fetch(`${API_BASE_URL}/analytics/zones/`)
+    fetch(`${API_BASE_URL}/stats/zones/`)
       .then(res => res.json())
 };
 
@@ -67,7 +67,7 @@ const Reports = () => {
 
       if (!shiftData) {
         try {
-          const dRes = await fetch(`${API_BASE_URL}/analytics/dashboard/`).then(r => r.json());
+          const dRes = await fetch(`${API_BASE_URL}/stats/dashboard/`).then(r => r.json());
           if (dRes.success) {
             shiftData = {
               staff_name: dRes.data.current_staff_name,
@@ -154,7 +154,7 @@ const Reports = () => {
       if (!data) {
         // Fallback: Try to get data from dashboard stats if no shift log exists
         try {
-          const dashboardRes = await fetch(`${API_BASE_URL}/analytics/dashboard/`).then(r => r.json());
+          const dashboardRes = await fetch(`${API_BASE_URL}/stats/dashboard/`).then(r => r.json());
           if (dashboardRes.success) {
             data = {
               staff_name: dashboardRes.data.current_staff_name,
@@ -330,11 +330,36 @@ const Reports = () => {
     }
   };
 
+  const viewVehicleHistory = async () => {
+    try {
+      // Use the staff API instead of the custom reportApi
+      const response = await fetch('/api/core/sessions/', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          'Content-Type': 'application/json'
+        }
+      }).then(res => res.json());
+      
+      const sessions = response.sessions || [];
+      setHistoryResults(sessions);
+      setShowResultsModal(true);
+    } catch (error) {
+      console.error('Error fetching vehicle history:', error);
+      alert('Failed to load vehicle history');
+    }
+  };
+
   const handleSearchHistory = async () => {
     if (!vehicleInput) return;
 
     try {
-      const response = await reportApi.getVehicleHistory(vehicleInput);
+      const response = await fetch(`/api/core/sessions/?vehicle_number=${vehicleInput}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          'Content-Type': 'application/json'
+        }
+      }).then(res => res.json());
+      
       const sessions = response.sessions || [];
       setHistoryResults(sessions);
       setShowHistoryModal(false);
@@ -416,7 +441,7 @@ const Reports = () => {
             <p>Payment methods and collection details</p>
           </div>
 
-          <div className="report-card" onClick={() => setShowHistoryModal(true)}>
+          <div className="report-card" onClick={viewVehicleHistory}>
             <h3>🚗 Vehicle History</h3>
             <p>Complete vehicle entry/exit records</p>
           </div>
@@ -547,7 +572,7 @@ const Reports = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <div>
                 <h3 style={{ margin: 0, color: '#1e293b', fontSize: '1.5rem' }}>Vehicle History</h3>
-                <p style={{ margin: '5px 0 0 0', color: '#64748b' }}>Records for: <span style={{ fontWeight: 'bold', color: '#1e293b' }}>{vehicleInput || 'Unknown'}</span></p>
+                <p style={{ margin: '5px 0 0 0', color: '#64748b' }}>Records for: <span style={{ fontWeight: 'bold', color: '#1e293b' }}>{vehicleInput || 'All Records'}</span></p>
               </div>
               <button
                 onClick={() => setShowResultsModal(false)}
