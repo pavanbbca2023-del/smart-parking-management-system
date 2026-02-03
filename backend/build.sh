@@ -13,3 +13,6 @@ python manage.py migrate
 
 echo "Seeding/Refreshing database..."
 python seed_db.py
+
+echo "Cleaning up ghost slots..."
+python fix_slots.py
