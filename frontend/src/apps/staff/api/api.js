@@ -77,7 +77,7 @@ export const alertApi = {
 export const parkingApi = {
     getDashboardStats: () => api.get('stats/dashboard/'),
     getZones: () => api.get('core/zones/'),
-    getActiveSessions: () => api.get('core/sessions/?status=active,reserved'),
+    getActiveSessions: () => api.get('core/sessions/?status=active,reserved,pending_payment'),
     getCompletedSessions: () => api.get('core/sessions/?status=completed'),
     getAvailableSlots: (zoneId) => api.get(`core/slots/?zone=${zoneId}&is_occupied=false&is_active=true`),
     processEntry: (data) => api.post('core/sessions/scan-entry/', {
