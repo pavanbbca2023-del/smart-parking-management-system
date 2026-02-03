@@ -270,7 +270,6 @@ const AdminDashboard = ({ onPageChange }) => {
               { icon: '🏗️', label: 'Create New Zone', desc: 'Add new parking zones', page: 'zone-management' },
               { icon: '👤', label: 'Add Staff User', desc: 'Create staff accounts', page: 'staff-management' },
               { icon: '📊', label: 'Generate Report', desc: 'Create analytics reports', page: 'financial' },
-              { icon: '⚙️', label: 'System Settings', desc: 'Configure system options', page: 'settings' },
               { icon: '🔔', label: 'Send Notification', desc: 'Broadcast messages', page: 'notifications' }
             ].map((action, i) => (
               <button

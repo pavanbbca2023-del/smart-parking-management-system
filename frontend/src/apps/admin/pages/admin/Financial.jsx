@@ -592,9 +592,7 @@ const Financial = () => {
       }}>
         {[
           { id: 'revenue', label: '💰 Revenue Reports', icon: '💰' },
-          { id: 'transactions', label: '📊 Transaction History', icon: '📊' },
-          { id: 'payment', label: '💳 Payment Gateway', icon: '💳' },
-          { id: 'invoices', label: '📄 Invoices', icon: '📄' }
+          { id: 'transactions', label: '📊 Transaction History', icon: '📊' }
         ].map(tab => (
           <button
             key={tab.id}
@@ -895,30 +893,7 @@ const Financial = () => {
         </div>
       )}
 
-      {/* Other Tabs Content */}
-      {(activeTab === 'payment' || activeTab === 'invoices') && (
-        <div style={{
-          backgroundColor: 'white',
-          padding: '48px 24px',
-          borderRadius: '12px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          border: '1px solid #e2e8f0',
-          textAlign: 'center'
-        }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🛠️</div>
-          <h3 style={{
-            fontSize: '20px',
-            fontWeight: '600',
-            color: '#1e293b',
-            margin: '0 0 8px 0'
-          }}>Coming Soon</h3>
-          <p style={{
-            fontSize: '16px',
-            color: '#64748b',
-            margin: '0'
-          }}>This feature is under development</p>
-        </div>
-      )}
+
     </div>
   );
 };
