@@ -11,14 +11,9 @@ const Home = ({ onNavigate }) => {
     reservedSlots: 0
   });
   const [loading, setLoading] = useState(true);
-  const [activeBooking, setActiveBooking] = useState(null);
 
-  useEffect(() => {
-    const savedBooking = localStorage.getItem('activeBooking');
-    if (savedBooking) {
-      setActiveBooking(JSON.parse(savedBooking));
-    }
-  }, []);
+
+
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -53,63 +48,7 @@ const Home = ({ onNavigate }) => {
         icon="🚗"
       />
 
-      {/* Active Booking Alert */}
-      {activeBooking && (
-        <div className="container" style={{ marginBottom: '30px' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
-            border: '1px solid #3b82f6',
-            borderRadius: '16px',
-            padding: '20px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            boxShadow: '0 4px 12px rgba(59, 130, 246, 0.1)',
-            position: 'relative'
-          }}>
-            {/* Close Button */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                localStorage.removeItem('activeBooking');
-                setActiveBooking(null);
-              }}
-              style={{
-                position: 'absolute',
-                top: '10px',
-                right: '10px',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '18px',
-                color: '#64748b',
-                padding: '5px',
-                lineHeight: 1
-              }}
-              title="Dismiss"
-            >
-              ✕
-            </button>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-              <div style={{ fontSize: '32px' }}>🎫</div>
-              <div>
-                <h3 style={{ margin: '0', color: '#1e40af' }}>Active Booking Found</h3>
-                <p style={{ margin: '5px 0 0 0', color: '#1e40af', opacity: '0.8' }}>
-                  Vehicle: <strong>{activeBooking.vehicleNumber}</strong> | ID: #{activeBooking.bookingId}
-                </p>
-              </div>
-            </div>
-            <button
-              className="btn-primary"
-              onClick={() => onNavigate('booking-confirmation', activeBooking)}
-              style={{ whiteSpace: 'nowrap', marginRight: '20px' }}
-            >
-              View QR Code →
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Parking Status Section */}
       <div className="status-section">
