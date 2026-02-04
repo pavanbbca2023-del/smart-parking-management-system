@@ -97,6 +97,11 @@ class TwilioSMSService:
             if not all([account_sid, auth_token, from_number]):
                 logger.error("Twilio credentials not fully configured in settings")
                 return False, {"error": "Twilio not configured"}
+
+            # Check for default placeholders
+            if account_sid == 'your_account_sid' or auth_token == 'your_auth_token':
+                logger.error("Twilio credentials are set to default placeholders. Please update environment variables.")
+                return False, {"error": "Twilio credentials invalid (defaults detected)"}
             
             client = Client(account_sid, auth_token)
             
@@ -138,6 +143,18 @@ class TwilioSMSService:
             logger.error(f"Twilio SMS failed: {error_msg}")
             return False, {"error": error_msg}
 
+class MockSMSService:
+    """
+    Mock SMS Service for development/testing
+    """
+    @staticmethod
+    def send_sms(mobile_numbers, message):
+        logger.info(f"== MOCK SMS SENT ==")
+        logger.info(f"To: {mobile_numbers}")
+        logger.info(f"Message: {message}")
+        logger.info(f"===================")
+        return True, {"status": "mock_sent", "provider": "mock"}
+
 class SMSService:
     """
     Unified SMS Service to switch between providers easily
@@ -148,6 +165,8 @@ class SMSService:
         
         if provider == 'twilio':
             return TwilioSMSService.send_sms(mobile_numbers, message)
+        elif provider == 'mock':
+            return MockSMSService.send_sms(mobile_numbers, message)
         else:
             return Fast2SMSService.send_sms(mobile_numbers, message)
 

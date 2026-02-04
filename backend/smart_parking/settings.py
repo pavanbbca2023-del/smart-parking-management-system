@@ -177,10 +177,10 @@ FAST2SMS_API_KEY = os.environ.get('FAST2SMS_API_KEY', '')
 FAST2SMS_SENDER_ID = 'FSTSMS'
 
 # Twilio Configuration
-TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', 'your_account_sid')
-TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', 'your_auth_token')
-TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER', 'your_phone_number')
-SMS_PROVIDER = os.environ.get('SMS_PROVIDER', 'twilio')
+TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', None)
+TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', None)
+TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER', None)
+SMS_PROVIDER = os.environ.get('SMS_PROVIDER', 'fast2sms')
 
 # Razorpay Configuration
 RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', 'your_razorpay_key_id')
@@ -207,4 +207,14 @@ LOGGING = {
         },
     },
 }
+
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
 

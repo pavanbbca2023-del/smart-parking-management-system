@@ -117,10 +117,33 @@ class CoreDashboardView(APIView):
         })
 
 def home(request):
+    
+    # Check SMS Configuration
+    sms_provider = getattr(settings, 'SMS_PROVIDER', 'unknown')
+    sms_configured = False
+    
+    if sms_provider == 'twilio':
+        # Check if values exist and are NOT the default placeholders
+        sid = str(getattr(settings, 'TWILIO_ACCOUNT_SID', '') or '').strip()
+        token = str(getattr(settings, 'TWILIO_AUTH_TOKEN', '') or '').strip()
+        phone = str(getattr(settings, 'TWILIO_PHONE_NUMBER', '') or '').strip()
+        
+        sms_configured = all([sid, token, phone]) and \
+                         sid != 'your_account_sid' and \
+                         token != 'your_auth_token'
+    elif sms_provider == 'fast2sms':
+        api_key = str(getattr(settings, 'FAST2SMS_API_KEY', '') or '').strip()
+        sms_configured = bool(api_key) and api_key != 'your_fast2sms_key'
+
+    
     return JsonResponse({
         "status": "online",
         "message": "Smart Parking Management System API is running",
         "version": "1.0.0",
+        "sms_status": {
+            "provider": sms_provider,
+            "configured": sms_configured
+        },
         "endpoints": {
             "admin": "/admin/",
             "api_auth": "/api/auth/",
@@ -353,6 +376,13 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
             except Exception as sms_err:
                 import logging
                 logging.getLogger(__name__).error(f"Booking SMS failed: {str(sms_err)}")
+            
+            # Send Booking Email
+            try:
+                from .email_service import EmailService
+                EmailService.send_booking_confirmation(session)
+            except Exception as email_err:
+                logging.getLogger(__name__).error(f"Booking Email failed: {str(email_err)}")
 
             return Response(response_data, status=201)
         except Zone.DoesNotExist:
@@ -419,6 +449,13 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
             except Exception as e:
                 import logging
                 logging.getLogger(__name__).error(f"Entry SMS failed: {str(e)}")
+            
+            # Send Entry Email
+            try:
+                from .email_service import EmailService
+                EmailService.send_entry_alert(session)
+            except Exception as e:
+                logging.getLogger(__name__).error(f"Entry Email failed: {str(e)}")
         return Response({'success': True, 'message': 'Entry verified', 'session_id': session.id})
             
         # 4. If no session found, create walk-in session if zone_id provided
@@ -588,6 +625,13 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
         except Exception as e:
             import logging
             logging.getLogger(__name__).error(f"Exit SMS failed: {str(e)}")
+            
+        # Send Exit Email
+        try:
+            from .email_service import EmailService
+            EmailService.send_exit_alert(session)
+        except Exception as e:
+            logging.getLogger(__name__).error(f"Exit Email failed: {str(e)}")
 
         return Response({
             'success': True, 
