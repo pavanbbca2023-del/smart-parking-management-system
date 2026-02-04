@@ -88,11 +88,11 @@
     width: calc(100% - 32px);
     margin: 24px auto;
   }
-  
+
   .header-left h1 {
     font-size: 1.8rem;
   }
-  
+
   .status-bar {
     flex-direction: row;
     flex-wrap: wrap;
@@ -107,21 +107,21 @@
     width: calc(100% - 24px);
     margin: 16px auto;
   }
-  
+
   .header-left h1 {
     font-size: 1.5rem;
   }
-  
+
   .header-left p {
     font-size: 0.9rem;
   }
-  
+
   .status-bar {
     flex-direction: column;
     align-items: center;
     gap: 6px;
   }
-  
+
   .weather-status,
   .time-status,
   .date-status {

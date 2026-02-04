@@ -342,7 +342,7 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
                 booking_expiry_time=booking_expiry
             )
             
-            # Mark slot as reserved - MOVED TO PAYMENT VERIFICATION
+            # DO NOT reserve slot immediately. Wait for payment verification.
             # slot.is_reserved = True 
             # slot.save()
             
@@ -922,8 +922,9 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
             
             # OPTIMISTIC BOOKING: Check availability now
             if parking_session.slot.is_reserved or parking_session.slot.is_occupied:
-                # Double check if WE are the ones who reserved it (retry scenario)
-                if parking_session.status != 'reserved':
+                # Double check if WE are the ones who reserved it
+                # Allow 'pending_payment' (normal flow) or 'reserved' (retry flow)
+                if parking_session.status not in ['reserved', 'pending_payment']:
                      return Response({'success': False, 'error': 'Slot already taken by another user.'}, status=400)
 
             # Lock the slot

@@ -51,7 +51,7 @@ const ContactSidebar = ({ isOpen, onClose }) => {
           paddingBottom: '16px',
           borderBottom: '1px solid #e5e7eb'
         }}>
-          <h3 style={{margin: 0}}>📞 Contact Support</h3>
+          <h3 style={{ margin: 0 }}>📞 Contact Support</h3>
           <button
             onClick={onClose}
             style={{
@@ -74,10 +74,10 @@ const ContactSidebar = ({ isOpen, onClose }) => {
           padding: '16px',
           marginBottom: '24px'
         }}>
-          <div style={{marginBottom: '12px'}}>
+          <div style={{ marginBottom: '12px' }}>
             <strong>📞 Phone:</strong> +91 98765 43210
           </div>
-          <div style={{marginBottom: '12px'}}>
+          <div style={{ marginBottom: '12px' }}>
             <strong>📧 Email:</strong> support@smartparking.com
           </div>
           <div>
@@ -87,8 +87,8 @@ const ContactSidebar = ({ isOpen, onClose }) => {
 
         {/* Contact Form */}
         <form onSubmit={handleSubmit}>
-          <div className="form-group" style={{marginBottom: '16px'}}>
-            <label style={{display: 'block', marginBottom: '6px', fontWeight: '600'}}>Name *</label>
+          <div className="form-group" style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600' }}>Name *</label>
             <input
               type="text"
               name="name"
@@ -106,8 +106,8 @@ const ContactSidebar = ({ isOpen, onClose }) => {
             />
           </div>
 
-          <div className="form-group" style={{marginBottom: '16px'}}>
-            <label style={{display: 'block', marginBottom: '6px', fontWeight: '600'}}>Email *</label>
+          <div className="form-group" style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600' }}>Email *</label>
             <input
               type="email"
               name="email"
@@ -125,8 +125,8 @@ const ContactSidebar = ({ isOpen, onClose }) => {
             />
           </div>
 
-          <div className="form-group" style={{marginBottom: '16px'}}>
-            <label style={{display: 'block', marginBottom: '6px', fontWeight: '600'}}>Phone</label>
+          <div className="form-group" style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600' }}>Phone</label>
             <input
               type="tel"
               name="phone"
@@ -143,8 +143,8 @@ const ContactSidebar = ({ isOpen, onClose }) => {
             />
           </div>
 
-          <div className="form-group" style={{marginBottom: '16px'}}>
-            <label style={{display: 'block', marginBottom: '6px', fontWeight: '600'}}>Subject *</label>
+          <div className="form-group" style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600' }}>Subject *</label>
             <select
               name="subject"
               value={formData.subject}
@@ -167,8 +167,8 @@ const ContactSidebar = ({ isOpen, onClose }) => {
             </select>
           </div>
 
-          <div className="form-group" style={{marginBottom: '20px'}}>
-            <label style={{display: 'block', marginBottom: '6px', fontWeight: '600'}}>Message *</label>
+          <div className="form-group" style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600' }}>Message *</label>
             <textarea
               name="message"
               value={formData.message}
@@ -187,7 +187,7 @@ const ContactSidebar = ({ isOpen, onClose }) => {
             />
           </div>
 
-          <div style={{display: 'flex', gap: '10px'}}>
+          <div style={{ display: 'flex', gap: '10px' }}>
             <button
               type="button"
               onClick={onClose}
