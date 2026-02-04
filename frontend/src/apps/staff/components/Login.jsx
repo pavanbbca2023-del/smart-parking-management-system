@@ -220,7 +220,7 @@ const Login = () => {
                     <div style={styles.brandIcon}>
                         <Building2 size={40} color="white" />
                     </div>
-                    <h1 style={styles.brandTitle}>PARK-PRO</h1>
+                    <h1 style={styles.brandTitle}>Quick Park</h1>
                     <p style={styles.brandSubtitle}>
                         Staff Portal
                     </p>

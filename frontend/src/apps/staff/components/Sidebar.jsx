@@ -70,7 +70,7 @@ const Sidebar = () => {
                     fontSize: '20px',
                     fontWeight: '700',
                     letterSpacing: '0.5px'
-                }}>PARK-PRO</span>
+                }}>Quick Park</span>
             </div>
 
             <nav style={{

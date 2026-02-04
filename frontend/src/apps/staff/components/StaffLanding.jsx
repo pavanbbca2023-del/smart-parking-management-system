@@ -28,7 +28,7 @@ const StaffLanding = () => {
                     }}>
                         <Building2 size={24} color="white" />
                     </div>
-                    <span style={{ fontSize: '24px', fontWeight: '800', color: '#1e293b' }}>PARK-PRO</span>
+                    <span style={{ fontSize: '24px', fontWeight: '800', color: '#1e293b' }}>Quick Park</span>
                 </div>
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                     <button
