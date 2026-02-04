@@ -48,6 +48,7 @@ const TrackBooking = ({ onNavigate }) => {
                     backendSessionId: latestSession.id,
                     status: latestSession.status.toUpperCase(),
                     isReserved: latestSession.status.toLowerCase() === 'reserved',
+                    bookingTime: latestSession.booking_time,
                     fullExpiryTime: latestSession.booking_expiry_time
                 };
                 localStorage.setItem('activeBooking', JSON.stringify(bookingData));

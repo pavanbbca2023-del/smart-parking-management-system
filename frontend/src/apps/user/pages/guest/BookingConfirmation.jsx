@@ -88,10 +88,15 @@ const BookingConfirmation = ({ bookingData, onNavigate }) => {
                   <div>
                     <span style={{ color: '#64748b', fontSize: '13px', display: 'block' }}>Entry Time</span>
                     <span style={{ fontWeight: '600' }}>
-                      {['RESERVED', 'PENDING_PAYMENT'].includes(bookingData.status) ?
-                        <span style={{ color: '#f59e0b' }}>On Arrival</span> :
-                        (bookingData.entryTime ? new Date(bookingData.entryTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Not specified')
-                      }
+                      {bookingData.entryTime ? (
+                        bookingData.entryTime.toString().length > 10 ?
+                          new Date(bookingData.entryTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) :
+                          bookingData.entryTime
+                      ) : (
+                        ['RESERVED', 'PENDING_PAYMENT'].includes(bookingData.status) ?
+                          <span style={{ color: '#f59e0b' }}>On Arrival</span> :
+                          'Not specified'
+                      )}
                     </span>
                   </div>
 
@@ -109,7 +114,7 @@ const BookingConfirmation = ({ bookingData, onNavigate }) => {
                           if (hrs === 0) return `${mins} mins`;
                           return `${hrs}h ${mins}m`;
                         }
-                        return '1 hour (Default)';
+                        return '1 hour';
                       })()}
                     </span>
                   </div>
