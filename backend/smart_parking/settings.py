@@ -30,9 +30,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-+!hk^60cq%=)-b7+c98t*jwwzsw74air=7d*#@kv78sg0jm%c5')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+DEBUG = True
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,smart-parking-management-system-backend-1.onrender.com').split(',')
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -144,8 +144,10 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 AUTH_USER_MODEL = 'backend_core_api.User'
 
 # CORS Configuration
-CORS_ALLOW_ALL_ORIGINS = True  # Modern setting
-CORS_ORIGIN_ALLOW_ALL = True   # Legacy setting for maximum compatibility
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOWED_ORIGINS = [
     "https://smart-parking-management-system-jov7-k0eqiwplv.vercel.app",
     "https://smart-parking-management-system-4yfdg2xrj.vercel.app",
