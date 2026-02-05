@@ -78,8 +78,8 @@ const StaffDashboard = () => {
     }}>
       {/* Header */}
       <header style={{
-        background: 'linear-gradient(90deg, #1e3a8a 0%, #1e40af 50%, #1d4ed8 100%)', // Horizontal admin gradient
-        color: 'white',
+        background: 'white',
+        color: '#1e293b',
         padding: '24px',
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
       }}>
@@ -94,22 +94,28 @@ const StaffDashboard = () => {
             <div style={{
               width: '50px',
               height: '50px',
-              backgroundImage: 'url("https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=100&h=100&fit=crop&crop=center")',
+              backgroundColor: '#3b82f6',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               borderRadius: '8px',
-              border: '2px solid #3b82f6'
-            }}></div>
+              border: '2px solid #3b82f6',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: '20px'
+            }}>🅿️</div>
             <div>
               <h1 style={{
                 fontSize: '24px',
                 fontWeight: '700',
                 margin: '0',
-                color: 'white'
+                color: '#1e293b'
               }}>Staff Dashboard</h1>
               <p style={{
                 fontSize: '14px',
-                color: 'rgba(255, 255, 255, 0.8)',
+                color: '#64748b',
                 margin: '4px 0 0 0'
               }}>Welcome back, {stats.currentStaffName || 'Staff Member'}</p>
             </div>
@@ -122,15 +128,15 @@ const StaffDashboard = () => {
             <div style={{
               width: '40px',
               height: '40px',
-              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              backgroundColor: '#f1f5f9',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'white',
+              color: '#1e293b',
               fontWeight: '600',
               fontSize: '16px',
-              backdropFilter: 'blur(4px)'
+              border: '1px solid #e2e8f0'
             }}>SM</div>
           </div>
         </div>
