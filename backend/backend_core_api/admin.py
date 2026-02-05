@@ -1,6 +1,40 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Slot, Attendance, Zone, ParkingSession, Payment
+from .models import (
+    User, Slot, Attendance, Zone, ParkingSession, Payment,
+    Vehicle, Dispute, Feedback, Schedule, ShiftLog, BookingActivityLog
+)
+
+@admin.register(Vehicle)
+class VehicleAdmin(admin.ModelAdmin):
+    list_display = ('vehicle_number', 'user', 'vehicle_type', 'created_at')
+    search_fields = ('vehicle_number', 'user__username')
+
+@admin.register(Dispute)
+class DisputeAdmin(admin.ModelAdmin):
+    list_display = ('session', 'user', 'severity', 'status', 'created_at')
+    list_filter = ('severity', 'status')
+    search_fields = ('reason', 'session__vehicle_number')
+
+@admin.register(Feedback)
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ('session', 'rating', 'created_at')
+    list_filter = ('rating',)
+
+@admin.register(Schedule)
+class ScheduleAdmin(admin.ModelAdmin):
+    list_display = ('staff', 'zone', 'day', 'shift_type', 'is_active')
+    list_filter = ('day', 'shift_type', 'is_active')
+
+@admin.register(ShiftLog)
+class ShiftLogAdmin(admin.ModelAdmin):
+    list_display = ('staff', 'shift_start', 'shift_end', 'revenue_collected')
+    list_filter = ('staff', 'shift_start')
+
+@admin.register(BookingActivityLog)
+class BookingActivityLogAdmin(admin.ModelAdmin):
+    list_display = ('session', 'activity_type', 'user', 'created_at')
+    list_filter = ('activity_type', 'created_at')
 
 @admin.register(Slot)
 class SlotAdmin(admin.ModelAdmin):

@@ -5,11 +5,15 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, IsAuthenticatedOrReadOnly
 from django.utils import timezone
 from django.http import JsonResponse
-from .models import User, Slot, Attendance, Zone, ParkingSession, Payment
+from .models import (
+    User, Slot, Attendance, Zone, ParkingSession, Payment,
+    Vehicle, Dispute, Feedback, Schedule, ShiftLog, BookingActivityLog
+)
 from .serializers import (
     UserSerializer, SlotSerializer, ZoneSerializer, 
     ParkingSessionSerializer, PaymentSerializer,
-    AttendanceSerializer
+    AttendanceSerializer, VehicleSerializer, DisputeSerializer,
+    ScheduleSerializer, ShiftLogSerializer, FeedbackSerializer
 )
 import razorpay
 from django.conf import settings
@@ -96,12 +100,30 @@ class StaffLoginView(APIView):
 
 
 class ShiftLogViewSet(viewsets.ModelViewSet):
-    queryset = []
+    queryset = ShiftLog.objects.all()
+    serializer_class = ShiftLogSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        queryset = ShiftLog.objects.all()
+        if self.request.user.role != 'ADMIN':
+            queryset = queryset.filter(staff=self.request.user)
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({'success': True, 'shift_logs': serializer.data})
+
 class FeedbackViewSet(viewsets.ModelViewSet):
-    queryset = []
+    queryset = Feedback.objects.all()
+    serializer_class = FeedbackSerializer
     permission_classes = [IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({'success': True, 'feedbacks': serializer.data})
 
 class CoreDashboardView(APIView):
     permission_classes = [IsAuthenticated]
@@ -189,7 +211,27 @@ class UserViewSet(viewsets.ModelViewSet):
 class SlotViewSet(viewsets.ModelViewSet):
     queryset = Slot.objects.all()
     serializer_class = SlotSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny] # Allow staff to see slots
+
+    def get_queryset(self):
+        queryset = Slot.objects.all()
+        zone_id = self.request.query_params.get('zone')
+        is_occupied = self.request.query_params.get('is_occupied')
+        is_active = self.request.query_params.get('is_active')
+
+        if zone_id:
+            queryset = queryset.filter(zone_id=zone_id)
+        if is_occupied is not None:
+            queryset = queryset.filter(is_occupied=is_occupied.lower() == 'true')
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active.lower() == 'true')
+            
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({'success': True, 'slots': serializer.data})
 
 
 class AttendanceViewSet(viewsets.ModelViewSet):
@@ -279,9 +321,16 @@ class ZoneViewSet(viewsets.ModelViewSet):
         return Response({'success': True, 'slots': serializer.data})
 
 class ParkingSessionViewSet(viewsets.ModelViewSet):
-    queryset = ParkingSession.objects.all()
     serializer_class = ParkingSessionSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = ParkingSession.objects.all()
+        status = self.request.query_params.get('status')
+        if status:
+            status_list = status.split(',')
+            queryset = queryset.filter(status__in=status_list)
+        return queryset
 
     def get_permissions(self):
         if self.action in ['list', 'book_parking', 'scan_entry', 'scan_exit', 'create_razorpay_order', 'verify_razorpay_payment']:
@@ -305,6 +354,7 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
         zone_id = request.data.get('zone_id')
         guest_mobile = request.data.get('mobileNumber')
         guest_email = request.data.get('email')
+        entry_time_str = request.data.get('entryTime')
         exit_time_str = request.data.get('exitTime')
         
         try:
@@ -313,24 +363,27 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
             if not slot:
                 return Response({'error': 'No slots available in this zone'}, status=400)
             
-            # Set expiry time if exitTime is provided
             from datetime import timedelta
-            booking_expiry = None
-            if exit_time_str:
+            now_local = timezone.localtime(timezone.now())
+            
+            # Helper to create localized datetime from "HH:MM"
+            def get_localized_dt(time_str, reference_now):
+                if not time_str: return None
                 try:
-                    h, m = map(int, exit_time_str.split(':'))
-                    now_local = timezone.localtime(timezone.now())
-                    booking_expiry = now_local.replace(hour=h, minute=m, second=0, microsecond=0)
-                    
-                    # If the selected time is earlier than now, assume it's for tomorrow
-                    if booking_expiry <= now_local:
-                        booking_expiry += timedelta(days=1)
-                        
-                    # Still check to prevent invalid very close times if needed, 
-                    # but the main goal is to allow next-day bookings.
-                except ValueError:
-                    return Response({'error': 'Invalid time format'}, status=400)
+                    h, m = map(int, time_str.split(':'))
+                    dt = reference_now.replace(hour=h, minute=m, second=0, microsecond=0)
+                    return dt
+                except (ValueError, AttributeError):
+                    return None
 
+            booking_start = get_localized_dt(entry_time_str, now_local) or now_local
+            booking_expiry = get_localized_dt(exit_time_str, now_local)
+            
+            if booking_expiry:
+                # If expiry is before start, it's definitely tomorrow
+                if booking_expiry <= booking_start:
+                    booking_expiry += timedelta(days=1)
+            
             session = ParkingSession.objects.create(
                 vehicle_number=vehicle_number,
                 zone=zone,
@@ -339,6 +392,7 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
                 user=request.user if request.user.is_authenticated else None,
                 guest_mobile=guest_mobile,
                 guest_email=guest_email,
+                entry_time=booking_start,
                 booking_expiry_time=booking_expiry
             )
             
@@ -456,23 +510,53 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
                 EmailService.send_entry_alert(session)
             except Exception as e:
                 logging.getLogger(__name__).error(f"Entry Email failed: {str(e)}")
-        return Response({'success': True, 'message': 'Entry verified', 'session_id': session.id})
             
+            return Response({'success': True, 'message': 'Entry verified', 'session_id': session.id})
+                
         # 4. If no session found, create walk-in session if zone_id provided
         if vehicle_number and zone_id:
             try:
                 zone = Zone.objects.get(id=zone_id)
-                slot = Slot.objects.filter(zone=zone, is_occupied=False, is_reserved=False, is_active=True).first()
+                
+                # Manual slot selection support
+                slot_id = request.data.get('slot_id')
+                if slot_id:
+                    try:
+                        slot = Slot.objects.get(id=slot_id, zone=zone)
+                        if slot.is_occupied or slot.is_reserved:
+                            return Response({'error': 'Selected slot is already taken'}, status=400)
+                    except Slot.DoesNotExist:
+                        return Response({'error': 'Invalid slot selected'}, status=400)
+                else:
+                    slot = Slot.objects.filter(zone=zone, is_occupied=False, is_reserved=False, is_active=True).first()
+                
                 if not slot:
                     return Response({'error': 'No slots available in this zone'}, status=400)
                 
+                # Optional details
+                guest_mobile = request.data.get('mobileNumber') or request.data.get('phone_number')
+                guest_email = request.data.get('email')
+                
+                # Custom entry time support
+                entry_time = timezone.localtime(timezone.now())
+                entry_time_str = request.data.get('entryTime')
+                if entry_time_str:
+                    try:
+                        h, m = map(int, entry_time_str.split(':'))
+                        entry_time = entry_time.replace(hour=h, minute=m, second=0, microsecond=0)
+                    except:
+                        pass
+
                 session = ParkingSession.objects.create(
                     vehicle_number=vehicle_number,
                     zone=zone,
                     slot=slot,
                     status='active',
                     initial_amount_paid=request.data.get('initial_amount', zone.base_price),
-                    payment_status='partially_paid'
+                    payment_status='partially_paid',
+                    guest_mobile=guest_mobile,
+                    guest_email=guest_email,
+                    entry_time=entry_time
                 )
                 slot.is_occupied = True
                 slot.save()
@@ -480,6 +564,7 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
                 # Record Initial Payment
                 payment_method = request.data.get('payment_method', 'Cash')
                 params_amount = session.initial_amount_paid
+                from .models import Payment
                 Payment.objects.create(
                     session=session,
                     amount=params_amount,
@@ -497,10 +582,8 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
                 try:
                     from .sms_service import SMSService
                     message = f"ENTRY RECORDED: Vehicle {session.vehicle_number} has entered {zone.name}. Slot: {slot.slot_number}. Initial Paid: Rs.{params_amount}."
-                    # For walk-ins, we might not have a mobile yet unless passed in request
-                    mobile = request.data.get('mobileNumber') or request.data.get('phone_number')
-                    if mobile:
-                        SMSService.send(mobile, message)
+                    if guest_mobile:
+                        SMSService.send(guest_mobile, message)
                 except Exception as e:
                     import logging
                     logging.getLogger(__name__).error(f"Walk-in Entry SMS failed: {str(e)}")
@@ -514,16 +597,17 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
                 
                 return Response({
                     'success': True, 
-                    'message': 'Walk-in entry recorded with initial payment', 
+                    'message': 'Walk-in entry recorded successfully', 
                     'session_id': session.id,
-                    'initial_amount': float(session.initial_amount_paid)
+                    'initial_amount': float(session.initial_amount_paid),
+                    'slot_number': slot.slot_number
                 })
             except Zone.DoesNotExist:
                 return Response({'error': 'Zone not found'}, status=404)
             except Exception as e:
                 return Response({'error': str(e)}, status=500)
 
-        return Response({'error': 'Missing vehicle_number or session_id'}, status=400)
+        return Response({'error': 'Missing required fields for entry (Vehicle Number and Zone/Session)'}, status=400)
 
     @action(detail=False, methods=['post'], url_path='scan-exit', permission_classes=[AllowAny])
     def scan_exit(self, request):
@@ -972,28 +1056,40 @@ class ParkingSessionViewSet(viewsets.ModelViewSet):
 
 
 class VehicleViewSet(viewsets.ModelViewSet):
-    queryset = []
+    queryset = Vehicle.objects.all()
+    serializer_class = VehicleSerializer
     permission_classes = [AllowAny]
 
     def list(self, request, *args, **kwargs):
-        return Response({'success': True, 'vehicles': []})
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({'success': True, 'vehicles': serializer.data})
 
 class DisputeViewSet(viewsets.ModelViewSet):
-    queryset = []
+    queryset = Dispute.objects.all()
+    serializer_class = DisputeSerializer
     permission_classes = [AllowAny]
 
     def list(self, request, *args, **kwargs):
-        return Response({'success': True, 'disputes': []})
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({'success': True, 'disputes': serializer.data})
 
 class ScheduleViewSet(viewsets.ModelViewSet):
-    queryset = []
+    queryset = Schedule.objects.all()
+    serializer_class = ScheduleSerializer
     permission_classes = [AllowAny]
 
     def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        zone_id = request.query_params.get('zone')
+        if zone_id:
+            queryset = queryset.filter(zone_id=zone_id)
+        serializer = self.get_serializer(queryset, many=True)
         return Response({
             'success': True,
-            'schedules': [],
-            'zone_id': request.query_params.get('zone')
+            'schedules': serializer.data,
+            'zone_id': zone_id
         })
 
 class PaymentViewSet(viewsets.ModelViewSet):

@@ -90,6 +90,7 @@ export const parkingApi = {
                 mobileNumber: bookingData.mobileNumber,
                 email: bookingData.email,
                 vehicleType: bookingData.vehicleType,
+                entryTime: bookingData.entryTime,
                 exitTime: bookingData.exitTime
             });
             return response.data;

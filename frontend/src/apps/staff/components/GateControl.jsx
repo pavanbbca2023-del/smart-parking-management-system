@@ -15,9 +15,15 @@ const GateControl = () => {
         vehicleNumber: '',
         vehicleType: 'car',
         zoneId: '',
-        initialAmount: 0
+        initialAmount: 0,
+        mobileNumber: '',
+        email: '',
+        slot_id: '',
+        entryTime: new Date().toTimeString().slice(0, 5),
+        paymentMethod: 'cash'
     });
     const [zones, setZones] = useState([]);
+    const [availableSlots, setAvailableSlots] = useState([]);
 
     const [exitVehicleNumber, setExitVehicleNumber] = useState('');
     const [exitQrInput, setExitQrInput] = useState('');
@@ -66,6 +72,23 @@ const GateControl = () => {
         }
     };
 
+    const fetchSlots = async (zId) => {
+        try {
+            const response = await parkingApi.getAvailableSlots(zId);
+            if (response.data.success) {
+                setAvailableSlots(response.data.slots || []);
+            }
+        } catch (error) {
+            console.error('Error fetching slots:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (entryData.zoneId && gateMode === 'entry') {
+            fetchSlots(entryData.zoneId);
+        }
+    }, [entryData.zoneId, gateMode]);
+
     const handleEntrySubmit = async (e) => {
         e.preventDefault();
         if (!entryData.vehicleNumber || !entryData.zoneId) {
@@ -75,13 +98,22 @@ const GateControl = () => {
         try {
             setLoading(true);
             const response = await parkingApi.processEntry({
-                vehicleNumber: entryData.vehicleNumber,
-                zoneId: entryData.zoneId,
-                initial_amount: entryData.initialAmount
+                ...entryData,
+                payment_method: entryData.paymentMethod || 'cash'
             });
             if (response.data.success) {
-                alert(`✅ Entry Successful!\nFee Collected: ₹${response.data.initial_amount}\n\nGATE OPENING... 🚪`);
-                setEntryData({ ...entryData, vehicleNumber: '' });
+                alert(`✅ Entry Successful!\nSlot Allocated: ${response.data.slot_number}\nFee Collected: ₹${response.data.initial_amount}\n\nGATE OPENING... 🚪`);
+                setEntryData({
+                    vehicleNumber: '',
+                    vehicleType: 'car',
+                    zoneId: zones[0]?.id || '',
+                    initialAmount: zones[0]?.base_price || 0,
+                    mobileNumber: '',
+                    email: '',
+                    slot_id: '',
+                    entryTime: new Date().toTimeString().slice(0, 5),
+                    paymentMethod: 'cash'
+                });
             }
         } catch (error) {
             alert(error.response?.data?.error || 'Server error');
@@ -95,7 +127,6 @@ const GateControl = () => {
         if (!qrCodeInput) return;
         try {
             setLoading(true);
-            // Send the request with proper field names expected by backend
             const response = await parkingApi.processEntry({
                 session_id: qrCodeInput,
                 zone_id: entryData.zoneId
@@ -235,8 +266,18 @@ const GateControl = () => {
                 stopEntryScanner();
             }
         } catch (err) {
-            console.error('QR Parse Error:', err);
-            alert('Invalid QR code format');
+            console.error('QR Process Error:', err);
+            if (err.response) {
+                // API Error
+                const msg = err.response.data?.error || err.response.data?.detail || 'Entry verification failed at server.';
+                alert(`❌ Entry Failed: ${msg}`);
+            } else if (err instanceof SyntaxError) {
+                // JSON Parse Error
+                alert('❌ Invalid QR code format. Please scan a valid Quick Park booking QR.');
+            } else {
+                // Unknown Error
+                alert(`❌ Error processing QR: ${err.message}`);
+            }
         }
     };
 
@@ -396,6 +437,14 @@ const GateControl = () => {
                                                 <option value="suv">Heavy / SUV</option>
                                             </select>
                                         </div>
+                                        <div className="form-group-themed">
+                                            <label>Mobile Number (Optional)</label>
+                                            <input type="tel" value={entryData.mobileNumber} onChange={(e) => setEntryData({ ...entryData, mobileNumber: e.target.value })} placeholder="10 Digits" maxLength="10" />
+                                        </div>
+                                        <div className="form-group-themed">
+                                            <label>Email ID (Optional)</label>
+                                            <input type="email" value={entryData.email} onChange={(e) => setEntryData({ ...entryData, email: e.target.value })} placeholder="customer@example.com" />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -404,11 +453,34 @@ const GateControl = () => {
                                     <div className="zones-selection-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '10px', marginBottom: '20px' }}>
                                         {zones.map(z => (
                                             <button type="button" key={z.id} className={`slot-btn-themed ${entryData.zoneId === z.id ? 'selected' : ''}`}
-                                                onClick={() => setEntryData({ ...entryData, zoneId: z.id, initialAmount: z.base_price })}>
+                                                onClick={() => setEntryData({ ...entryData, zoneId: z.id, initialAmount: z.base_price, slot_id: '' })}>
                                                 <strong>{z.name}</strong><br /><span style={{ fontSize: '0.75rem' }}>Min: ₹{z.base_price}</span>
                                             </button>
                                         ))}
                                     </div>
+
+                                    <div className="themed-form-grid" style={{ marginBottom: '20px' }}>
+                                        <div className="form-group-themed">
+                                            <label>Select Slot {loading && <span style={{ fontSize: '0.7rem', color: '#3b82f6' }}>(Syncing...)</span>}</label>
+                                            <select value={entryData.slot_id} onChange={(e) => setEntryData({ ...entryData, slot_id: e.target.value })}>
+                                                {availableSlots.length > 0 ? (
+                                                    <>
+                                                        <option value="">Auto-allocate First</option>
+                                                        {availableSlots.map(s => (
+                                                            <option key={s.id} value={s.id}>{s.slot_number} (Available)</option>
+                                                        ))}
+                                                    </>
+                                                ) : (
+                                                    <option value="">No Slots Available</option>
+                                                )}
+                                            </select>
+                                        </div>
+                                        <div className="form-group-themed">
+                                            <label>Entry Time</label>
+                                            <input type="time" value={entryData.entryTime} onChange={(e) => setEntryData({ ...entryData, entryTime: e.target.value })} />
+                                        </div>
+                                    </div>
+
                                     <div className="form-group-themed">
                                         <label>🎟️ Booking Fee Collected (₹)</label>
                                         <input type="number" value={entryData.initialAmount} onChange={(e) => setEntryData({ ...entryData, initialAmount: e.target.value })} style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#10b981' }} />

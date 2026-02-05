@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Building2, ShieldCheck, Clock, ArrowRight, CheckCircle } from 'lucide-react';
 
 const StaffLanding = () => {
     const navigate = useNavigate();
@@ -24,9 +23,11 @@ const StaffLanding = () => {
                     <div style={{
                         backgroundColor: '#3b82f6',
                         padding: '8px',
-                        borderRadius: '8px'
+                        borderRadius: '8px',
+                        fontSize: '24px',
+                        lineHeight: '1'
                     }}>
-                        <Building2 size={24} color="white" />
+                        🅿️
                     </div>
                     <span style={{ fontSize: '24px', fontWeight: '800', color: '#1e293b' }}>Quick Park</span>
                 </div>
@@ -122,8 +123,7 @@ const StaffLanding = () => {
                         onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
                         onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
                     >
-                        Access Dashboard
-                        <ArrowRight size={20} />
+                        Access Dashboard ➡️
                     </button>
                 </div>
                 <div style={{ flex: 1, position: 'relative' }}>
@@ -170,17 +170,17 @@ const StaffLanding = () => {
                     }}>
                         {[
                             {
-                                icon: <ShieldCheck size={32} color="#3b82f6" />,
+                                icon: "🛡️",
                                 title: "Secure Access",
                                 desc: "Enterprise-grade security for staff authentication and role management."
                             },
                             {
-                                icon: <Clock size={32} color="#3b82f6" />,
+                                icon: "⏱️",
                                 title: "Real-time Monitoring",
                                 desc: "Live updates on zone occupancy, vehicle flows, and payment status."
                             },
                             {
-                                icon: <CheckCircle size={32} color="#3b82f6" />,
+                                icon: "✅",
                                 title: "Shift Management",
                                 desc: "Track shift logs, attendance, and performance metrics effortlessly."
                             }
@@ -200,6 +200,7 @@ const StaffLanding = () => {
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
+                                    fontSize: '32px',
                                     marginBottom: '20px'
                                 }}>
                                     {feature.icon}

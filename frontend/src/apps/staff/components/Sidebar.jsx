@@ -1,17 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { attendanceApi } from '../api/api';
-import {
-    LayoutDashboard,
-    QrCode,
-    CreditCard,
-    UserPlus,
-    LogOut,
-    FileText,
-    AlertTriangle,
-    History,
-    Building2
-} from 'lucide-react';
 
 const Sidebar = () => {
     const navigate = useNavigate();
@@ -28,13 +17,13 @@ const Sidebar = () => {
     };
 
     const menuItems = [
-        { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/staff/dashboard' },
-        { name: 'Gate Control', icon: <Building2 size={20} />, path: '/staff/gate-control' },
-        { name: 'Reports', icon: <FileText size={20} />, path: '/staff/reports' },
-        { name: 'Zone Status', icon: <Building2 size={20} />, path: '/staff/zones' },
-        { name: 'Active Sessions', icon: <History size={20} />, path: '/staff/active-sessions' },
-        { name: 'Alerts', icon: <AlertTriangle size={20} />, path: '/staff/alerts' },
-        { name: 'Payments Mgmt', icon: <CreditCard size={20} />, path: '/staff/payments-mgmt' },
+        { name: 'Dashboard', icon: '📊', path: '/staff/dashboard' },
+        { name: 'Gate Control', icon: '🚧', path: '/staff/gate-control' },
+        { name: 'Reports', icon: '📋', path: '/staff/reports' },
+        { name: 'Zone Status', icon: '🏢', path: '/staff/zones' },
+        { name: 'Active Sessions', icon: '⏱️', path: '/staff/active-sessions' },
+        { name: 'Alerts', icon: '⚠️', path: '/staff/alerts' },
+        { name: 'Payments Mgmt', icon: '💳', path: '/staff/payments-mgmt' },
     ];
 
     return (
@@ -62,9 +51,11 @@ const Sidebar = () => {
                 <div style={{
                     backgroundColor: '#3b82f6',
                     padding: '8px',
-                    borderRadius: '8px'
+                    borderRadius: '8px',
+                    fontSize: '24px',
+                    lineHeight: '1'
                 }}>
-                    <Building2 size={24} color="white" />
+                    🅿️
                 </div>
                 <span style={{
                     fontSize: '20px',
@@ -97,7 +88,7 @@ const Sidebar = () => {
                             fontWeight: isActive ? '600' : '400'
                         })}
                     >
-                        {item.icon}
+                        <span style={{ fontSize: '20px' }}>{item.icon}</span>
                         <span>{item.name}</span>
                     </NavLink>
                 ))}
@@ -124,7 +115,7 @@ const Sidebar = () => {
                 }}
                     onClick={handleLogout}
                 >
-                    <LogOut size={20} />
+                    <span style={{ fontSize: '20px' }}>🚪</span>
                     <span>Logout</span>
                 </button>
             </div>

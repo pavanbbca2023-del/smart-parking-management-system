@@ -20,6 +20,25 @@ const Payment = ({ onNavigate, bookingData = {} }) => {
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [receiptId, setReceiptId] = useState('');
 
+  // Helper to format 24h time to 12h AM/PM without timezone shift
+  const formatTime = (timeStr) => {
+    if (!timeStr) return '--:--';
+    if (typeof timeStr === 'string' && timeStr.includes('T')) {
+      const timePart = timeStr.split('T')[1].substring(0, 5);
+      const [h, m] = timePart.split(':');
+      const date = new Date();
+      date.setHours(parseInt(h), parseInt(m));
+      return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+    }
+    if (typeof timeStr === 'string' && timeStr.includes(':')) {
+      const [h, m] = timeStr.split(':');
+      const date = new Date();
+      date.setHours(parseInt(h), parseInt(m));
+      return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+    }
+    return timeStr;
+  };
+
   const calculateAmounts = () => {
     if (!bookingData) return { total: 0, initial: 0, balance: 0 };
 
@@ -35,7 +54,16 @@ const Payment = ({ onNavigate, bookingData = {} }) => {
     // Fallback calculation if not passed
     const [entryH, entryM] = (bookingData.entryTime || '09:00').split(':').map(Number);
     const [exitH, exitM] = (bookingData.exitTime || '10:00').split(':').map(Number);
-    const minutes = (exitH * 60 + exitM) - (entryH * 60 + entryM);
+
+    let minutes1 = entryH * 60 + entryM;
+    let minutes2 = exitH * 60 + exitM;
+
+    // Handle overnight
+    if (minutes2 < minutes1) {
+      minutes2 += 24 * 60;
+    }
+
+    const minutes = minutes2 - minutes1;
     const hours = Math.ceil(minutes / 60);
     const rate = bookingData.vehicleType === 'Bike' ? 10 : (bookingData.vehicleType === 'Auto' ? 15 : 30);
     const total = hours * rate;
@@ -49,7 +77,16 @@ const Payment = ({ onNavigate, bookingData = {} }) => {
     if (!entryTime || !exitTime) return '0 hours';
     const [entryH, entryM] = entryTime.split(':').map(Number);
     const [exitH, exitM] = exitTime.split(':').map(Number);
-    const minutes = (exitH * 60 + exitM) - (entryH * 60 + entryM);
+
+    let minutes1 = entryH * 60 + entryM;
+    let minutes2 = exitH * 60 + exitM;
+
+    // Handle overnight
+    if (minutes2 < minutes1) {
+      minutes2 += 24 * 60;
+    }
+
+    const minutes = minutes2 - minutes1;
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
 
@@ -234,11 +271,11 @@ const Payment = ({ onNavigate, bookingData = {} }) => {
               <h4>Parking Duration</h4>
               <div className="receipt-item">
                 <span>Entry Time:</span>
-                <span>{bookingData.entryTime}</span>
+                <span>{formatTime(bookingData.entryTime || bookingData.entry_time)}</span>
               </div>
               <div className="receipt-item">
                 <span>Exit Time:</span>
-                <span>{bookingData.exitTime}</span>
+                <span>{formatTime(bookingData.exitTime || bookingData.exit_time)}</span>
               </div>
             </div>
 
@@ -353,11 +390,11 @@ const Payment = ({ onNavigate, bookingData = {} }) => {
             </div>
             <div className="detail-item">
               <span className="label">Entry Time:</span>
-              <span className="value">{bookingData.entryTime}</span>
+              <span className="value">{formatTime(bookingData.entryTime || bookingData.entry_time)}</span>
             </div>
             <div className="detail-item">
               <span className="label">Exit Time:</span>
-              <span className="value">{bookingData.exitTime}</span>
+              <span className="value">{formatTime(bookingData.exitTime || bookingData.exit_time)}</span>
             </div>
             <div className="detail-item highlight">
               <span className="label">Total Duration:</span>

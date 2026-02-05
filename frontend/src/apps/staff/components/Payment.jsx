@@ -167,7 +167,7 @@ const Payment = () => {
       const duration = s.duration || '0h 0m';
       // Only show sessions that actually have pending balance
       const pendingAmount = s.estimated_balance !== undefined ? parseFloat(s.estimated_balance).toFixed(2) : parseFloat(s.estimated_total - s.initial_amount_paid).toFixed(2);
-      
+
       // Skip if payment is complete or no balance due
       if (s.payment_status === 'paid' || parseFloat(pendingAmount) <= 0) {
         return;

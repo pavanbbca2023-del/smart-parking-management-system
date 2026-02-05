@@ -238,3 +238,93 @@ class Payment(models.Model):
     def __str__(self):
         return f"{self.transaction_id or 'TXN'} - {self.amount} ({self.payment_type})"
 
+class Vehicle(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='vehicles')
+    vehicle_number = models.CharField(max_length=20, unique=True)
+    vehicle_type = models.CharField(max_length=50, default='Car')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.vehicle_number} ({self.vehicle_type})"
+
+class Dispute(models.Model):
+    SEVERITY_CHOICES = (
+        ('Low', 'Low'),
+        ('Medium', 'Medium'),
+        ('High', 'High'),
+    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    session = models.ForeignKey(ParkingSession, on_delete=models.CASCADE)
+    reason = models.TextField()
+    severity = models.CharField(max_length=10, choices=SEVERITY_CHOICES, default='Medium')
+    dispute_type = models.CharField(max_length=50, default='General')
+    status = models.CharField(max_length=20, default='Open')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Dispute: {self.session.vehicle_number} - {self.status}"
+
+class Feedback(models.Model):
+    session = models.OneToOneField(ParkingSession, on_delete=models.CASCADE, related_name='feedback')
+    rating = models.IntegerField(default=5)
+    comment = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Feedback: {self.session.vehicle_number} - {self.rating}/5"
+
+class Schedule(models.Model):
+    SHIFT_CHOICES = (
+        ('Alpha', 'Alpha (06:00 - 14:00)'),
+        ('Bravo', 'Bravo (14:00 - 22:00)'),
+        ('Charlie', 'Charlie (22:00 - 06:00)'),
+    )
+    staff = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, limit_choices_to={'role': 'STAFF'})
+    zone = models.ForeignKey(Zone, on_delete=models.CASCADE, related_name='schedules', null=True, blank=True)
+    day = models.CharField(max_length=20)
+    shift_type = models.CharField(max_length=20, choices=SHIFT_CHOICES, default='Alpha')
+    shift_start = models.TimeField()
+    shift_end = models.TimeField()
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.staff.username} - {self.day} ({self.shift_type})"
+
+class ShiftLog(models.Model):
+    staff = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, limit_choices_to={'role': 'STAFF'})
+    shift_start = models.DateTimeField()
+    shift_end = models.DateTimeField(null=True, blank=True)
+    entry_count = models.IntegerField(default=0)
+    exit_count = models.IntegerField(default=0)
+    revenue_collected = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    cash_collected = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    online_collected = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    notes = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Shift: {self.staff.username} - {self.shift_start}"
+
+class BookingActivityLog(models.Model):
+    ACTIVITY_TYPE_CHOICES = (
+        ('booking_created', 'Booking Created'),
+        ('booking_cancelled', 'Booking Cancelled'),
+        ('booking_extended', 'Booking Extended'),
+        ('auto_cancelled', 'Auto Cancelled'),
+        ('sms_sent', 'SMS Notification Sent'),
+        ('refund_processed', 'Refund Processed'),
+    )
+    session = models.ForeignKey(ParkingSession, on_delete=models.CASCADE, related_name='activity_logs')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    activity_type = models.CharField(max_length=30, choices=ACTIVITY_TYPE_CHOICES)
+    description = models.TextField()
+    metadata = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Booking Activity Log'
+        verbose_name_plural = 'Booking Activity Logs'
+
+    def __str__(self):
+        return f"{self.activity_type} - {self.session.vehicle_number}"
+

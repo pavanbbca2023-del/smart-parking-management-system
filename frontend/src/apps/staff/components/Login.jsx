@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Building2, User, Lock, ArrowRight } from 'lucide-react';
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -84,6 +83,7 @@ const Login = () => {
             justifyContent: 'center',
             marginBottom: '32px',
             backdropFilter: 'blur(10px)',
+            fontSize: '40px'
         },
         brandTitle: {
             fontSize: '48px',
@@ -144,6 +144,7 @@ const Login = () => {
             top: '50%',
             transform: 'translateY(-50%)',
             color: '#94a3b8',
+            fontSize: '18px'
         },
         input: {
             width: '100%',
@@ -218,7 +219,7 @@ const Login = () => {
 
                 <div style={styles.brandContent}>
                     <div style={styles.brandIcon}>
-                        <Building2 size={40} color="white" />
+                        🅿️
                     </div>
                     <h1 style={styles.brandTitle}>Quick Park</h1>
                     <p style={styles.brandSubtitle}>
@@ -241,7 +242,7 @@ const Login = () => {
                         <div style={styles.inputGroup}>
                             <label htmlFor="username" style={styles.label}>Username</label>
                             <div style={styles.inputWrapper}>
-                                <User size={20} style={styles.inputIcon} />
+                                <span style={styles.inputIcon}>👤</span>
                                 <input
                                     type="text"
                                     id="username"
@@ -268,7 +269,7 @@ const Login = () => {
                         <div style={styles.inputGroup}>
                             <label htmlFor="password" style={styles.label}>Password</label>
                             <div style={styles.inputWrapper}>
-                                <Lock size={20} style={styles.inputIcon} />
+                                <span style={styles.inputIcon}>🔒</span>
                                 <input
                                     type="password"
                                     id="password"
@@ -301,8 +302,7 @@ const Login = () => {
                         >
                             {loading ? 'Logging in...' : (
                                 <>
-                                    Access Dashboard
-                                    <ArrowRight size={20} />
+                                    Access Dashboard ➡️
                                 </>
                             )}
                         </button>

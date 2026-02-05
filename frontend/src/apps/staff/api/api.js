@@ -81,11 +81,15 @@ export const parkingApi = {
     getCompletedSessions: () => api.get('core/sessions/?status=completed'),
     getAvailableSlots: (zoneId) => api.get(`core/slots/?zone=${zoneId}&is_occupied=false&is_active=true`),
     processEntry: (data) => api.post('core/sessions/scan-entry/', {
-        vehicle_number: data.vehicleNumber,
-        session_id: data.session_id,
-        zone_id: data.zoneId,
+        vehicle_number: data.vehicle_number || data.vehicleNumber,
+        session_id: data.session_id || data.sessionId,
+        zone_id: data.zone_id || data.zoneId,
         initial_amount: data.initial_amount,
-        payment_method: data.payment_method
+        payment_method: data.payment_method,
+        slot_id: data.slot_id,
+        mobileNumber: data.mobileNumber,
+        email: data.email,
+        entryTime: data.entryTime
     }),
     processExit: (data) => api.post('core/sessions/scan-exit/', {
         vehicle_number: data.vehicle_number || data.vehicleNumber,

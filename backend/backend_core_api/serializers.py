@@ -1,5 +1,37 @@
 from rest_framework import serializers
-from .models import User, Slot, Attendance, Zone, ParkingSession, Payment
+from .models import (
+    User, Slot, Attendance, Zone, ParkingSession, Payment,
+    Vehicle, Dispute, Feedback, Schedule, ShiftLog, BookingActivityLog
+)
+
+class VehicleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vehicle
+        fields = '__all__'
+
+class DisputeSerializer(serializers.ModelSerializer):
+    vehicle_number = serializers.CharField(source='session.vehicle_number', read_only=True)
+    class Meta:
+        model = Dispute
+        fields = '__all__'
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = '__all__'
+
+class ScheduleSerializer(serializers.ModelSerializer):
+    staff_name = serializers.CharField(source='staff.username', read_only=True)
+    zone_name = serializers.CharField(source='zone.name', read_only=True)
+    class Meta:
+        model = Schedule
+        fields = '__all__'
+
+class ShiftLogSerializer(serializers.ModelSerializer):
+    staff_name = serializers.CharField(source='staff.username', read_only=True)
+    class Meta:
+        model = ShiftLog
+        fields = '__all__'
 
 class AttendanceSerializer(serializers.ModelSerializer):
     staff_name = serializers.CharField(source='staff.username', read_only=True)

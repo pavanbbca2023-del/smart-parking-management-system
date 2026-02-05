@@ -2,6 +2,74 @@ import React, { useState, useEffect } from 'react';
 import PageHeader from '../../components/PageHeader';
 import { parkingApi } from '../../api/api';
 
+// Helper Component for Time Selection (12h Format)
+const TimePicker = ({ label, value, onChange, required }) => {
+  // Parse 24h HH:MM to 12h format
+  const parseTime = (timeStr) => {
+    if (!timeStr) return { h: '12', m: '00', p: 'AM' };
+    let [h, m] = timeStr.split(':').map(Number);
+    const p = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12; // Convert 0 to 12
+    return {
+      h: h.toString().padStart(2, '0'),
+      m: m.toString().padStart(2, '0'),
+      p
+    };
+  };
+
+  const { h, m, p } = parseTime(value);
+
+  const updateTime = (newH, newM, newP) => {
+    let pH = parseInt(newH);
+    if (newP === 'PM' && pH !== 12) pH += 12;
+    if (newP === 'AM' && pH === 12) pH = 0;
+    const time24 = `${pH.toString().padStart(2, '0')}:${newM}`;
+    onChange(time24);
+  };
+
+  return (
+    <div className="form-group">
+      <label>{label} {required && '*'}</label>
+      <div style={{ display: 'flex', gap: '8px' }}>
+        {/* Hour */}
+        <select
+          value={h}
+          onChange={(e) => updateTime(e.target.value, m, p)}
+          style={{ flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid #ddd' }}
+        >
+          {Array.from({ length: 12 }, (_, i) => i + 1).map(num => (
+            <option key={num} value={num.toString().padStart(2, '0')}>
+              {num.toString().padStart(2, '0')}
+            </option>
+          ))}
+        </select>
+        <span style={{ alignSelf: 'center', fontWeight: 'bold' }}>:</span>
+        {/* Minute */}
+        <select
+          value={m}
+          onChange={(e) => updateTime(h, e.target.value, p)}
+          style={{ flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid #ddd' }}
+        >
+          {Array.from({ length: 12 }, (_, i) => i * 5).map(num => (
+            <option key={num} value={num.toString().padStart(2, '0')}>
+              {num.toString().padStart(2, '0')}
+            </option>
+          ))}
+        </select>
+        {/* AM/PM */}
+        <select
+          value={p}
+          onChange={(e) => updateTime(h, m, e.target.value)}
+          style={{ flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid #ddd' }}
+        >
+          <option value="AM">AM</option>
+          <option value="PM">PM</option>
+        </select>
+      </div>
+    </div>
+  );
+};
+
 const BookSlot = ({ onNavigate, bookingData }) => {
   const [formData, setFormData] = useState({
     selectedZone: '',
@@ -104,26 +172,29 @@ const BookSlot = ({ onNavigate, bookingData }) => {
       const entry = new Date(`2024-01-01T${formData.entryTime}`);
       const exit = new Date(`2024-01-01T${formData.exitTime}`);
 
-      if (exit > entry) {
-        const durationHours = Math.ceil((exit - entry) / (1000 * 60 * 60));
-
-        // Use real zone rate if zone is selected, else default
-        let rate = 30;
-        if (formData.selectedZone) {
-          const zone = availableZones.find(z => z.id.toString() === formData.selectedZone.toString());
-          if (zone) rate = parseFloat(zone.base_price || 30);
-        }
-
-        const amount = durationHours * rate;
-
-        setCharges(prev => ({
-          ...prev,
-          ratePerHour: rate,
-          duration: durationHours,
-          estimatedAmount: amount,
-          initialPayment: Math.round(amount * 0.25) // 25% of total
-        }));
+      // Handle overnight: if exit is before or same as entry, assume next day
+      if (exit <= entry) {
+        exit.setDate(exit.getDate() + 1);
       }
+
+      const durationHours = Math.ceil((exit - entry) / (1000 * 60 * 60));
+
+      // Use real zone rate if zone is selected, else default
+      let rate = 30;
+      if (formData.selectedZone) {
+        const zone = availableZones.find(z => z.id.toString() === formData.selectedZone.toString());
+        if (zone) rate = parseFloat(zone.base_price || 30);
+      }
+
+      const amount = durationHours * rate;
+
+      setCharges(prev => ({
+        ...prev,
+        ratePerHour: rate,
+        duration: durationHours,
+        estimatedAmount: amount,
+        initialPayment: Math.round(amount * 0.25) // 25% of total
+      }));
     }
   }, [formData.entryTime, formData.exitTime, formData.vehicleType, formData.selectedZone, availableZones]);
 
@@ -155,8 +226,8 @@ const BookSlot = ({ onNavigate, bookingData }) => {
       return;
     }
 
-    if (!formData.exitTime || formData.exitTime <= formData.entryTime) {
-      alert('Exit time must be after entry time');
+    if (!formData.exitTime) {
+      alert('Please select an exit time');
       return;
     }
 
@@ -195,6 +266,7 @@ const BookSlot = ({ onNavigate, bookingData }) => {
   };
 
   return (
+
     <div className="guest-page book-slot-page">
       <PageHeader
         title="Book Parking Slot"
@@ -324,28 +396,18 @@ const BookSlot = ({ onNavigate, bookingData }) => {
             <div className="form-section">
               <h3>Parking Time Details</h3>
               <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="entryTime">Entry Time *</label>
-                  <input
-                    type="time"
-                    id="entryTime"
-                    name="entryTime"
-                    value={formData.entryTime}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="exitTime">Expected Exit Time *</label>
-                  <input
-                    type="time"
-                    id="exitTime"
-                    name="exitTime"
-                    value={formData.exitTime}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
+                <TimePicker
+                  label="Entry Time"
+                  value={formData.entryTime}
+                  onChange={(val) => setFormData(prev => ({ ...prev, entryTime: val }))}
+                  required
+                />
+                <TimePicker
+                  label="Expected Exit Time"
+                  value={formData.exitTime}
+                  onChange={(val) => setFormData(prev => ({ ...prev, exitTime: val }))}
+                  required
+                />
               </div>
             </div>
 
