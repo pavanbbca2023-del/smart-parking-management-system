@@ -73,7 +73,7 @@ const StaffDashboard = () => {
     <div style={{
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       backgroundColor: '#f1f5f9',
-      minHeight: '100vh',
+      minHeight: '100%',
       padding: '0'
     }}>
       {/* Header */}
@@ -87,8 +87,10 @@ const StaffDashboard = () => {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          maxWidth: '1200px',
-          margin: '0 auto'
+          maxWidth: '1400px',
+          margin: '0 auto',
+          flexWrap: 'wrap',
+          gap: '16px'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div style={{
@@ -144,10 +146,11 @@ const StaffDashboard = () => {
 
       {/* Main Content */}
       <main style={{
-        maxWidth: '1200px',
+        maxWidth: '1400px',
         margin: '0 auto',
         padding: '24px'
-      }}>
+      }}
+        className="staff-dashboard-main">
         {error && (
           <div style={{
             backgroundColor: '#fee2e2',
@@ -181,9 +184,10 @@ const StaffDashboard = () => {
           }}>🏢 Zone Status</h2>
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
             gap: '16px'
-          }}>
+          }}
+            className="zone-grid">
             {zones.map(zone => {
               const occupancy = zone.current_occupancy || { total_slots: 0, occupied: 0, available: 0 };
               const occRate = occupancy.total_slots > 0 ? (occupancy.occupied / occupancy.total_slots) * 100 : 0;
@@ -240,10 +244,11 @@ const StaffDashboard = () => {
         {/* Stats Grid */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
           gap: '20px',
           marginBottom: '32px'
-        }}>
+        }}
+          className="stats-grid">
           <div style={{
             backgroundColor: 'white',
             padding: '24px',
@@ -395,9 +400,10 @@ const StaffDashboard = () => {
           }}>Quick Actions</h2>
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
             gap: '16px'
-          }}>
+          }}
+            className="quick-actions-grid">
             <button
               onClick={() => navigate('/staff/gate-control', { state: { mode: 'entry' } })}
               style={{
@@ -445,6 +451,34 @@ const StaffDashboard = () => {
           </div>
         </div>
       </main>
+
+      {/* Responsive Styles */}
+      <style>{`
+        @media (max-width: 768px) {
+          .staff-dashboard-main {
+            padding: 16px !important;
+          }
+          .zone-grid {
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+            gap: 12px !important;
+          }
+          .stats-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
+          .quick-actions-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .staff-dashboard-main {
+            padding: 12px !important;
+          }
+          .zone-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

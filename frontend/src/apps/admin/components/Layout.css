@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: row;
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
   background: transparent;
   overflow: hidden;
 }
@@ -18,7 +18,8 @@
   overflow-x: hidden;
   padding: 0;
   margin: 0;
-  /* Zero-Tolerance for spacing */
+  margin-left: 280px;
+  /* Account for fixed sidebar */
   box-sizing: border-box;
 }
 
@@ -26,6 +27,8 @@
   width: 100%;
   max-width: 100%;
   margin: 0;
+  padding: 0;
+  /* Remove default padding */
   animation: fadeIn 0.3s ease-in-out;
   box-sizing: border-box;
 }
@@ -42,24 +45,51 @@
   }
 }
 
-/* Responsive */
+/* Responsive Breakpoints */
+@media (max-width: 1366px) {
+  .main-content {
+    padding: 0;
+    margin-left: 260px;
+  }
+}
+
 @media (max-width: 1024px) {
-  /* Sidebar width handled in Sidebar.css */
+  .main-content {
+    padding: 0;
+    margin-left: 240px;
+  }
 }
 
 @media (max-width: 768px) {
   .layout {
     display: flex;
-    /* Switch to flex column for mobile */
-    flex-direction: column;
-    height: auto;
-    overflow: visible;
+    flex-direction: row;
+    height: 100vh;
+    overflow: hidden;
   }
 
   .main-content {
-    padding: 1rem;
-    height: auto;
-    overflow-y: visible;
+    margin-left: 0 !important;
+    /* Full width on mobile */
+    padding-top: 70px;
+    /* Space for hamburger button */
+  }
+
+  .page-content {
+    padding: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    margin-left: 0 !important;
+    padding-top: 70px;
+  }
+}
+
+@media (max-width: 375px) {
+  .main-content {
+    padding: 0;
   }
 }
 
