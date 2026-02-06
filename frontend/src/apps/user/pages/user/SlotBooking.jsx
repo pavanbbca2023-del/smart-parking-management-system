@@ -42,15 +42,51 @@ const SlotBooking = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
-      // In a real scenario, we would call an API here. 
-      // For now, mirroring the confirm UI logic.
-      setBookingConfirmed(true);
-      setTimeout(() => setBookingConfirmed(false), 5000);
+      const selectedZone = zones.find(z => z.name === formData.zone);
+      if (!selectedZone) {
+        alert('Please select a valid zone');
+        return;
+      }
+
+      const bookingData = {
+        vehicleNumber: formData.vehicleNumber,
+        selectedZone: selectedZone.id,
+        vehicleType: formData.vehicleType,
+        entryTime: `${formData.date} ${formData.startTime}`,
+        exitTime: `${formData.date} ${formData.endTime}`,
+        mobileNumber: localStorage.getItem('user_phone') || '',
+        email: localStorage.getItem('user_email') || ''
+      };
+
+      const response = await parkingApi.bookSlot(bookingData);
+      
+      if (response.success) {
+        setBookingConfirmed(true);
+        alert(`✅ Booking Confirmed!\n\nBooking ID: ${response.data.session_id}\nSlot: ${response.data.slot_number}\nAmount: ₹${response.data.amount}`);
+        
+        // Reset form
+        setFormData({
+          zone: '',
+          slotType: '',
+          date: '',
+          startTime: '',
+          endTime: '',
+          vehicleNumber: '',
+          vehicleType: 'Car'
+        });
+        
+        setTimeout(() => setBookingConfirmed(false), 5000);
+      }
     } catch (error) {
-      alert('Booking failed');
+      console.error('Booking error:', error);
+      const errorMsg = error.response?.data?.message || error.message || 'Network error. Please check your connection.';
+      alert(`❌ Booking Failed\n\n${errorMsg}`);
+    } finally {
+      setLoading(false);
     }
-  };
+  }
 
   return (
     <div className="page">
@@ -158,8 +194,8 @@ const SlotBooking = () => {
             />
           </div>
 
-          <button type="submit" className="btn-primary btn-large">
-            Confirm Booking
+          <button type="submit" className="btn-primary btn-large" disabled={loading}>
+            {loading ? 'Processing...' : 'Confirm Booking'}
           </button>
         </form>
 
