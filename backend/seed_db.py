@@ -25,37 +25,35 @@ def seed():
     admin = User.objects.get(username='admin')
 
     # 2. Create Zones & Slots
-    # zones_data = [
-    #     {'name': 'Zone A', 'total_slots': 50, 'base_price': 60.00},
-    #     {'name': 'Zone B', 'total_slots': 50, 'base_price': 30.00},
-    #     {'name': 'Zone C', 'total_slots': 50, 'base_price': 40.00},
-    #     {'name': 'Zone D', 'total_slots': 50, 'base_price': 50.00},
-    #     {'name': 'Zone E', 'total_slots': 50, 'base_price': 80.00},
-    # ]
-    # zones = []
-    # for z in zones_data:
-    #     # Update or Create Zone
-    #     obj = Zone.objects.filter(name=z['name']).first()
-    #     if obj:
-    #         print(f"Updating {obj.name}...")
-    #         obj.total_slots = z['total_slots']
-    #         obj.base_price = z['base_price']
-    #         obj.save()
-    #     else:
-    #         print(f"Creating {z['name']}...")
-    #         obj = Zone.objects.create(**z)
-    #     
-    #     # Ensure all slots exist sequentially
-    #     print(f"Ensuring slots for {obj.name}...")
-    #     for i in range(1, z['total_slots'] + 1):
-    #         slot_number = f"{obj.name[5] if len(obj.name) > 5 else obj.name[0]}{i:03d}"
-    #         Slot.objects.get_or_create(
-    #             zone=obj,
-    #             slot_number=slot_number,
-    #             defaults={'is_active': True}
-    #         )
-    #     
-    #     zones.append(obj)
+    zones_data = [
+        {'name': 'Zone A', 'total_slots': 50, 'base_price': 60.00},
+        {'name': 'Zone B', 'total_slots': 50, 'base_price': 30.00},
+        {'name': 'Zone C', 'total_slots': 50, 'base_price': 40.00},
+        {'name': 'Zone D', 'total_slots': 50, 'base_price': 50.00},
+        {'name': 'Zone E', 'total_slots': 50, 'base_price': 80.00},
+    ]
+    zones = []
+    for z in zones_data:
+        obj, created = Zone.objects.get_or_create(
+            name=z['name'],
+            defaults={'total_slots': z['total_slots'], 'base_price': z['base_price']}
+        )
+        if not created:
+            obj.total_slots = z['total_slots']
+            obj.base_price = z['base_price']
+            obj.save()
+        print(f"{'Created' if created else 'Updated'} {obj.name}")
+        
+        # Create slots
+        for i in range(1, z['total_slots'] + 1):
+            slot_number = f"{obj.name.split()[-1]}{i:03d}"
+            Slot.objects.get_or_create(
+                zone=obj,
+                slot_number=slot_number,
+                defaults={'is_active': True}
+            )
+        zones.append(obj)
+    print(f"Created {len(zones)} zones with slots")
 
     # 3. Create Staff Members
     staff_data = [
