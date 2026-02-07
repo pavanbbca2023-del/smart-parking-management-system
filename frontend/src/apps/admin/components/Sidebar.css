@@ -11,6 +11,7 @@
   z-index: 50;
   margin: 0;
   padding: 0;
+  position: relative;
 }
 
 /* Header */
@@ -50,11 +51,12 @@
 
 /* Navigation */
 .sidebar-nav {
-  flex: 1;
-  padding: 1rem 0;
+  flex: 1 1 auto;
+  padding: 0.5rem 0;
   overflow-y: auto;
   overflow-x: hidden;
   min-height: 0;
+  height: auto;
 }
 
 .nav-list {
@@ -72,7 +74,7 @@
   align-items: center;
   gap: 1rem;
   width: 100%;
-  padding: 1rem 1.5rem;
+  padding: 0.875rem 1.5rem;
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.8);
@@ -81,6 +83,7 @@
   transition: all 0.2s ease;
   border-radius: 0;
   position: relative;
+  flex-shrink: 0;
 }
 
 .nav-link:hover {
@@ -394,16 +397,16 @@
 
 /* Scrollbar Styling */
 .sidebar-nav::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
 }
 
 .sidebar-nav::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .sidebar-nav::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
+  border-radius: 3px;
 }
 
 .sidebar-nav::-webkit-scrollbar-thumb:hover {
