@@ -55,8 +55,6 @@
   overflow-y: auto;
   overflow-x: hidden;
   min-height: 0;
-  max-height: none;
-  /* Let it take available space */
 }
 
 .nav-list {
@@ -126,10 +124,6 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
-  max-height: none;
-  /* Remove height limit */
-  overflow-y: visible;
-  /* No scroll on switcher */
 }
 
 .switcher-section h4 {
