@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar Scroll Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+        }
+
+        .sidebar {
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 50%, #1d4ed8 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-nav {
+            flex: 1 1 auto;
+            padding: 1rem 0;
+            overflow-y: auto !important;
+            overflow-x: hidden;
+            min-height: 0;
+            height: auto;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .sidebar-nav::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 4px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .nav-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-switcher {
+            padding: 0.75rem 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+            flex-grow: 0;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-footer {
+            padding: 1rem;
+            flex-shrink: 0;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .test-info {
+            margin-left: 300px;
+            padding: 2rem;
+        }
+
+        .test-info h1 {
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+        }
+
+        .test-info p {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .success {
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .warning {
+            color: #f59e0b;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Smart Parking</h2>
+            <p>Management System</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-item">🏠 DASHBOARD</div>
+            <div class="nav-item">👥 USER MANAGEMENT</div>
+            <div class="nav-item">🏢 ZONE MANAGEMENT</div>
+            <div class="nav-item">💰 FINANCIAL REPORT</div>
+            <div class="nav-item">🚗 PARKING OPERATIONS</div>
+            <div class="nav-item">👮 STAFF MANAGEMENT</div>
+            <div class="nav-item">⭐ REVIEWS & FEEDBACK</div>
+            <!-- Extra items to force scrolling -->
+            <div class="nav-item">📊 ANALYTICS</div>
+            <div class="nav-item">📈 REPORTS</div>
+            <div class="nav-item">🔔 NOTIFICATIONS</div>
+            <div class="nav-item">⚙️ SETTINGS</div>
+            <div class="nav-item">📱 MOBILE APP</div>
+            <div class="nav-item">🔒 SECURITY</div>
+            <div class="nav-item">📝 LOGS</div>
+            <div class="nav-item">🎨 THEMES</div>
+        </nav>
+
+        <div class="sidebar-switcher">
+            <h4>Switch Portal</h4>
+            <div style="padding: 0.5rem; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 0.5rem;">
+                👨‍💼 Admin Panel
+            </div>
+            <div style="padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 4px; margin-top: 0.5rem;">
+                👷‍♂️ Staff Portal
+            </div>
+            <div style="padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 4px; margin-top: 0.5rem;">
+                👤 User Portal
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div style="padding: 0.75rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                <strong>Admin User</strong><br>
+                <small>Super User</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-info">
+        <h1>Sidebar Scroll Test</h1>
+        <p><span class="success">✓</span> Sidebar has fixed height (100vh)</p>
+        <p><span class="success">✓</span> Navigation section uses flex: 1 1 auto</p>
+        <p><span class="success">✓</span> Navigation has overflow-y: auto !important</p>
+        <p><span class="success">✓</span> Header, Switcher, and Footer are flex-shrink: 0</p>
+        <p><span class="success">✓</span> Scrollbar is visible (8px width, semi-transparent)</p>
+        <p class="warning">⚠️ Try scrolling the sidebar navigation to see all menu items</p>
+        <p class="warning">⚠️ Resize your browser window to test different heights</p>
+        
+        <h2 style="margin-top: 2rem; color: #1e3a8a;">Expected Behavior:</h2>
+        <ul style="margin-left: 2rem; line-height: 2;">
+            <li>The sidebar should stay fixed at 100vh height</li>
+            <li>The navigation section should scroll when content overflows</li>
+            <li>Header, switcher, and footer should remain visible and fixed</li>
+            <li>Scrollbar should be visible on the right side of the navigation</li>
+        </ul>
+    </div>
+
+    <script>
+        // Log sidebar dimensions for debugging
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarNav = document.querySelector('.sidebar-nav');
+        
+        console.log('Sidebar height:', sidebar.offsetHeight);
+        console.log('Sidebar-nav height:', sidebarNav.offsetHeight);
+        console.log('Sidebar-nav scrollHeight:', sidebarNav.scrollHeight);
+        console.log('Can scroll:', sidebarNav.scrollHeight > sidebarNav.offsetHeight);
+        
+        // Add visual indicator if scrolling is possible
+        if (sidebarNav.scrollHeight > sidebarNav.offsetHeight) {
+            console.log('✓ Scrolling is enabled!');
+            sidebarNav.style.border = '2px solid rgba(16, 185, 129, 0.5)';
+        } else {
+            console.log('✗ No scrolling needed - content fits');
+            sidebarNav.style.border = '2px solid rgba(245, 158, 11, 0.5)';
+        }
+    </script>
+</body>
+</html>
