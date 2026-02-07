@@ -9,6 +9,10 @@
   box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   z-index: 50;
+  position: fixed;
+  left: 0;
+  top: 0;
+  transition: left 0.3s ease-in-out;
 }
 
 /* Header */
@@ -52,6 +56,9 @@
   padding: 1rem 0;
   overflow-y: auto;
   overflow-x: hidden;
+  min-height: 0;
+  max-height: none;
+  /* Let it take available space */
 }
 
 .nav-list {
@@ -121,6 +128,10 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
+  max-height: none;
+  /* Remove height limit */
+  overflow-y: visible;
+  /* No scroll on switcher */
 }
 
 .switcher-section h4 {
@@ -334,12 +345,9 @@
   }
 
   .sidebar {
-    position: fixed;
     left: -100%;
-    top: 0;
     width: 280px;
     z-index: 1001;
-    transition: left 0.3s ease-in-out;
   }
 
   .sidebar.mobile-open {
