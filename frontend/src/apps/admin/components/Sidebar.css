@@ -51,12 +51,11 @@
 
 /* Navigation */
 .sidebar-nav {
-  flex: 1 1 auto;
+  flex: 1;
   padding: 0.5rem 0;
-  overflow-y: auto;
+  overflow-y: scroll;
   overflow-x: hidden;
-  min-height: 0;
-  height: auto;
+  max-height: calc(100vh - 400px);
 }
 
 .nav-list {
