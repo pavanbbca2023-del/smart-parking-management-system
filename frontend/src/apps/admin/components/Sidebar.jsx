@@ -80,8 +80,8 @@ const Sidebar = ({ currentPage, onPageChange, userType, onUserTypeChange }) => {
       )}
 
       {/* Sidebar */}
-      <div className={`sidebar ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
-        <div className="sidebar-header">
+      <div className={`sidebar ${isMobileMenuOpen ? 'mobile-open' : ''}`} style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+        <div className="sidebar-header" style={{ flexShrink: 0 }}>
           <div className="logo">
             <div className="logo-icon">
               <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -98,7 +98,7 @@ const Sidebar = ({ currentPage, onPageChange, userType, onUserTypeChange }) => {
           </div>
         </div>
 
-        <nav className="sidebar-nav">
+        <nav className="sidebar-nav" style={{ flex: '1', overflowY: 'scroll', overflowX: 'hidden', minHeight: 0 }}>
           <ul className="nav-list">
             {getMenuItems().map((item) => (
               <li key={item.id} className="nav-item">
@@ -114,7 +114,7 @@ const Sidebar = ({ currentPage, onPageChange, userType, onUserTypeChange }) => {
           </ul>
         </nav>
 
-        <div className="sidebar-switcher">
+        <div className="sidebar-switcher" style={{ flexShrink: 0 }}>
           <div className="switcher-section">
             <h4>Switch Portal</h4>
             <div className="switcher-buttons">
@@ -152,7 +152,7 @@ const Sidebar = ({ currentPage, onPageChange, userType, onUserTypeChange }) => {
           </div>
         </div>
 
-        <div className="sidebar-footer">
+        <div className="sidebar-footer" style={{ flexShrink: 0 }}>
           <div className="user-profile">
             <div className="user-avatar">
               <span>{userType === 'admin' ? 'AD' : userType === 'staff' ? 'ST' : 'US'}</span>
