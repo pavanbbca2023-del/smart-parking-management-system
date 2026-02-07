@@ -27,17 +27,29 @@ const Layout = ({ children }) => {
     }
 
     return (
-        <div style={{ display: 'flex' }}>
+        <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
             <Sidebar />
             <main style={{
                 flex: 1,
                 marginLeft: '260px',
                 backgroundColor: '#f1f5f9',
-                minHeight: '100vh',
+                height: '100vh',
+                overflowY: 'auto',
+                overflowX: 'hidden',
                 padding: '0'
-            }}>
+            }}
+                className="staff-main-content"
+            >
                 {children}
             </main>
+            <style>{`
+                @media (max-width: 768px) {
+                    .staff-main-content {
+                        margin-left: 0 !important;
+                        padding-top: 60px !important;
+                    }
+                }
+            `}</style>
         </div>
     );
 };
