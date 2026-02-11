@@ -199,8 +199,10 @@
 
 .status-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .status-card {
@@ -209,8 +211,10 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   text-align: center;
   transition: transform 0.3s ease;
-  padding: 32px 24px;
+  padding: 60px 48px;
   border: 2px solid transparent;
+  min-height: 320px;
+  min-width: 450px;
 }
 
 .status-card:hover {
@@ -231,20 +235,20 @@
 }
 
 .status-icon {
-  font-size: 3rem;
-  margin-bottom: 16px;
+  font-size: 4rem;
+  margin-bottom: 20px;
 }
 
 .status-number {
-  font-size: 2.5rem;
+  font-size: 3.5rem;
   font-weight: 700;
-  margin: 8px 0;
+  margin: 12px 0;
   color: #3b82f6;
 }
 
 .status-label {
   color: #64748b;
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .features-section {

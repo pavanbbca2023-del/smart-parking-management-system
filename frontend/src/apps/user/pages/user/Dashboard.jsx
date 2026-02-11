@@ -82,14 +82,14 @@ const Dashboard = () => {
       {/* Stats Cards Grid */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-        gap: '24px'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))',
+        gap: '28px'
       }}>
 
         {/* Today's Bookings */}
         <div style={{
           backgroundColor: 'white',
-          padding: '24px',
+          padding: '32px',
           borderRadius: '12px',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
           border: '1px solid #e2e8f0'
@@ -99,7 +99,7 @@ const Dashboard = () => {
               <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 8px 0', fontWeight: '500' }}>
                 Today's Bookings
               </p>
-              <p style={{ fontSize: '32px', fontWeight: '700', color: '#2563eb', margin: '0' }}>
+              <p style={{ fontSize: '40px', fontWeight: '700', color: '#2563eb', margin: '0' }}>
                 {stats.total_bookings}
               </p>
               <p style={{ fontSize: '12px', color: '#059669', margin: '4px 0 0 0' }}>
@@ -107,14 +107,14 @@ const Dashboard = () => {
               </p>
             </div>
             <div style={{
-              width: '48px',
-              height: '48px',
+              width: '56px',
+              height: '56px',
               backgroundColor: '#dbeafe',
               borderRadius: '12px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '24px'
+              fontSize: '28px'
             }}>
               📅
             </div>
@@ -124,7 +124,7 @@ const Dashboard = () => {
         {/* Current Revenue */}
         <div style={{
           backgroundColor: 'white',
-          padding: '24px',
+          padding: '32px',
           borderRadius: '12px',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
           border: '1px solid #e2e8f0'
@@ -134,7 +134,7 @@ const Dashboard = () => {
               <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 8px 0', fontWeight: '500' }}>
                 Current Revenue
               </p>
-              <p style={{ fontSize: '32px', fontWeight: '700', color: '#059669', margin: '0' }}>
+              <p style={{ fontSize: '40px', fontWeight: '700', color: '#059669', margin: '0' }}>
                 ₹{stats.total_revenue}
               </p>
               <p style={{ fontSize: '12px', color: '#059669', margin: '4px 0 0 0' }}>
@@ -159,7 +159,7 @@ const Dashboard = () => {
         {/* Active Sessions */}
         <div style={{
           backgroundColor: 'white',
-          padding: '24px',
+          padding: '32px',
           borderRadius: '12px',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
           border: '1px solid #e2e8f0'
@@ -169,7 +169,7 @@ const Dashboard = () => {
               <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 8px 0', fontWeight: '500' }}>
                 Active Sessions
               </p>
-              <p style={{ fontSize: '32px', fontWeight: '700', color: '#dc2626', margin: '0' }}>
+              <p style={{ fontSize: '40px', fontWeight: '700', color: '#dc2626', margin: '0' }}>
                 {stats.active_count}
               </p>
               <p style={{ fontSize: '12px', color: '#64748b', margin: '4px 0 0 0' }}>
@@ -194,7 +194,7 @@ const Dashboard = () => {
         {/* Total Users */}
         <div style={{
           backgroundColor: 'white',
-          padding: '24px',
+          padding: '32px',
           borderRadius: '12px',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
           border: '1px solid #e2e8f0'
@@ -204,7 +204,7 @@ const Dashboard = () => {
               <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 8px 0', fontWeight: '500' }}>
                 Total Users
               </p>
-              <p style={{ fontSize: '32px', fontWeight: '700', color: '#7c3aed', margin: '0' }}>
+              <p style={{ fontSize: '40px', fontWeight: '700', color: '#7c3aed', margin: '0' }}>
                 {stats.total_users || 0}
               </p>
               <p style={{ fontSize: '12px', color: '#059669', margin: '4px 0 0 0' }}>
@@ -229,7 +229,7 @@ const Dashboard = () => {
         {/* Occupancy Rate */}
         <div style={{
           backgroundColor: 'white',
-          padding: '24px',
+          padding: '32px',
           borderRadius: '12px',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
           border: '1px solid #e2e8f0'
@@ -239,7 +239,7 @@ const Dashboard = () => {
               <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 8px 0', fontWeight: '500' }}>
                 Occupancy Rate
               </p>
-              <p style={{ fontSize: '32px', fontWeight: '700', color: '#ea580c', margin: '0' }}>
+              <p style={{ fontSize: '40px', fontWeight: '700', color: '#ea580c', margin: '0' }}>
                 {stats.occupancy_rate}%
               </p>
               <p style={{ fontSize: '12px', color: '#64748b', margin: '4px 0 0 0' }}>
@@ -264,7 +264,7 @@ const Dashboard = () => {
         {/* Reserved Slots */}
         <div style={{
           backgroundColor: 'white',
-          padding: '24px',
+          padding: '32px',
           borderRadius: '12px',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
           border: '1px solid #e2e8f0'
@@ -274,7 +274,7 @@ const Dashboard = () => {
               <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 8px 0', fontWeight: '500' }}>
                 Reserved Slots
               </p>
-              <p style={{ fontSize: '32px', fontWeight: '700', color: '#f59e0b', margin: '0' }}>
+              <p style={{ fontSize: '40px', fontWeight: '700', color: '#f59e0b', margin: '0' }}>
                 {stats.reserved_slots}
               </p>
               <p style={{ fontSize: '12px', color: '#64748b', margin: '4px 0 0 0' }}>
@@ -299,7 +299,7 @@ const Dashboard = () => {
         {/* Zone Availability */}
         <div style={{
           backgroundColor: 'white',
-          padding: '24px',
+          padding: '32px',
           borderRadius: '12px',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
           border: '1px solid #e2e8f0'
@@ -309,7 +309,7 @@ const Dashboard = () => {
               <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 8px 0', fontWeight: '500' }}>
                 Zone Availability
               </p>
-              <p style={{ fontSize: '32px', fontWeight: '700', color: '#0891b2', margin: '0' }}>
+              <p style={{ fontSize: '40px', fontWeight: '700', color: '#0891b2', margin: '0' }}>
                 4/6
               </p>
               <p style={{ fontSize: '12px', color: '#64748b', margin: '4px 0 0 0' }}>
